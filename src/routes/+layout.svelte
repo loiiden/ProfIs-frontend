@@ -28,8 +28,8 @@
             <a href="/studenten">Studenten</a>
         </div>
         <div class="global-actions">
-            <span>Anlagen+</span>
-            <span>Import/Export</span>
+            <span class="anlegen">Anlegen+</span>
+            <span class="export">Import/Export</span>
             <span>
                 <img src={settingsicon} alt="">
             </span>
@@ -38,15 +38,21 @@
 </header>
 
 <style lang="scss">
+:global(body) {
+    margin: 0px;
+    padding: 0px;
+}
+
+
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 
     font-family: "Roboto", sans-serif;
-    background: green;
+    background: #F9F9F9;
 
-    padding: 20px 40px;
+    padding: 10px 20px;
 }
 
 .left-nav {
@@ -55,10 +61,10 @@ header {
     align-items: center;
     
     a {
-        margin-right: 20px;
+        margin-right: 30px;
 
         img {
-            width: 3em;
+            width: 5em;
         }
     }
 }
@@ -70,6 +76,9 @@ header {
 
     .page-navigation {
         margin-right: 70px;
+        font-weight: 500;
+        font-size: 14px;
+        font-family: "Inter";
 
         a {
             text-decoration: none;
@@ -79,8 +88,36 @@ header {
     }
 
     .global-actions {
+        display: flex;
+        align-items: center;
+
+        font-weight: 600;
+        font-size: 14px;
+        font-family: "Inter";
+
+        .anlegen {
+            background-color: #24B6D8;
+            color: #FFFFFF;
+            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        }
+
+        .export {
+            background-color: #FFFFFF;
+            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        }
+
+        .anlegen, .export {
+            border-radius: 6px;
+            padding: 12px;
+        }
+
         span {
             margin: 0px 10px;
+            cursor: pointer;
+
+            img {
+                width: 2em;
+            }
         }
     }
 }
