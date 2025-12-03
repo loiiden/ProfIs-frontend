@@ -1,11 +1,11 @@
-<div class="filter-arbeiten-container">
+<div class="comment-arbeit-container">
 </div>
 
 <style lang="scss">
-.filter-arbeiten-container {
-    grid-column-start: 8;
-    grid-column-end: 13;
-    grid-row-start: 2;
+.comment-arbeit-container {
+    grid-column-start: 3;
+    grid-column-end: 8;
+    grid-row-start: 10;
     grid-row-end: 12;
 
     box-sizing: border-box;

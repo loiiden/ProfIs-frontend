@@ -1,12 +1,12 @@
-<div class="filter-arbeiten-container">
+<div class="noten-skala-container">
 </div>
 
 <style lang="scss">
-.filter-arbeiten-container {
-    grid-column-start: 8;
+.noten-skala-container {
+    grid-column-start: 6;
     grid-column-end: 13;
-    grid-row-start: 2;
-    grid-row-end: 12;
+    grid-row-start: 12;
+    grid-row-end: 16;
 
     box-sizing: border-box;
     background-color: #FFFFFF;

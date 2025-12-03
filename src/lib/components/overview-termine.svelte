@@ -1,12 +1,12 @@
-<div class="filter-arbeiten-container">
+<div class="overview-termine-container">
 </div>
 
 <style lang="scss">
-.filter-arbeiten-container {
-    grid-column-start: 8;
-    grid-column-end: 13;
-    grid-row-start: 2;
-    grid-row-end: 12;
+.overview-termine-container {
+    grid-column-start: 3;
+    grid-column-end: 6;
+    grid-row-start: 12;
+    grid-row-end: 16;
 
     box-sizing: border-box;
     background-color: #FFFFFF;

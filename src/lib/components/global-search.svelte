@@ -10,6 +10,9 @@
 
 <style lang="scss">
 .global-search-container {
+    grid-column-start: 2;
+    grid-column-end: 6;
+    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,7 +20,7 @@
     background-color: #FFFFFF;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     border-radius: 8px;
-    padding: 8px;
+    margin: 16px;
 
     color: #7D8398;
 
