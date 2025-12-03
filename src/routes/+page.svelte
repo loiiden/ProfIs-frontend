@@ -14,7 +14,7 @@
     <OverviewSws />
     <CommentArbeit />
     <OverviewTermine />
-    <NotenSkala />
+    <NotenSkala bewertet="12" offen="6" average="2.8"/>
 </main>
 
 <style lang="scss">
