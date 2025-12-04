@@ -11,7 +11,7 @@
     <div>Übersicht</div>
     <OverviewArbeit />
     <FilterArbeiten />
-    <OverviewSws />
+    <OverviewSws target={2.0} current={2.3} count={15} />
     <CommentArbeit />
     <OverviewTermine />
     <NotenSkala bewertet="12" offen="6" average="2.8"/>
