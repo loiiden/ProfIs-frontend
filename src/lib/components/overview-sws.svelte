@@ -108,7 +108,7 @@ h3 {
 .bar-fill {
     width: 100%;
     border-radius: 8px;
-    /* Der Segment-Effekt */
+    //Block-Effekt
     background-image: repeating-linear-gradient(
         to top,
         $success,
@@ -116,7 +116,7 @@ h3 {
         transparent 18px,
         transparent 22px
     );
-    transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1); /* Elegante Animation */
+    transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1); //Animation
 }
 
 //Container für die Infos rechts neben dem Balken
