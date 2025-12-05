@@ -1,7 +1,20 @@
+<script>
+    export let item = null;
+</script>
+
 <div class="overview-arbeit-container">
     <div class="effect-el-1"></div>
     <div class="effect-el-2"></div>
     <div class="overview-arbeit">
+
+    {#if item}
+        <div class="">
+            <h2>{item.title}</h2>
+            <p><b>Status:</b> {item.status}</p>
+            <p>{item.description}</p>
+        </div>
+    {/if}
+
     </div>
 </div>
 
@@ -47,3 +60,4 @@
     }
 }
 </style>
+
