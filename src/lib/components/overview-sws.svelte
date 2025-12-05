@@ -3,7 +3,7 @@
 
     // APIs [Number() wandelt Text zu Zahl um]
     let ziel = $derived(Number(props.target ?? 2.0));
-    let jetzt = $derived(Number(props.current ?? 0));
+    let jetzt = $derived(Number(props.count ?? 0) * 0.2);
     let arbeiten = $derived(Number(props.count ?? 0));
 
     // Prozentberechnung für den Balken [geteilt durch 0 geht nicht]
