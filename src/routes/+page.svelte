@@ -5,16 +5,18 @@
     import CommentArbeit from "$lib/components/comment-arbeit.svelte";
     import OverviewTermine from "$lib/components/overview-termine.svelte";
     import NotenSkala from "$lib/components/noten-skala.svelte";
+
+    let { data } = $props();
 </script>
 
 <main class="overview-container">
     <div>Übersicht</div>
     <OverviewArbeit />
     <FilterArbeiten />
-    <OverviewSws target={2.0} count={12} />
+    <OverviewSws target={data.sws.target} count={data.sws.count} />
     <CommentArbeit />
     <OverviewTermine />
-    <NotenSkala bewertet="12" offen="6" average="2.8"/>
+    <NotenSkala bewertet={data.marks.marked} offen={data.marks.open} average={data.marks.average}/>
 </main>
 
 <style lang="scss">
