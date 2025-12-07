@@ -34,9 +34,9 @@
             <div class="anlegen-menu">
                 <button class="anlegen" onclick={toggle}>Anlegen+</button>
                 <div class="anlegen-options" style="display: {anlegen_toggle ? "flex" : "none"}">
-                    <a href="/erstellen/referent">Referent</a>
-                    <a href="/erstellen/arbeit">Arbeit</a>
-                    <a href="/erstellen/student">Student</a>
+                    <a href="/erstellen/referent" onclick={toggle}>Referent</a>
+                    <a href="/erstellen/arbeit" onclick={toggle}>Arbeit</a>
+                    <a href="/erstellen/student" onclick={toggle}>Student</a>
                 </div>
             </div>
             <button class="export">Import/Export</button>
