@@ -7,6 +7,12 @@
     import GlobalSearch from '$lib/components/global-search.svelte';
 
 	let { children } = $props();
+
+    let anlegen_toggle = $state(false);
+
+    function toggle() {
+        anlegen_toggle = !anlegen_toggle;
+    }
 </script>
 
 <svelte:head>
@@ -25,15 +31,20 @@
             <a href="/studenten">Studenten</a>
         </div>
         <div class="global-actions">
-            <span class="anlegen">Anlegen+</span>
-            <span class="export">Import/Export</span>
+            <div class="anlegen-menu">
+                <button class="anlegen" onclick={toggle}>Anlegen+</button>
+                <div class="anlegen-options" style="display: {anlegen_toggle ? "flex" : "none"}">
+                    <a href="/erstellen/referent" onclick={toggle}>Referent</a>
+                    <a href="/erstellen/arbeit" onclick={toggle}>Arbeit</a>
+                    <a href="/erstellen/student" onclick={toggle}>Student</a>
+                </div>
+            </div>
+            <button class="export">Import/Export</button>
         </div>
     </header>
 
     {@render children()}
 </div>
-
-
 
 <style lang="scss">
 :global(html, body) {
@@ -96,24 +107,45 @@ header {
         font-size: 14px;
         font-family: "Inter";
 
-        .anlegen {
-            background-color: $primary;
-            color: #FFFFFF;
-            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        .anlegen-menu {
+            position: relative;
+
+            .anlegen {
+                background-color: $primary;
+                color: #FFFFFF;
+                box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+            }
+
+            .anlegen-options {
+                display: none;
+                position: absolute;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                width: 100%;
+                margin-top: 8px;
+
+                a {
+                    padding: 8px 6px;
+                    text-decoration: none;
+                    color: black;
+                }
+            }
         }
 
         .export {
+            margin-left: 20px;
             background-color: #FFFFFF;
             box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         }
 
         .anlegen, .export {
+            border: none;
             border-radius: 6px;
             padding: 12px;
         }
 
-        span {
-            margin-left: 20px;
+        button {
             cursor: pointer;
         }
     }
