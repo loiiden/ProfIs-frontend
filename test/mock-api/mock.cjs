@@ -32,7 +32,7 @@ app.get('/sws/info', (req, res) => {
     res.send({count: 12, target: 2.0});
 })
 
-app.get('/student/all', (req, res) => {
+app.get('/api/student', (req, res) => {
     res.send(students);
 })
 
