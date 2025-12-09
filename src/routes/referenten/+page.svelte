@@ -1,12 +1,12 @@
 <script>
-    import PersonFilterTable from "$lib/components/person-filter-table.svelte";
+	import ReferentFilterTable from "$lib/components/referent-filter-table.svelte";
 
     let { data } = $props();
 </script>
 
 <main class="referent-overview-container">
     <div>Übersicht Referenten</div>
-    <PersonFilterTable persons={data.referenten}/>
+    <ReferentFilterTable persons={data.referenten}/>
 </main>
 
 <style lang="scss">

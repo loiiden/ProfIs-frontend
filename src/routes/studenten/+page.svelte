@@ -1,12 +1,12 @@
 <script>
-    import PersonFilterTable from "$lib/components/person-filter-table.svelte";
+    import StudentFilterTable from "$lib/components/student-filter-table.svelte";
 
     let { data } = $props();
 </script>
 
 <main class="student-overview-container">
     <div>Übersicht Studenten</div>
-    <PersonFilterTable persons={data.students}/>
+    <StudentFilterTable persons={data.students}/>
 </main>
 
 <style lang="scss">
