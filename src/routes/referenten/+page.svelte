@@ -6,7 +6,7 @@
 
 <main class="referent-overview-container">
     <div>Übersicht Referenten</div>
-    <ReferentFilterTable persons={data.referenten}/>
+    <ReferentFilterTable referenten={data.referenten}/>
 </main>
 
 <style lang="scss">

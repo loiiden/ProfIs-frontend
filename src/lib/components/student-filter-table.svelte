@@ -5,12 +5,12 @@
 <div class="person-filter-table-container">
     <div class="person-filter"></div>
     <div class="person-table">
-        {#each props.persons as person}
+        {#each props.students as student}
             <div class="person-row">
-                <span>{person.vorname}</span>
-                <span>{person.nachname}</span>
-                <span>{person.mail}</span>
-                <span>{person.scheinfrei_ja_nein}</span>
+                <span>{student.vorname}</span>
+                <span>{student.nachname}</span>
+                <span>{student.mail}</span>
+                <span>{student.scheinfrei_ja_nein}</span>
             </div>
         {/each}
     </div>

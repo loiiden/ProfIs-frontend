@@ -6,7 +6,7 @@
 
 <main class="student-overview-container">
     <div>Übersicht Studenten</div>
-    <StudentFilterTable persons={data.students}/>
+    <StudentFilterTable students={data.students}/>
 </main>
 
 <style lang="scss">
