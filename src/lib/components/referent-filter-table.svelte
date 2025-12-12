@@ -7,7 +7,9 @@
     <div class="referent-table">
         {#each props.referenten as referent}
             <div class="referent-row">
-                <span>{referent.vorname}</span>
+                <span>{referent.firstName}</span>
+                <span>{referent.email}</span>
+                <span>{referent.phoneNumber}</span>
             </div>
         {/each}
     </div>

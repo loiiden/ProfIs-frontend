@@ -7,10 +7,11 @@
     <div class="person-table">
         {#each props.students as student}
             <div class="person-row">
-                <span>{student.vorname}</span>
-                <span>{student.nachname}</span>
-                <span>{student.mail}</span>
-                <span>{student.scheinfrei_ja_nein}</span>
+                <span>{student.firstName}</span>
+                <span>{student.lastName}</span>
+                <span>{student.email}</span>
+                <span>{student.phoneNumber}</span>
+                <span>{student.scientificWorksIds.length}</span>
             </div>
         {/each}
     </div>
