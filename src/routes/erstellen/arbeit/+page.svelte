@@ -1,7 +1,7 @@
 <script>
-    import PreviewOverviewArbeit from "$lib/components/preview-overview-arbeit.svelte";
-    import ErfassenNoten from "$lib/components/erfassen-noten.svelte";
-    import ErfassenDatenArbeit from "$lib/components/erfassen-daten-arbeit.svelte";
+    import PreviewOverviewArbeit from "$lib/components/arbeit/preview-overview-arbeit.svelte";
+    import ErfassenNoten from "$lib/components/arbeit/erfassen-noten.svelte";
+    import ErfassenDatenArbeit from "$lib/components/arbeit/erfassen-daten-arbeit.svelte";
 </script>
 
 <main class="erstellen-arbeit-container">
