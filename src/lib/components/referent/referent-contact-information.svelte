@@ -1,12 +1,15 @@
 <script>
     import AnnotatedTextInput from "../blocks/annotated-text-input.svelte";
+    import { rf_state } from "../../../routes/erstellen/referent/state.svelte";
+
+    let props = $props();
 </script>
 
 <div class="referent-contact-information-container">
     <div>Kontaktdaten</div>
-    <AnnotatedTextInput annotation="Telefonnummer"/>
-    <AnnotatedTextInput annotation="E-Mail"/>
-    <AnnotatedTextInput annotation="Addresse"/>
+    <AnnotatedTextInput annotation="Telefonnummer" store={rf_state} attribute="telefon"/>
+    <AnnotatedTextInput annotation="E-Mail" store={rf_state} attribute="email"/>
+    <AnnotatedTextInput annotation="Addresse" store={rf_state} attribute="addresse"/>
 </div>
 
 <style lang="scss">
