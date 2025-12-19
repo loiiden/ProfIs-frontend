@@ -3,19 +3,181 @@
 
     let search = "";
 
-    let selectedItem = null;
-    let activeId = null;
+    let selectedIndex = null;
+    $: selectedItem = selectedIndex !== null ? filteredItems[selectedIndex] : null;
+
 
     let items = [
-        {id: 1, title: "Loick", status: "in Planung"},
-        {id: 2, title: "Max", status: "in Bearbeitung"},
-        {id: 3, title: "Mena", status: "Korrektur"},
-        {id: 4, title: "Anton Rodenwald", status: "Abgeschlossen"},
-        {id: 5, title: "Anton Baranov", status: "Abgebrochen"},
-        {id: 6, title: "Kiro Laban", status: "Korrektur"},
-        {id: 7, title: "Max Zoll", status: "Abgebrochen"},
-        {id: 8, title: "Loick Gandonou", status: "Abgeschlossen"},
-        {id: 9, title: "Marcel Mena", status: "in Bearbeitung"}
+        {
+            id: 1,
+            title: "Loick",
+            status: "in Planung",
+            arbeit: "Bachelorthesis",
+            course: "B.S Softwaretechnologie",
+            startDatum: "2025-09-04",
+            abgabe: "2025-12-01",
+            korrektur: "2025-12-02",
+            besprechung: "2026-04-25",
+            kolloquium: "2026-07-25",
+            referent: "Dr. Grüne",
+            referentNote: "1.0",
+            korreferent: "Mustermann",
+            koNote: "1.5",
+            gesamtnote: "1.5"
+        },
+        {
+            id: 2,
+            title: "Max",
+            status: "in Bearbeitung",
+            arbeit: "Masterarbeit",
+            course: "Mathematik",
+            startDatum: "2025-04-09",
+            abgabe: "2025-09-12",
+            korrektur: "2025-12-01",
+            besprechung: "2025-12-09",
+            kolloquium: "2026-01-01",
+            referent: "Dr. Grüne",
+            referentNote: "2.0",
+            korreferent: "Mustermann",
+            koNote: "2.5",
+            gesamtnote: "2.2"
+        },
+        {
+            id: 3,
+            title: "Mena",
+            status: "Korrektur",
+            arbeit: "Bachelorthesis",
+            course: "Maschinenbau",
+            startDatum: "2025-09-04",
+            abgabe: "2025-12-09",
+            korrektur: "2026-02-12",
+            besprechung: "2026-04-25",
+            kolloquium: "2026-07-25",
+            referent: "Dr. Grüne",
+            referentNote: "1.0",
+            korreferent: "Mustermann",
+            koNote: "1.5",
+            gesamtnote: "1.5"
+        },
+        {
+            id: 4,
+            title: "Anton Rodenwald",
+            status: "Abgeschlossen",
+            arbeit: "Bachelorthesis",
+            course: "Bau IW",
+            startDatum: "2025-09-04",
+            abgabe: "2025-12-09",
+            korrektur: "2026-02-12",
+            besprechung: "2026-04-25",
+            kolloquium: "2026-07-25",
+            referent: "Dr. Grüne",
+            referentNote: "1.0",
+            korreferent: "Mustermann",
+            koNote: "1.5",
+            gesamtnote: "1.5"
+        },
+        {
+            id: 5,
+            title: "Anton Baranov",
+            status: "Abgebrochen",
+            arbeit: "Masterabeit",
+            course: "B.S Softwaretechnologie",
+            startDatum: "2025-09-04",
+            abgabe: "2025-12-09",
+            korrektur: "2026-02-12",
+            besprechung: "2026-04-25",
+            kolloquium: "2026-07-25",
+            referent: "Dr. Grüne",
+            referentNote: "1.0",
+            korreferent: "Mustermann",
+            koNote: "1.5",
+            gesamtnote: "1.5"
+        },
+        {
+            id: 6,
+            title: "Kiro Laban",
+            status: "Korrektur",
+            arbeit: "Praxisprojekt",
+            course: "BWL",
+            startDatum: "2025-09-04",
+            abgabe: "2025-12-09",
+            korrektur: "2026-02-12",
+            besprechung: "2026-04-25",
+            kolloquium: "2026-07-25",
+            referent: "Dr. Grüne",
+            referentNote: "1.0",
+            korreferent: "Mustermann",
+            koNote: "1.5",
+            gesamtnote: "1.5"
+        },
+        {
+            id: 7,
+            title: "Max Zoll",
+            status: "Abgebrochen",
+            arbeit: "Bachelorthesis",
+            course: "B.S Softwaretechnologie",
+            startDatum: "2025-09-04",
+            abgabe: "2025-12-09",
+            korrektur: "2026-02-12",
+            besprechung: "2026-04-25",
+            kolloquium: "2026-07-25",
+            referent: "Dr. Grüne",
+            referentNote: "1.0",
+            korreferent: "Mustermann",
+            koNote: "1.5",
+            gesamtnote: "1.5"
+        },
+        {
+            id: 8,
+            title: "Loick Gandonou",
+            status: "Abgeschlossen",
+            arbeit: "Masterabeit",
+            course: "B.S Softwaretechnologie",
+            startDatum: "2025-09-04",
+            abgabe: "2025-12-09",
+            korrektur: "2026-02-12",
+            besprechung: "2026-04-25",
+            kolloquium: "2026-07-25",
+            referent: "Dr. Grüne",
+            referentNote: "1.0",
+            korreferent: "Mustermann",
+            koNote: "1.5",
+            gesamtnote: "1.5"
+        },
+        {
+            id: 9,
+            title: "Marcel Mena",
+            status: "in Bearbeitung",
+            arbeit: "Praxisprojekt",
+            course: "Maschinenbau",
+            startDatum: "2025-09-04",
+            abgabe: "2025-12-09",
+            korrektur: "2026-02-12",
+            besprechung: "2026-04-25",
+            kolloquium: "2026-07-25",
+            referent: "Dr. Grüne",
+            referentNote: "1.0",
+            korreferent: "Mustermann",
+            koNote: "1.5",
+            gesamtnote: "1.5"
+        },
+        {
+            id: 10,
+            title: "Maksim",
+            status: "in Bearbeitung",
+            arbeit: "Bachelorthesis",
+            course: "Mathematik",
+            startDatum: "2025-09-04",
+            abgabe: "2025-12-09",
+            korrektur: "2026-02-12",
+            besprechung: "2026-04-25",
+            kolloquium: "2026-07-25",
+            referent: "Dr. Grüne",
+            referentNote: "1.0",
+            korreferent: "Mustermann",
+            koNote: "1.5",
+            gesamtnote: "1.5"
+        }
     ]
 
     $: filteredItems = items.filter(item =>
@@ -39,9 +201,42 @@
 
     function showDetails(item) {
         selectedItem = item;
-        activeId = item.id;
     }
+
+    function prev() {
+        if (selectedIndex > 0) selectedIndex--;
+    }
+
+    function next() {
+        if (selectedIndex < filteredItems.length - 1) selectedIndex++;
+    }
+
 </script>
+
+<div class="filter-arbeiten-container">
+    <h2>Arbeiten</h2>
+
+    <input
+            type="text"
+            placeholder="Arbeit suchen..."
+            bind:value={search}
+    />
+
+    <div class="scroll-area">
+        {#each filteredItems as item, i}
+            <div class="list-item">
+                <button
+                        class="detail-btn {selectedIndex === i ? 'active' : ''}"
+                        on:click={() => selectedIndex = i}
+                ></button>
+
+                <div class="title">{item.title}</div>
+                <div class={getStatusClass(item.status)}>{item.status}</div>
+            </div>
+        {/each}
+    </div>
+
+</div>
 
 <style lang="scss">
   .filter-arbeiten-container {
@@ -118,55 +313,32 @@
   }
 
   .planning {
-    background: #dce7ff;
-    color: #244b9b;
+    color: $note2;
   }
 
   .correction {
-    background: #ffe8c6;
-    color: #8a5f0a;
+    color: $note4;
   }
 
   .done {
-    background: #d3fbd8;
-    color: #155d15;
+    color: $note1;
   }
 
   .progress {
-    background: #ffe2a3;
-    color: #8a5b00;
+    color: $note3;
   }
 
   .canceled {
-    background: #ffd2d2;
-    color: #8a1a1a;
+    color: $note5;
   }
 
 </style>
 
-<div class="filter-arbeiten-container">
-    <h2>Arbeiten</h2>
 
-    <input
-            type="text"
-            placeholder="Arbeit suchen..."
-            bind:value={search}
-    />
-
-    <div class="scroll-area">
-        {#each filteredItems as item}
-            <div class="list-item">
-                <button class="detail-btn {activeId === item.id ? 'active' : ''}"
-                        on:click={() => showDetails(item)}></button>
-
-                <div class="title">{item.title}</div>
-
-                <div class={getStatusClass(item.status)}>
-                    {item.status}
-                </div>
-            </div>
-        {/each}
-    </div>
-
-</div>
-<DetailView item={selectedItem}/>
+<DetailView
+        item={selectedItem}
+        index={selectedIndex}
+        count={filteredItems.length}
+        prev={prev}
+        next={next}
+/>
