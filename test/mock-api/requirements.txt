@@ -2,3 +2,4 @@ ipykernel
 pandas
 openpyxl
 random-address
+requests
