@@ -1,30 +1,37 @@
 <script>
-    import ReferentName from "$lib/components/referent/referent-name.svelte";
-    import ReferentContactInformation from "$lib/components/referent/referent-contact-information.svelte";
+    import { onMount } from 'svelte';
+    
+    import ReferentAnlegen from '$lib/components/referent/referent-anlegen.svelte';
+    
+    import { GET, POST } from '$lib/functions';
+    
+    function get_referent(id){
+        return GET(`/api/evaluator/${id}`);
+    }
+
+    let create = $state(true);
+    let referent_id = $state(0);
+    let referent_data = $state({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        academicLevel: null,
+        role: null
+    });
+
+    onMount(async () => {
+        const url_params = new URLSearchParams(window.location.search);
+        if(url_params.has('id')){
+            referent_id = url_params.get("id");
+            create = false;
+            referent_data = await get_referent(referent_id);
+        }
+    });
 </script>
 
 <main class="erstellen-referent-container">
-    <div>Referent erfassen</div>
-    <ReferentName />
-    <ReferentContactInformation />
+    <ReferentAnlegen create={create} referent_id={referent_id} referent_data={referent_data}/>
 </main>
 
-<style lang="scss">
-.erstellen-referent-container {
-    display: grid;
-    grid-template-rows: repeat(15, 9px);
-    grid-template-columns: repeat(12, 1fr);
-    column-gap: 110px;
-    row-gap: 50px;
-
-    font-family: "Roboto";
-
-    div {
-        grid-column-start: 1;
-        grid-column-end: 5;
-        padding: 0px 30px;
-        font-size: 2em;
-    }
-}
-
-</style>
+<style lang="scss"></style>
