@@ -1,17 +1,18 @@
 <script>
     import AnnotatedTextInput from "../blocks/annotated-text-input.svelte";
-    import { rf_state } from "../../../routes/erstellen/referent/state.svelte";
-
+    
     let props = $props();
-    let vorname = $state(props.vorname);
-    let nachname = $state(props.nachname);
+
+    let rf_state = props.rf_state;
+
+    let vorname = $derived(props.vorname);
+    let nachname = $derived(props.nachname);
 
     let external_toggle = $state(false);
 </script>
 
-<div class="referent-name-container">
+<div class="referent-name-container stroke-style">
     <div>Referent</div>
-    <AnnotatedTextInput annotation="Titel" store={rf_state} attribute="titel"/>
     <AnnotatedTextInput annotation="Vorname" value={vorname} store={rf_state} attribute="vorname"/>
     <AnnotatedTextInput annotation="Nachname" value={nachname} store={rf_state} attribute="nachname"/>
     <div class="referent-status">

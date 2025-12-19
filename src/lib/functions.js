@@ -1,7 +1,7 @@
 import { api_url } from "./constants";
 
-export function POST(path, payload){
-    fetch(api_url + path, {
+export async function POST(path, payload){
+    return fetch(api_url + path, {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -20,3 +20,4 @@ export async function GET(path){
         method: "get"
     })).json();
 }
+

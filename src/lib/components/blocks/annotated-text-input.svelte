@@ -1,11 +1,12 @@
 <script>
     let props = $props();
-    let text_value = $state(props.value);
+    let text_value = $derived(props.value);
 </script>
 
 <div class="annotated-text-input">
     <div class="annotation">{props.annotation}</div>
-    <input type="text" placeholder={props.annotation} value={text_value} onchange={() => { props.store[props.attribute] = text_value; }}>
+    <input class="stroke-style" type="text" placeholder={props.annotation} bind:value={text_value}
+        onchange={() => { props.store[props.attribute] = text_value; }}>
 </div>
 
 <style lang="scss">
@@ -19,7 +20,7 @@
 }
 
 .annotation {
-    font-size: 12px;
+    font-size: 12px;    
     font-weight: 900;
     margin-bottom: 8px;
     padding-left: 0px;
@@ -32,7 +33,7 @@ input {
     outline: none;
     padding: 12px;
     width: 100%;
-    background-color: #F8FAFB;
+    box-sizing: border-box;
 }
 
 </style>
