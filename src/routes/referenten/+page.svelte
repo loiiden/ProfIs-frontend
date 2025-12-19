@@ -1,5 +1,5 @@
 <script>
-	import ReferentFilterTable from "$lib/components/referent-filter-table.svelte";
+	import ReferentFilterTable from "$lib/components/referent/referent-filter-table.svelte";
 
     let { data } = $props();
 </script>
