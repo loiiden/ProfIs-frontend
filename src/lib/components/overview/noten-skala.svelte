@@ -1,6 +1,6 @@
 <script>
-    import ColoredNumber from "./blocks/colored-number.svelte";
-    import AnnotatedNumber from "./blocks/annotated-number.svelte";
+    import ColoredNumber from "../blocks/colored-number.svelte";
+    import AnnotatedNumber from "../blocks/annotated-number.svelte";
 
     let props = $props();
 

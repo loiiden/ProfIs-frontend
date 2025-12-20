@@ -1,5 +1,5 @@
 <script>
-    import StudentFilterTable from "$lib/components/student-filter-table.svelte";
+    import StudentFilterTable from "$lib/components/student/student-filter-table.svelte";
 
     let { data } = $props();
 </script>
