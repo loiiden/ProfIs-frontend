@@ -4,7 +4,7 @@
     import favicon from '$lib/assets/favicon.svg';
     import profisicon from '$lib/assets/profis-icon.png'
 
-    import GlobalSearch from '$lib/components/global-search.svelte';
+    import { page } from '$app/state';
 
 	let { children } = $props();
 
@@ -25,9 +25,9 @@
                 <img src={profisicon} alt="" class="profis-logo">
         </a>
         <div class="page-navigation">
-            <a href="/referenten">Referenten</a>
-            <a href="/arbeiten">Arbeiten</a>
-            <a href="/studenten">Studenten</a>
+            <a href="/referenten" class:active="{page.url.pathname == '/referenten'}">Referenten</a>
+            <a href="/arbeiten" class:active="{page.url.pathname == '/arbeiten'}">Arbeiten</a>
+            <a href="/studenten" class:active="{page.url.pathname == '/studenten'}">Studenten</a>
         </div>
         <div class="global-actions">
             <div class="anlegen-menu">
@@ -86,6 +86,10 @@ header {
         font-weight: 600;
         font-size: 18px;
         font-family: "Inter";
+
+        .active {
+            color: #317B3B;
+        }
 
         a {
             text-decoration: none;
