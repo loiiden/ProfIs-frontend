@@ -24,7 +24,6 @@
         <a href="/">
                 <img src={profisicon} alt="" class="profis-logo">
         </a>
-        <GlobalSearch />
         <div class="page-navigation">
             <a href="/referenten">Referenten</a>
             <a href="/arbeiten">Arbeiten</a>
@@ -81,11 +80,11 @@ header {
         justify-content: left;
         align-items: center;
 
-        grid-column-start: 6;
-        grid-column-end: 10;
+        grid-column-start: 2;
+        grid-column-end: 6;
 
-        font-weight: 500;
-        font-size: 14px;
+        font-weight: 600;
+        font-size: 18px;
         font-family: "Inter";
 
         a {
