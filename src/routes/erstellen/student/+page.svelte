@@ -1,14 +1,8 @@
 <script>
-    import StudentName from "$lib/components/student/student-name.svelte";
-    import StudentStudyInformation from "$lib/components/student/student-study-information.svelte";
-    import StudentContactInformation from "$lib/components/student/student-contact-information.svelte";
 </script>
 
 <main class="erstellen-student-container">
     <div>Student erfassen</div>
-    <StudentName />
-    <StudentStudyInformation />
-    <StudentContactInformation />
 </main>
 
 <style lang="scss">
