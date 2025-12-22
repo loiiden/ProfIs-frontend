@@ -1,32 +1,40 @@
 <script>
-    import StudentName from "$lib/components/student/student-name.svelte";
-    import StudentStudyInformation from "$lib/components/student/student-study-information.svelte";
-    import StudentContactInformation from "$lib/components/student/student-contact-information.svelte";
+    import { onMount } from 'svelte';
+    
+    import StudentAnlegen from "$lib/components/student/student-anlegen.svelte";
+    
+    import { GET, POST } from '$lib/functions';
+    
+    function get_student(id){
+        return GET(`/api/student/${id}`);
+    }
+
+    let create = $state(true);
+    let student_id = $state(0);
+    let student_data = $state({
+        id: null,
+        firstName: "",
+        lastName: "",
+        address: "",
+        email: "",
+        phoneNumber: "",
+        studentNumber: null,
+        academicLevel: null,
+        scientificWorksIds: []
+    });
+
+    onMount(async () => {
+        const url_params = new URLSearchParams(window.location.search);
+        if(url_params.has('id')){
+            student_id = url_params.get("id");
+            create = false;
+            student_data = await get_student(student_id);
+        }
+    });
 </script>
 
 <main class="erstellen-student-container">
-    <div>Student erfassen</div>
-    <StudentName />
-    <StudentStudyInformation />
-    <StudentContactInformation />
+    <StudentAnlegen create={create} student_id={student_id} student_data={student_data}/>
 </main>
 
-<style lang="scss">
-.erstellen-student-container {
-    display: grid;
-    grid-template-rows: repeat(15, 9px);
-    grid-template-columns: repeat(12, 1fr);
-    column-gap: 60px;
-    row-gap: 50px;
-
-    font-family: "Roboto";
-
-    div {
-        grid-column-start: 1;
-        grid-column-end: 5;
-        padding: 0px 30px;
-        font-size: 2em;
-    }
-}
-
-</style>
+<style lang="scss"></style>
