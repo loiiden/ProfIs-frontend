@@ -2,7 +2,7 @@
     import "../styles/fonts.css";
 
     import favicon from '$lib/assets/favicon.svg';
-    import profisicon from '$lib/assets/profis-icon.png'
+    import profisicon from '$lib/assets/profis-icon.jpeg'
 
     import { page } from '$app/state';
 
@@ -25,20 +25,20 @@
                 <img src={profisicon} alt="" class="profis-logo">
         </a>
         <div class="page-navigation">
-            <a href="/referenten" class:active="{page.url.pathname == '/referenten'}">Referenten</a>
-            <a href="/arbeiten" class:active="{page.url.pathname == '/arbeiten'}">Arbeiten</a>
-            <a href="/studenten" class:active="{page.url.pathname == '/studenten'}">Studenten</a>
+            <a href="/referenten" class:active="{page.url.pathname == '/referenten'}">REFERENTEN</a>
+            <a href="/arbeiten" class:active="{page.url.pathname == '/arbeiten'}">ARBEITEN</a>
+            <a href="/studenten" class:active="{page.url.pathname == '/studenten'}">STUDENTEN</a>
         </div>
         <div class="global-actions">
             <div class="anlegen-menu">
-                <button class="anlegen" onclick={toggle}>Anlegen+</button>
+                <button class="anlegen" onclick={toggle}>ANLEGEN +</button>
                 <div class="anlegen-options" style="display: {anlegen_toggle ? "flex" : "none"}">
-                    <a href="/erstellen/referent" onclick={toggle}>Referent</a>
-                    <a href="/erstellen/arbeit" onclick={toggle}>Arbeit</a>
-                    <a href="/erstellen/student" onclick={toggle}>Student</a>
+                    <a href="/erstellen/referent" onclick={toggle}>REFERENT</a>
+                    <a href="/erstellen/arbeit" onclick={toggle}>ARBEIT</a>
+                    <a href="/erstellen/student" onclick={toggle}>STUDENT</a>
                 </div>
             </div>
-            <button class="export">Import/Export</button>
+            <button class="export">EINSTELLUNGEN</button>
         </div>
     </header>
 
@@ -49,7 +49,7 @@
 :global(html, body) {
     margin: 0px;
     padding: 0px;
-    background: #F9F9F9;
+    background: #FFFFFF;
 }
 
 .page-padding {
@@ -62,7 +62,7 @@ header {
     grid-template-rows: 1fr;
     grid-template-columns: repeat(12, 1fr);
 
-    font-family: "Roboto", sans-serif;
+    font-family: "Inter", sans-serif;
     padding: 20px 0px;
     padding-bottom: 10px;
 
@@ -114,21 +114,24 @@ header {
             position: relative;
 
             .anlegen {
-                background-color: $primary;
-                color: #FFFFFF;
-                box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+                color: $primary;
+                background-color: #FFFFFF;
+                font-family: "Inter SB";
+                font-size: 14px;
             }
 
             .anlegen-options {
                 display: none;
                 position: absolute;
                 justify-content: center;
-                align-items: center;
+                align-items: flex-start;
                 flex-direction: column;
                 width: 100%;
-                margin-top: 8px;
+                margin-top: 10px;
 
                 a {
+                    position: relative;
+                    left: 8px;
                     padding: 8px 6px;
                     text-decoration: none;
                     color: black;
@@ -139,7 +142,8 @@ header {
         .export {
             margin-left: 20px;
             background-color: #FFFFFF;
-            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+            font-family: "Inter SB";
+            font-size: 14px;
         }
 
         .anlegen, .export {

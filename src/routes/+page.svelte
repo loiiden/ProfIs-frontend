@@ -10,7 +10,7 @@
 </script>
 
 <main class="overview-container">
-    <div>Übersicht</div>
+    <div>ÜBERSICHT</div>
     <OverviewArbeit />
     <FilterArbeiten />
     <OverviewSws target={data.sws.target} count={data.sws.count} />
@@ -27,7 +27,7 @@
     column-gap: 15px;
     row-gap: 15px;
 
-    font-family: "Roboto";
+    font-family: "Inter";
 
     div {
         grid-column-start: 1;

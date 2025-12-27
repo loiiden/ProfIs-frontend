@@ -14,9 +14,9 @@
 </script>
 
 <div class="student-filter-table-container">
-    <div class="headline-s">Studenten</div>
+    <div class="headline-s">STUDENTEN</div>
     <div class="student-table-container stroke-style">
-        <div class="search-bar stroke-style">
+        <div class="search-bar">
             <img src={search} alt="">
             <input type="text" class="search-input" placeholder="Studenten suchen"
                 bind:value={search_value} oninput={filter_search}>
@@ -50,7 +50,7 @@
     column-gap: 20px;
     row-gap: 45px;
 
-    font-family: 'Roboto';
+    font-family: 'Inter';
 
     .headline-s {
         grid-column-start: 1;
@@ -71,7 +71,6 @@
         display: flex;
         flex-direction: column;
 
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
         padding: 12px;
         border-radius: 10px;
         padding-right: 0px;
@@ -85,7 +84,7 @@
             font-size: 12px;
             width: 50%;
             border-radius: 6px;
-            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    
 
             * {
                 padding: 6px;
@@ -175,7 +174,7 @@
         align-items: center;
         flex-direction: column;
 
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+
         padding: 12px;
         border-radius: 10px;
     }

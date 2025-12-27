@@ -65,7 +65,7 @@
 
 <main class="erstellen-arbeit-container">
     <div class="header-row">
-        <div class="page-title">Arbeit erfassen</div>
+        <div class="page-title">ARBEIT ANLEGEN</div>
         </div>
 
     <PreviewOverviewArbeit />
@@ -94,7 +94,7 @@
         column-gap: 20px;
         row-gap: 30px;
         padding-bottom: 50px;
-        font-family: "Roboto";
+        font-family: "Inter";
     }
 
     /* Header oben mit Titel */

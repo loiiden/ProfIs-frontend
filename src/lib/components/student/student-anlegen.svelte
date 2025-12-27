@@ -39,7 +39,7 @@
 </script>
 
 <div class="student-anlegen-container">
-    <div class="headline">Student anlegen</div>
+    <div class="headline">STUDENT ANLEGEN</div>
     <div class="student-name-container stroke-style">
         <div class="headline-s">Student</div>
         <div class="select-title">Titel</div>
@@ -93,18 +93,18 @@
 <style lang="scss">
 .student-anlegen-container {
     display: grid;
-    grid-template-rows: repeat(15, 9px);
+    grid-template-rows: repeat(30, 4.5px);
     grid-template-columns: repeat(12, 1fr);
     column-gap: 110px;
-    row-gap: 50px;
+    row-gap: 25px;
 
-    font-family: "Roboto";
+    font-family: "Inter";
 
     .headline {
         grid-column-start: 1;
         grid-column-end: 6;
         grid-row-start: 1;
-        grid-row-end: 2;
+        grid-row-end: 3;
         padding: 0px 30px;
         font-size: 2em;
     }
@@ -113,21 +113,23 @@
 .student-name-container {
     grid-column-start: 1;
     grid-column-end: 7;
-    grid-row-start: 2;
-    grid-row-end: 10;
+    grid-row-start: 3;
+    grid-row-end: 19;
 
     background-color: #FFFFFF;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     padding: 12px;
     border-radius: 10px;
 
     .headline-s {
         padding: 12px;
         font-weight: 600;
+        font-size: 18px;
+        font-family: 'Inter SB';
     }
 
     .select-title {
-        font-size: 12px;
+        font-size: 14px;
+        font-family: 'Inter SB';
         font-weight: 900;
         margin-bottom: 0px;
         padding-left: 12px;
@@ -170,17 +172,18 @@
 .student-contact-information-container {
     grid-column-start: 7;
     grid-column-end: 13;
-    grid-row-start: 2;
-    grid-row-end: 9;
+    grid-row-start: 3;
+    grid-row-end: 16;
 
     background-color: #FFFFFF;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     padding: 12px;
     border-radius: 10px;
 
     .headline-s {
         padding: 12px;
         font-weight: 600;
+        font-size: 18px;
+        font-family: 'Inter SB';
     }
 }
 
@@ -193,8 +196,8 @@
     padding: 12px;
 
     .annotation {
-        font-size: 12px;    
-        font-weight: 900;
+        font-size: 14px;
+        font-family: 'Inter SB';
         margin-bottom: 8px;
         padding-left: 0px;
     }
@@ -212,8 +215,8 @@
 .buttons {
     grid-column-start: 10;
     grid-column-end: 13;
-    grid-row-start: 10;
-    grid-row-end: 12;
+    grid-row-start: 15;
+    grid-row-end: 19;
 
     display: flex;
     justify-content: center;
@@ -238,7 +241,6 @@
     .submit {
         background-color: $primary;
         color: #FFFFFF;
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     }
 }
 
