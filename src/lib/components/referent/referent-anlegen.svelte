@@ -37,7 +37,7 @@
 </script>
 
 <div class="referent-anlegen-container">
-    <div class="headline">Referent anlegen</div>
+    <div class="headline">REFERENT ANLEGEN</div>
     <div class="referent-name-container stroke-style">
         <div class="headline-s">Referent</div>
         <div class="select-title">Titel</div>
@@ -63,7 +63,7 @@
             <input class="stroke-style" type="text" placeholder="Nachname" bind:value={nachname}>
         </div>
         <div class="referent-status">
-            <span>Status:</span>
+            <span class="description">Status</span>
             <span class="toggle toggle-internal { external_toggle ? "" : "toggle-active" }" onclick={() => external_toggle = false}>Internal</span>
             <span class="toggle toggle-external { external_toggle ? "toggle-active" : "" }" onclick={() => external_toggle = true}>External</span>
         </div>
@@ -92,18 +92,18 @@
 <style lang="scss">
 .referent-anlegen-container {
     display: grid;
-    grid-template-rows: repeat(15, 9px);
+    grid-template-rows: repeat(30, 4.5px);
     grid-template-columns: repeat(12, 1fr);
     column-gap: 110px;
-    row-gap: 50px;
+    row-gap: 25px;
 
-    font-family: "Roboto";
+    font-family: "Inter";
 
     .headline {
         grid-column-start: 1;
         grid-column-end: 5;
         grid-row-start: 1;
-        grid-row-end: 2;
+        grid-row-end: 3;
         padding: 0px 30px;
         font-size: 2em;
     }
@@ -112,24 +112,26 @@
 .referent-name-container {
     grid-column-start: 1;
     grid-column-end: 7;
-    grid-row-start: 2;
-    grid-row-end: 10;
+    grid-row-start: 3;
+    grid-row-end: 17;
 
     background-color: #FFFFFF;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     padding: 12px;
     border-radius: 10px;
 
     .headline-s {
         padding: 12px;
         font-weight: 600;
+        font-size: 18px;
+        font-family: 'Inter SB';
     }
 
     .select-title {
-        font-size: 12px;
         font-weight: 900;
         margin-bottom: 0px;
         padding-left: 12px;
+        font-size: 14px;
+        font-family: 'Inter SB';
     }
 
     .titel {
@@ -149,19 +151,24 @@
     .referent-status {
         padding: 12px;
 
+        .description {
+            font-size: 14x;
+        }
+
         .toggle-internal {
             margin-left: 20px;
         }
 
         .toggle {
-            font-size: 12px;
+            font-size: 13px;
+            font-family: 'Inter SB';
             padding: 12px;
             border-radius: 6px;
             cursor: pointer;
         }
 
         .toggle-active {
-            background-color: $note1;
+            color: $note1;
         }
     }
 }
@@ -169,17 +176,18 @@
 .referent-contact-information-container {
     grid-column-start: 7;
     grid-column-end: 13;
-    grid-row-start: 2;
-    grid-row-end: 9;
+    grid-row-start: 3;
+    grid-row-end: 16;
 
     background-color: #FFFFFF;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     padding: 12px;
     border-radius: 10px;
 
     .headline-s {
         padding: 12px;
         font-weight: 600;
+        font-size: 18px;
+        font-family: 'Inter SB';
     }
 }
 
@@ -192,8 +200,8 @@
     padding: 12px;
 
     .annotation {
-        font-size: 12px;    
-        font-weight: 900;
+        font-size: 14px;
+        font-family: 'Inter SB';
         margin-bottom: 8px;
         padding-left: 0px;
     }
@@ -211,8 +219,8 @@
 .buttons {
     grid-column-start: 10;
     grid-column-end: 13;
-    grid-row-start: 10;
-    grid-row-end: 12;
+    grid-row-start: 15;
+    grid-row-end: 19;
 
     display: flex;
     justify-content: center;
@@ -237,7 +245,6 @@
     .submit {
         background-color: $primary;
         color: #FFFFFF;
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     }
 }
 

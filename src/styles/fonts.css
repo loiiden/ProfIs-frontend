@@ -7,3 +7,8 @@
     font-family: 'Inter';
     src: url('/fonts/inter/Inter_24pt-Regular.ttf') format('truetype');
 }
+
+@font-face {
+    font-family: 'Inter SB';
+    src: url('/fonts/inter/Inter_24pt-SemiBold.ttf') format('truetype');
+}

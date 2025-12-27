@@ -9,7 +9,7 @@
 
 <style lang="scss">
 .annotated-number {
-    font-family: "Inter";
+    font-family: "Inter SB";
     display: flex;
     flex-direction: column;
     justify-content: center;
