@@ -1,15 +1,22 @@
 <script>
     import search from '$lib/assets/search.svg';
+    import openblank from '$lib/assets/open-blank.svg';
 
     let { data } = $props();
 
     let referent_base = data.referenten
     let referent_filtered = $state(data.referenten);
 
+    let connected_works = $state([]);
+
     let search_value = $state("");
 
     function filter_search(){
         referent_filtered = referent_base.filter((ref) => (ref.firstName + " " + ref.lastName + " " + ref.email).includes(search_value))
+    }
+
+    function show_connected(ref_id){
+        connected_works = [ref_id];
     }
 </script>
 
@@ -30,7 +37,7 @@
         <div class="referent-table">
             {#each referent_filtered as referent}
                 <div class="referent-row">
-                    <span class="ref-name">{referent.firstName + " " + referent.lastName}</span>
+                    <span onclick={() => { show_connected(referent.id); }} class="ref-name">{referent.firstName + " " + referent.lastName}<a target="_blank" href="/erstellen/referent/?id={referent.id}"><img class="open-new" src={openblank} alt=""></a></span>
                     <span class="current-works">{Math.floor(Math.random() * 10)}</span>
                     <span class="ref-email"><a href="mailto:{referent.email}">{referent.email}</a></span>
                     <span class="ref-phone">{referent.phoneNumber}</span>
@@ -39,7 +46,9 @@
         </div>
     </div>
     <div class="connected-works stroke-style">
-
+        {#each connected_works as work}
+            {work}
+        {/each}
     </div>
 </div>
 
@@ -144,6 +153,13 @@
 
                 .ref-name {
                     width: 30%;
+                    cursor: pointer;
+
+                    .open-new {
+                        width: 14px;
+                        margin-left: 10px;
+                        user-select: none;
+                    }
                 }
 
                 .current-works {
