@@ -104,9 +104,13 @@
         grid-column-start: 1;
         grid-column-end: 6;
         grid-row-start: 1;
-        grid-row-end: 3;
+        grid-row-end: 4;
         padding: 0px 30px;
-        font-size: 2em;
+        font-weight: 600;
+        font-size: 18px;
+        font-family: "Inter";
+        display: flex;
+        align-items: center;
     }
 }
 

@@ -56,10 +56,14 @@
         grid-column-start: 1;
         grid-column-end: 4;
         grid-row-start: 1;
-        grid-row-end: 2;
+        grid-row-end: 3;
 
         padding: 0px 30px;
-        font-size: 2em;
+        font-weight: 600;
+        font-size: 18px;
+        font-family: "Inter";
+        display: flex;
+        align-items: center;
     }
 
     .student-table-container {
