@@ -1,15 +1,22 @@
 <script>
     import search from '$lib/assets/search.svg';
+    import openblank from '$lib/assets/open-blank.svg';
 
     let { data } = $props();
 
     let students_base = data.students
     let students_filtered = $state(data.students);
 
+    let connected_works = $state([]);
+
     let search_value = $state("");
 
     function filter_search(){
         students_filtered = students_base.filter((stu) => (stu.firstName + " " + stu.lastName + " " + stu.email).includes(search_value))
+    }
+
+    function show_connected(ref_id){
+        connected_works = [ref_id];
     }
 </script>
 
@@ -30,7 +37,7 @@
         <div class="student-table">
             {#each students_filtered as student}
                 <div class="student-row">
-                    <span class="stu-name">{student.firstName + " " + student.lastName}</span>
+                    <span onclick={() => { show_connected(student.id); }} class="stu-name">{student.firstName + " " + student.lastName}<a target="_blank" href="/erstellen/student/?id={student.id}"><img class="open-new" src={openblank} alt=""></a></span>
                     <span class="stu-num">{student.studentNumber}</span>
                     <span class="stu-program">B. Sc. Softwaretechnologie</span>
                     <span class="stu-email"><a href="mailto:{student.email}">{student.email}</a></span>
@@ -147,6 +154,13 @@
 
                 .stu-name {
                     width: 30%;
+                    cursor: pointer;
+
+                    .open-new {
+                        width: 14px;
+                        margin-left: 10px;
+                        user-select: none;
+                    }
                 }
 
                 .stu-num {

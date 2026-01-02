@@ -6,16 +6,17 @@
             "firstName": vorname,
             "lastName": nachname,
             "email": email,
+            "address": addresse,
             "phoneNumber": telefon,
             "academicLevel": abschluss,
             "role": null
         }
-        console.log(payload);
+
         let res = await POST("/api/evaluator", payload);
         
-        if(res.status == 201){
+        if(res.status == 200){
             console.log("Successfully Created Referent");
-            // window.location = "/erstellen/referent";
+            window.location = "/erstellen/referent";
         }
     }
 

@@ -9,14 +9,17 @@
             "email": email,
             "phoneNumber": telefon,
             "studentNumber": Number(matrikel),
+            "salutation": anrede,
             "academicLevel": abschluss,
         }
-        console.log(payload);
+
         let res = await POST("/api/student", payload);
         
-        if(res.status == 201){
+        console.log(res);
+
+        if(res.status == 200){
             console.log("Successfully Created Student");
-            // window.location = "/erstellen/student";
+            window.location = "/erstellen/student";
         }
     }
 
@@ -33,9 +36,9 @@
     let telefon = $derived(student_data.phoneNumber);
     let matrikel = $derived(student_data.studentNumber);
     let abschluss = $derived(student_data.academicLevel);
+    let anrede = $derived(student_data.salutation);
 
     let external_toggle = $state(false);
-    let anrede = $state("d")
 </script>
 
 <div class="student-anlegen-container">
@@ -45,15 +48,17 @@
         <div class="select-title">Titel</div>
         <div class="titel">
             <select class="stroke-style" bind:value={anrede} name="" id="">
-                <option value="m">Herr</option>
-                <option value="w">Frau</option>
-                <option value="d">Divers</option>
+                <option value="HERR">Herr</option>
+                <option value="FRAU">Frau</option>
+                <option value="DIVERS">Divers</option>
             </select>
             <select class="stroke-style" bind:value={abschluss} name="" id="">
-                <option value="0">kein Abschluss</option>
-                <option value="1">Bachelor</option>
-                <option value="2">Master</option>
-                <option value="2">Doktor</option>
+                <option value="NONE">kein Abschluss</option>
+                <option value="BACHELOR">Bachelor</option>
+                <option value="MASTER">Master</option>
+                <option value="DR">Doktor</option>
+                <option value="PROF">Prof.</option>
+                <option value="PROF_DOCTOR">Prof. Dr.</option>
             </select>
         </div>
         <div class="annotated-text-input">
