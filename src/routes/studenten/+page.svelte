@@ -2,12 +2,16 @@
     import search from '$lib/assets/search.svg';
     import openblank from '$lib/assets/open-blank.svg';
 
+    import { GET } from '$lib/functions.js';
+
     let { data } = $props();
 
     let students_base = data.students
     let students_filtered = $state(data.students);
 
+    let current_student = $state(0);
     let connected_works = $state([]);
+    let cache = {};
 
     let search_value = $state("");
 
@@ -15,8 +19,21 @@
         students_filtered = students_base.filter((stu) => (stu.firstName + " " + stu.lastName + " " + stu.email).includes(search_value))
     }
 
-    function show_connected(ref_id){
-        connected_works = [ref_id];
+    async function get_connected_works(id){
+        return GET(`/api/student/${id}/shortWorks`);
+    }
+
+    async function show_connected(stu_id){
+        current_student = students_base.filter(stu => stu.id == stu_id)[0];
+
+        if(stu_id in cache){
+            connected_works = cache[stu_id];
+        } else {
+            let works = await get_connected_works(stu_id);
+            console.log(works);
+            cache[stu_id] = works;
+            connected_works = works;
+        }
     }
 </script>
 
@@ -46,6 +63,24 @@
         </div>
     </div>
     <div class="connected-works stroke-style">
+        {#if !(current_student == 0)}
+            <div class="current-student">
+                <span class="cur-anrede">{current_student.salutation !== null ? String(current_student.salutation).toLowerCase().charAt(0).toUpperCase() + String(current_student.salutation).toLowerCase().slice(1) : "-"}</span>
+                <span class="cur-name">{current_student.firstName + " " + current_student.lastName}</span>
+                <span class="cur-mat">Matrikelnummer: {current_student.studentNumber}</span>
+                <span class="cur-email">E-Mail: {current_student.email}</span>
+                <span class="cur-tel">Telefon: {current_student.phoneNumber}</span>
+            </div>
+            <div class="aktuelle-arbeiten">Aktive Arbeiten</div>
+            <div class="connected-works-list">
+                {#each connected_works as work}
+                    <div class="work">
+                        <span class="work-program">{work.StudyProgramTitle}</span>
+                        <span class="work-title">{work.title}</span>
+                    </div>
+                {/each}
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -75,7 +110,7 @@
 
     .student-table-container {
         grid-column-start: 1;
-        grid-column-end: 9;
+        grid-column-end: 10;
         grid-row-start: 2;
         grid-row-end: 16;
 
@@ -182,19 +217,75 @@
     }
 
     .connected-works {
-        grid-column-start: 9;
+        grid-column-start: 10;
         grid-column-end: 13;
         grid-row-start: 2;
         grid-row-end: 16;
 
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: flex-start;
+        align-items: flex-start;
         flex-direction: column;
-
 
         padding: 12px;
         border-radius: 10px;
+
+        .current-student {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+
+            width: 100%;
+
+            .cur-anrede {
+                font-size: 14px;
+                font-family: 'Inter SB';
+            }
+
+            .cur-name {
+                font-size: 22px;
+                font-weight: bold;
+                font-family: 'Inter SB';
+                padding: 6px 0px;
+            }
+
+            .cur-mat, .cur-email, .cur-tel {
+                font-size: 14px;
+                font-family: 'Inter';
+            }
+        }
+
+        .aktuelle-arbeiten {
+            background-color: #F9F9F9;
+            padding: 8px;
+            margin: 8px 0px;
+            border-radius: 6px;
+        }
+
+        .connected-works-list {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+
+            .work {
+                padding: 6px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: flex-start;
+                flex-direction: column;
+
+                .work-program {
+                    font-size: 12px;
+                }
+
+                .work-title {
+                    font-size: 14px;
+                    font-family: 'Inter SB';
+                }
+            }
+        }
     }
 }
 
