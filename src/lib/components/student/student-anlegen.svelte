@@ -1,5 +1,5 @@
 <script>
-    import { POST } from "$lib/functions";
+    import { POST, PATCH } from "$lib/functions";
 
     async function post_student(){
         let payload = {
@@ -11,6 +11,7 @@
             "studentNumber": Number(matrikel),
             "salutation": anrede,
             "academicLevel": abschluss,
+            "scientificWorksIds": []
         }
 
         let res = await POST("/api/student", payload);
@@ -19,6 +20,29 @@
 
         if(res.status == 200){
             console.log("Successfully Created Student");
+            window.location = "/erstellen/student";
+        }
+    }
+
+    async function patch_student(id){
+        let payload = {
+            "firstName": vorname,
+            "lastName": nachname,
+            "address": addresse,
+            "email": email,
+            "phoneNumber": telefon,
+            "studentNumber": Number(matrikel),
+            "salutation": anrede,
+            "academicLevel": abschluss,
+            "scientificWorksIds": []
+        }
+
+        let res = await PATCH(`/api/student/${id}`, payload);
+        
+        console.log(res);
+
+        if(res.status == 200){
+            console.log("Successfully Patched Student");
             window.location = "/erstellen/student";
         }
     }
@@ -91,7 +115,7 @@
     </div>
     <div class="buttons">
         <button class="cancel" onclick={() => { window.location = "/"; }}>Cancel</button>
-        <button class="submit" onclick={() => { post_student(); }}>Submit</button>
+        <button class="submit" onclick={() => { create ? post_student() : patch_student(student_id); }}>Submit</button>
     </div>
 </div>
 

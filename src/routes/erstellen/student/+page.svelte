@@ -21,6 +21,7 @@
         studentNumber: null,
         salutation: null,
         academicLevel: null,
+        scientificWorksIds: []
     });
 
     onMount(async () => {

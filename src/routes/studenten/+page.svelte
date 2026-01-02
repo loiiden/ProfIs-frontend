@@ -37,7 +37,7 @@
         <div class="student-table">
             {#each students_filtered as student}
                 <div class="student-row">
-                    <span onclick={() => { show_connected(student.id); }} class="stu-name">{student.firstName + " " + student.lastName}<a target="_blank" href="/erstellen/student/?id={student.id}"><img class="open-new" src={openblank} alt=""></a></span>
+                    <span onclick={() => { show_connected(student.id); }} class="stu-name">{student.firstName + " " + student.lastName}<a href="/erstellen/student/?id={student.id}"><img class="open-new" src={openblank} alt=""></a></span>
                     <span class="stu-num">{student.studentNumber}</span>
                     <span class="stu-program">B. Sc. Softwaretechnologie</span>
                     <span class="stu-email"><a href="mailto:{student.email}">{student.email}</a></span>

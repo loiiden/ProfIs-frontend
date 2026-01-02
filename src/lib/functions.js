@@ -6,7 +6,18 @@ export async function POST(path, payload){
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        method: "post",
+        method: "POST"  ,
+        body: JSON.stringify(payload)
+    });
+}
+
+export async function PATCH(path, payload){
+    return fetch(api_url + path, {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        method: "PATCH",
         body: JSON.stringify(payload)
     });
 }
@@ -17,7 +28,7 @@ export async function GET(path){
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        method: "get"
+        method: "GET"
     })).json();
 }
 

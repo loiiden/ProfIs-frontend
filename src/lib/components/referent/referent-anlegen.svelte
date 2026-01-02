@@ -1,5 +1,5 @@
 <script>
-    import { POST } from "$lib/functions";
+    import { POST, PATCH } from "$lib/functions";
 
     async function post_referent(){
         let payload = {
@@ -16,6 +16,27 @@
         
         if(res.status == 200){
             console.log("Successfully Created Referent");
+            window.location = "/erstellen/referent";
+        }
+    }
+
+    async function patch_referent(id){
+        let payload = {
+            "firstName": vorname,
+            "lastName": nachname,
+            "email": email,
+            "address": addresse,
+            "phoneNumber": telefon,
+            "academicLevel": abschluss,
+            "role": null
+        }
+
+        let res = await PATCH(`/api/evaluator/${id}`, payload);
+        
+        console.log(res);
+
+        if(res.status == 200){
+            console.log("Successfully Patched Referent");
             window.location = "/erstellen/referent";
         }
     }
@@ -86,7 +107,7 @@
     </div>
     <div class="buttons">
         <button class="cancel" onclick={() => { window.location = "/"; }}>Cancel</button>
-        <button class="submit" onclick={() => { post_referent(); }}>Submit</button>
+        <button class="submit" onclick={() => { create ? post_referent() : patch_referent(referent_id); }}>Submit</button>
     </div>
 </div>
 
