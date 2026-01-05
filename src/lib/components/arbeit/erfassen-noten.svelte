@@ -1,28 +1,47 @@
 <script>
     // Import von der Such-Komponente
     import EvaluatorSearch from '$lib/components/arbeit/evaluator-search.svelte';
-    
+
     let { 
         evaluators = [],
         data = $bindable({
-            referent: null,
-            korreferent: null,
-            pointsRefArbeit: null,
-            pointsRefKoll: null,
-            pointsKoArbeit: null,
-            pointsKoKoll: null,
+            mainEvaluator: null,
+            secondEvaluator: null,
+            mainEvaluatorWorkMark: null,
+            mainEvaluatorColloquiumMark: null,
+            secondEvaluatorWorkMark: null,
+            secondEvaluatorColloquiumMark: null,
             comment: ""
         })
     } = $props();
 
-    // Durchschnitt der 4 Noten, wenn nicht alle 4 Werte eingegeben --> ? anzeigen
-    let average = $derived.by(() => {
+    // Prüfung, dass nur Validen Noten eingegeben werden
+    function checkInput(e) {
+        let val = e.target.value;
+        
+        // Wenn das Feld leer ist, ist alles okay (Platzhalter wird angezeigt)
+        if (val === "") return;
+
+        let num = Number(val);
+
+        // 3 Fehlerfälle:
+        // 1. Wert ist kleiner 0
+        // 2. Wert ist größer 100
+        // 3. Wert ist keine Ganzzahl (enthält Punkt/Komma oder Restwert)
+        if (num < 0 || num > 100 || !Number.isInteger(num) || val.includes('.') || val.includes(',')) {
+            // Wert leeren
+            e.target.value = "";
+        }
+    }
+
+   let average = $derived.by(() => {
         const inputs = [
-            data.pointsRefArbeit, 
-            data.pointsRefKoll, 
-            data.pointsKoArbeit, 
-            data.pointsKoKoll
+            data.mainEvaluatorWorkMark, 
+            data.mainEvaluatorColloquiumMark, 
+            data.secondEvaluatorWorkMark, 
+            data.secondEvaluatorColloquiumMark
         ];
+        // Wir parsen sicherheitshalber nochmal als Number, falls Strings drin stehen
         const validInputs = inputs.filter(p => p !== null && p !== "" && !isNaN(p));
 
         if (validInputs.length < 4) return null;
@@ -47,45 +66,78 @@
 </script>
 
 <div class="erfassen-noten-container">
-    <!-- Block 1: Referent wählen und Noten des Referenten eingeben -->
     <div class="block">
         <div class="main-label">Referent</div>
         <div class="search-row">
-            <EvaluatorSearch data={evaluators} bind:selectedEvaluator={data.referent} />
+            <EvaluatorSearch data={evaluators} bind:selectedEvaluator={data.mainEvaluator} />
         </div>
         
         <div class="grades-row">
             <div class="grade-group">
-                <span class="grade-label">Note<br>Arbeit:</span>
-                <input type="number" class="grade-input" bind:value={data.pointsRefArbeit} placeholder="-">
-            </div>
+                <span class="grade-label">Punkte<br>Arbeit:</span>
+                <input 
+                    type="number" 
+                    class="grade-input" 
+                    bind:value={data.mainEvaluatorWorkMark} 
+                    placeholder="-"
+                    min="0"
+                    max="100"
+                    step="1"
+                    oninput={checkInput}
+                >
+           </div>
             <div class="grade-group">
-                <span class="grade-label">Note<br>Kolloquium:</span>
-                <input type="number" class="grade-input" bind:value={data.pointsRefKoll} placeholder="-">
-            </div>
+                <span class="grade-label">Punkte<br>Kolloquium:</span>
+                <input 
+                    type="number" 
+                    class="grade-input" 
+                    bind:value={data.mainEvaluatorColloquiumMark} 
+                    placeholder="-"
+                    min="0"
+                    max="100"
+                    step="1"
+                    oninput={checkInput}
+                >
+           </div>
         </div>
     </div>
 
-    <!-- Block 2: Korreferent wählen und Noten des Korreferenten eingeben -->
     <div class="block">
         <div class="main-label">Korreferent</div>
         <div class="search-row">
-            <EvaluatorSearch data={evaluators} bind:selectedEvaluator={data.korreferent} />
+            <EvaluatorSearch data={evaluators} bind:selectedEvaluator={data.secondEvaluator} />
         </div>
 
         <div class="grades-row">
             <div class="grade-group">
-                <span class="grade-label">Note<br>Arbeit:</span>
-                <input type="number" class="grade-input" bind:value={data.pointsKoArbeit} placeholder="-">
-            </div>
+                <span class="grade-label">Punkte<br>Arbeit:</span>
+                <input 
+                    type="number" 
+                    class="grade-input" 
+                    bind:value={data.secondEvaluatorWorkMark} 
+                    placeholder="-"
+                    min="0"
+                    max="100"
+                    step="1"
+                    oninput={checkInput}
+                >
+           </div>
             <div class="grade-group">
-                <span class="grade-label">Note<br>Kolloquium:</span>
-                <input type="number" class="grade-input" bind:value={data.pointsKoKoll} placeholder="-">
-            </div>
+                <span class="grade-label">Punkte<br>Kolloquium:</span>
+                <input 
+                    type="number" 
+                    class="grade-input" 
+                    bind:value={data.secondEvaluatorColloquiumMark} 
+                    placeholder="-"
+                    min="0"
+                    max="100"
+                    step="1"
+                    oninput={checkInput}
+                >
+           </div>
         </div>
     </div>
 
-    <!-- Block 3: Freitext-Kommentar und Anzeige der Gesamtnote -->
     <div class="block footer-block">
         <div class="left-col">
             <div class="main-label">Kommentar</div>
@@ -94,8 +146,7 @@
 
         <div class="right-col">
             <div class="total-wrapper">
-                <div class="total-label">Gesamtnote<br>der Arbeit:</div>
-                <!-- Farbbox zeigt "average" oder "?", Klasse kommt aus "resultColor" (mark1..mark5) -->
+                <div class="total-label">Gesamtpunkte<br>der Arbeit:</div>
                 <div class="total-box {resultColor}">
                     {average ?? "?"}
                 </div>
@@ -167,7 +218,6 @@
         font-size: 16px;
         color: #333;
         outline: none;
-
         &::placeholder { color: #333; }
         
         /* Browser Zahlenpfeile (diese nach oben/unten) ausblenden*/
@@ -200,7 +250,6 @@
         font-size: 14px;
         outline: none;
         box-sizing: border-box;
-
         &:focus { border-color: #ccc; }
     }
 
