@@ -52,8 +52,15 @@
                 />
                 
                 {#if filtered.length === 0 && searchTerm.length > 0}
-                    <!-- Keine Treffer, aber Suchtext vorhanden → optionaler "erstellen"-Button (Platzhalter) -->
-                    <button type="button" class="create-btn">erstellen</button>
+                    <!-- Keine Treffer, aber Suchtext vorhanden → Erstellen Button zu Referent erstellen -->
+                    <a 
+                        href="/erstellen/referent" 
+                        target="_blank" 
+                        class="create-btn"
+                        style="text-decoration: none; display: inline-block; text-align: center;"
+                    >
+                        erstellen
+                    </a>
                 {/if}
              </div>
         {/if}
