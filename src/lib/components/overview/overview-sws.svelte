@@ -49,7 +49,8 @@
 
 <style lang="scss">
 //Eigene Farben
-$text-light: #6e6f72;
+$text-light: #41525A66; //Grau Verbesserung Anton Baranov
+$bar-green: #317B3B; //Barfarbe, vorgegeben von Anton Baranov
 
 
 .overview-sws-container {
@@ -60,7 +61,7 @@ $text-light: #6e6f72;
 
     box-sizing: border-box;
     background-color: #FFFFFF;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    border: 1px solid #E9E9E9; //Umrandung wie von Anton Baranov verbessert
     
     // Angepasst auf 16px 
     padding: 16px; 
@@ -111,8 +112,8 @@ h3 {
     //Block-Effekt
     background-image: repeating-linear-gradient(
         to top,
-        $success,
-        $success 18px,
+        $bar-green,
+        $bar-green 18px,
         transparent 18px,
         transparent 22px
     );
@@ -155,6 +156,10 @@ h3 {
         }
     }
 
+    &.primary .label {  //Damit "Jetzt" schwarz ist
+        color: #000;
+    }
+
     &.secondary .value {
         color: $text-light;
     }
@@ -169,7 +174,7 @@ h3 {
 .footer-stat {
     font-size: 16px;
     font-weight: 500;
-    color: #000;
+    color: $text-light;
     border-top: 1px solid #F4F4F4; //Trennlinie
     padding-top: 10px;
 }
