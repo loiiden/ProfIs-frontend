@@ -22,6 +22,16 @@ export async function PATCH(path, payload){
     });
 }
 
+export async function DELETE(path){
+    return fetch(api_url + path, {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        method: "DELETE",
+    });
+}
+
 export async function GET(path){
     return await (await fetch(api_url + path, {
         headers: {

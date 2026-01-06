@@ -1,5 +1,5 @@
 <script>
-    import { POST, PATCH } from "$lib/functions";
+    import { POST, PATCH, DELETE } from "$lib/functions";
 
     async function post_student(){
         let payload = {
@@ -20,7 +20,7 @@
 
         if(res.status == 200){
             console.log("Successfully Created Student");
-            window.location = "/erstellen/student";
+            window.location = `/erstellen/student?id=${id}`;
         }
     }
 
@@ -43,7 +43,16 @@
 
         if(res.status == 200){
             console.log("Successfully Patched Student");
-            window.location = "/erstellen/student";
+            window.location = `/erstellen/student?id=${id}`;
+        }
+    }
+
+    async function delete_student(id){
+        let res = await DELETE(`/api/student/${id}`);
+
+        if(res.status == 204){
+            console.log("Successfully Deleted Student");
+            window.location = `/studenten`;
         }
     }
 
@@ -66,7 +75,7 @@
 </script>
 
 <div class="student-anlegen-container">
-    <div class="headline">STUDENT ANLEGEN</div>
+    <div class="headline">{create ? "STUDENT ANLEGEN" : "STUDENT BEARBEITEN"}</div>
     <div class="student-name-container stroke-style">
         <div class="headline-s">Student</div>
         <div class="select-title">Titel</div>
@@ -79,6 +88,7 @@
             <select class="stroke-style" bind:value={abschluss} name="" id="">
                 <option value="NONE">kein Abschluss</option>
                 <option value="BACHELOR">Bachelor</option>
+                <option value="DIPLOMA">Diplom</option>
                 <option value="MASTER">Master</option>
                 <option value="DR">Doktor</option>
                 <option value="PROF">Prof.</option>
@@ -114,8 +124,11 @@
         </div>
     </div>
     <div class="buttons">
-        <button class="cancel" onclick={() => { window.location = "/"; }}>Cancel</button>
-        <button class="submit" onclick={() => { create ? post_student() : patch_student(student_id); }}>Submit</button>
+        <button class="cancel stroke-style" onclick={() => { window.location = "/studenten"; }}>Abbrechen</button>
+        {#if !create}
+            <button class="delete stroke-style" onclick={() => { delete_student(student_id); }}>Löschen</button>
+        {/if}
+        <button class="submit" onclick={() => { create ? post_student() : patch_student(student_id); }}>{create ? "Erstellen" : "Aktualisieren"}</button>
     </div>
 </div>
 
@@ -246,13 +259,13 @@
 }
 
 .buttons {
-    grid-column-start: 10;
+    grid-column-start: 9;
     grid-column-end: 13;
     grid-row-start: 15;
     grid-row-end: 19;
 
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
 
     button {
@@ -260,10 +273,10 @@
         font-weight: 600;
         font-size: 14px;
         font-family: "Inter";
-        border: none;
         border-radius: 6px;
         padding: 12px;
         cursor: pointer;
+        min-width: 100px;
     }
 
     .cancel {
@@ -271,9 +284,15 @@
         background: none;
     }
 
+    .delete {
+        color: white;
+        background-color: $error;
+    }
+
     .submit {
         background-color: $primary;
         color: #FFFFFF;
+        border: none;
     }
 }
 
