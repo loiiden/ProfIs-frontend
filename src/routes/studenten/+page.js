@@ -3,10 +3,14 @@ import { api_url } from '$lib/constants.js';
 export const ssr = false
 
 export const load = async ({ fetch, params }) => {
-	let res = await fetch(`${api_url}/api/student`);
-	const students = await res.json();
+	let res_1 = await fetch(`${api_url}/api/student`);
+	const students = await res_1.json();
+
+    let res_2 = await fetch(`${api_url}/api/study-program`);
+	const study_programs = await res_2.json();
 	
     return {
-        students: students
+        students: students,
+        study_programs: study_programs
     };
 };

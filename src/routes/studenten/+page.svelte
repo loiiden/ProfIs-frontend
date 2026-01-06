@@ -1,6 +1,8 @@
 <script>
     import search from '$lib/assets/search.svg';
     import openblank from '$lib/assets/open-blank.svg';
+    import caretdown from '$lib/assets/caret-down.svg';
+    import caretup from '$lib/assets/caret-up.svg';
 
     import { GET } from '$lib/functions.js';
 
@@ -9,14 +11,51 @@
     let students_base = data.students
     let students_filtered = $state(data.students);
 
+    let study_programs = data.study_programs;
+    let study_programs_mapping = {};
+    data.study_programs.forEach(program => {
+        study_programs_mapping[program.id] = program.title;
+    });
+
     let current_student = $state(0);
     let connected_works = $state([]);
     let cache = {};
 
     let search_value = $state("");
+    let study_programs_selected = $state([]);
+    let show_filter = $state(false);
+    let filter_on = $derived(study_programs_selected.length > 0);
 
     function filter_search(){
         students_filtered = students_base.filter((stu) => (stu.firstName + " " + stu.lastName + " " + stu.email).includes(search_value))
+        if(study_programs_selected.length > 0)
+            students_filtered = students_filtered.filter((stu) => study_programs_selected.includes(stu.studyProgramId));
+    }
+
+    function set_active_programs(){
+        let root = document.querySelector(".filter-study-program");
+        
+        for(let child of root.children){
+            let id = Number(child.getAttribute("data-st-id"));
+            if(study_programs_selected.includes(id)){
+                child.style.fontWeight = "700";
+                child.style.color = "#000000";
+            } else {
+                child.style.fontWeight = "400";
+                child.style.color = "#3c3c3c";
+            }
+        }
+    }
+
+    function toggle_study_program(sp_id){
+        if(study_programs_selected.includes(sp_id)){
+            study_programs_selected.splice(study_programs_selected.indexOf(sp_id), 1)
+        } else {
+            study_programs_selected.push(sp_id);
+        }
+
+        set_active_programs();
+        filter_search();
     }
 
     async function get_connected_works(id){
@@ -41,9 +80,21 @@
     <div class="headline-s">STUDENTEN</div>
     <div class="student-table-container stroke-style">
         <div class="search-bar">
-            <img src={search} alt="">
-            <input type="text" class="search-input" placeholder="Studenten suchen"
-                bind:value={search_value} oninput={filter_search}>
+            <div class="search">
+                <img src={search} alt="">
+                <input type="text" class="search-input" placeholder="Studenten suchen"
+                    bind:value={search_value} oninput={filter_search}>
+            </div>
+            <div class="filter-container">
+                <span class="show-filter stroke-style" onclick={() => { show_filter = !show_filter; setTimeout(() => { set_active_programs(); }, 10); } }>{ filter_on ? "Filter: Ein" : "Filter: Aus" }<img src={show_filter ? caretup : caretdown} alt=""></span>
+                {#if show_filter}
+                    <div class="filter-study-program stroke-style">
+                        {#each study_programs as study_program}
+                            <div class="study-program" data-st-id="{study_program.id}" onclick={() => { toggle_study_program(study_program.id); }}>{study_program.title}</div>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
         </div>
         <div class="table-head">
             <span class="head-name">Student</span>
@@ -56,7 +107,7 @@
                 <div class="student-row">
                     <span onclick={() => { show_connected(student.id); }} class="stu-name">{student.firstName + " " + student.lastName}<a href="/erstellen/student/?id={student.id}"><img class="open-new" src={openblank} alt=""></a></span>
                     <span class="stu-num">{student.studentNumber}</span>
-                    <span class="stu-program">B. Sc. Softwaretechnologie</span>
+                    <span class="stu-program" title="{study_programs_mapping[student.studyProgramId]}">{study_programs_mapping[student.studyProgramId]}</span>
                     <span class="stu-email"><a href="mailto:{student.email}">{student.email}</a></span>
                 </div>
             {/each}
@@ -123,25 +174,76 @@
 
         .search-bar {
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
+            width: 100%;
             box-sizing: border-box;
-            padding: 6px;
-            font-size: 12px;
-            width: 50%;
-            border-radius: 6px;
-    
+            padding-right: 12px;
 
-            * {
+            .search {
                 padding: 6px;
+                font-size: 12px;
+                border-radius: 6px;
+
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                width: 60%;
+                
+                * {
+                    padding: 6px;
+                }
+
+                input {
+                    border: none;
+                    font-size: 14px;
+                    font-weight: 400;
+                    width: 80%;
+                    outline: none;
+                }
             }
 
-            input {
-                border: none;
-                font-size: 14px;
-                font-weight: 400;
-                width: 100%;
-                outline: none;
+            .filter-container {
+                display: flex;
+                justify-content: flex-end;
+                position: relative;
+
+                .show-filter {
+                    background-color: #F9F9F9;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    user-select: none;
+
+                    img {
+                        width: 10px;
+                        padding: 0px 4px;
+                    }
+                }
+
+                .filter-study-program {
+                    position: absolute;
+                    width: 200px;
+                    height: 300px;
+                    top: 40px;
+                    overflow: auto;
+                    background-color: #FFFFFF;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+
+                    .study-program {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        font-size: 12px;
+                        color: #3c3c3c;
+                        cursor: pointer;
+                        padding: 2px 0px;
+                        user-select: none;
+                    }
+                }
             }
         }
 
@@ -199,11 +301,16 @@
                 }
 
                 .stu-num {
-                    width: 8%;
+                    width: 9%;
                 }
 
                 .stu-program {
-                    width: 30%;
+                    width: 31%;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    padding-right: 10px;
+                    box-sizing: border-box;
                 }
 
                 .stu-email {
