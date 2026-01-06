@@ -2,6 +2,9 @@
     // Such-Icon (derzeit nicht verwendet)
     import searchIcon from '$lib/assets/search.svg';
 
+    //Neu: Import für Refresh-Button
+    import { invalidateAll } from '$app/navigation';
+
     let { 
         data = [], 
         placeholder = "Suche", 
@@ -34,36 +37,47 @@
 </script>
 
 <div class="search-component">
-    <div class="input-container">
-        <!-- Fall 1: Schon eine Person gewählt → als Button anzeigen (Klick = `clear()`) -->
-        {#if selectedEvaluator}
-             <button class="display-value" onclick={clear} aria-label="Auswahl ändern">
-                {selectedEvaluator.firstName} {selectedEvaluator.lastName}
-             </button>
-        {:else}
-             <!-- Fall 2: Noch keine Person gewählt → Eingabefeld für Suche anzeigen -->
-             <div class="input-wrapper">
-                <input 
-                    type="text" 
-                    {placeholder} 
-                    bind:value={searchTerm}
-                    onfocus={() => showDropdown = true}
-                    oninput={() => showDropdown = true}
-                />
-                
-                {#if filtered.length === 0 && searchTerm.length > 0}
-                    <!-- Keine Treffer, aber Suchtext vorhanden → Erstellen Button zu Referent erstellen -->
-                    <a 
-                        href="/erstellen/referent" 
-                        target="_blank" 
-                        class="create-btn"
-                        style="text-decoration: none; display: inline-block; text-align: center;"
-                    >
-                        erstellen
-                    </a>
-                {/if}
-             </div>
-        {/if}
+    <div class="search-wrapper">
+
+        <div class="input-container">
+            <!-- Fall 1: Schon eine Person gewählt → als Button anzeigen (Klick = `clear()`) -->
+            {#if selectedEvaluator}
+                 <button class="display-value" onclick={clear} aria-label="Auswahl ändern">
+                    {selectedEvaluator.firstName} {selectedEvaluator.lastName}
+                 </button>
+            {:else}
+                 <!-- Fall 2: Noch keine Person gewählt → Eingabefeld für Suche anzeigen -->
+                 <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        {placeholder} 
+                        bind:value={searchTerm}
+                        onfocus={() => showDropdown = true}
+                        oninput={() => showDropdown = true}
+                    />
+                    
+                    {#if filtered.length === 0 && searchTerm.length > 0}
+                        <!-- Keine Treffer, aber Suchtext vorhanden → Erstellen Button zu Referent erstellen -->
+                        <a 
+                            href="/erstellen/referent" 
+                            target="_blank" 
+                            class="create-btn"
+                            style="text-decoration: none; display: inline-block; text-align: center;"
+                        >
+                            erstellen
+                        </a>
+                    {/if}
+                 </div>
+            {/if}
+        </div>
+
+        <button 
+            class="refresh-btn" 
+            onclick={() => invalidateAll()} 
+        >
+            ⟳
+        </button>
+
     </div>
 
     <!-- Dropdown anzeigen, wenn sichtbar, keine Person gewählt, Suchtext vorhanden und Treffer existieren -->
@@ -79,6 +93,7 @@
     {/if}
 </div>
 
+
 <style lang="scss">
     /* Keine Imports nötig hier, wir nutzen feste Farben für dieses Element */
 
@@ -89,8 +104,17 @@
         font-family: "Inter", sans-serif;
     }
 
+    /* Äußerer Wrapper (Layout) um Input + Refresh-Button nebeneinander zu halten */
+    .search-wrapper {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        width: 100%;
+    }
+
     /* Rahmen und Layout des Eingabebereichs, inkl. Fokuszustand */
     .input-container {
+        flex-grow: 1;
         height: 50px;
         background: #FFFFFF;
         border: 1px solid #E9E9E9;
@@ -103,6 +127,32 @@
 
         &:focus-within {
             border-color: #ccc;
+        }
+    }
+
+    /* Refresh-Button zum Aktualisieren der Liste */
+    .refresh-btn {
+        flex-shrink: 0;
+        width: 50px;
+        height: 50px;
+        background: #FFFFFF;
+        border: 1px solid #E9E9E9;
+        border-radius: 6px;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #3B4B55;
+        transition: background-color 0.2s;
+        font-family: "Inter", sans-serif;
+
+        &:hover {
+            background-color: #f7f7f7;
+        }
+
+        &:active {
+            background-color: #e0e0e0;
         }
     }
 
