@@ -17,10 +17,6 @@
         study_programs_mapping[program.id] = program.title;
     });
 
-    let current_student = $state(0);
-    let connected_works = $state([]);
-    let cache = {};
-
     let search_value = $state("");
     let study_programs_selected = $state([]);
     let show_filter = $state(false);
@@ -34,6 +30,8 @@
 
     function set_active_programs(){
         let root = document.querySelector(".filter-study-program");
+        
+        if (root == null) return;
         
         for(let child of root.children){
             let id = Number(child.getAttribute("data-st-id"));
@@ -57,6 +55,10 @@
         set_active_programs();
         filter_search();
     }
+
+    let current_student = $state(0);
+    let connected_works = $state([]);
+    let cache = {};
 
     async function get_connected_works(id){
         return GET(`/api/student/${id}/shortWorks`);
@@ -247,16 +249,17 @@
                     background-color: #FFFFFF;
                     border-radius: 6px;
                     padding: 6px 6px;
+                    display: flex;
+                    flex-direction: column;
                     
                     .filter-heading {
                         font-weight: 700;
                         color: #000000;
                         user-select: none;
+                        padding: 4px 0px;
                     }
 
                     .filter-study-program {
-                        
-    
                         .study-program {
                             white-space: nowrap;
                             overflow: hidden;
