@@ -86,12 +86,16 @@
                     bind:value={search_value} oninput={filter_search}>
             </div>
             <div class="filter-container">
-                <span class="show-filter stroke-style" onclick={() => { show_filter = !show_filter; setTimeout(() => { set_active_programs(); }, 10); } }>{ filter_on ? "Filter: Ein" : "Filter: Aus" }<img src={show_filter ? caretup : caretdown} alt=""></span>
+                <span class="reset-filter stroke-style" onclick={() => { study_programs_selected.splice(0); set_active_programs(); filter_search(); }}>Zurücksetzen</span>
+                <span class="show-filter stroke-style" onclick={() => { show_filter = !show_filter; setTimeout(() => { set_active_programs(); }, 10); }}>{ filter_on ? "Filter: Ein" : "Filter: Aus" }<img src={show_filter ? caretup : caretdown} alt=""></span>
                 {#if show_filter}
-                    <div class="filter-study-program stroke-style">
-                        {#each study_programs as study_program}
-                            <div class="study-program" data-st-id="{study_program.id}" onclick={() => { toggle_study_program(study_program.id); }}>{study_program.title}</div>
-                        {/each}
+                    <div class="filter-popup stroke-style">
+                        <span class="filter-heading">Studiengang</span>
+                        <div class="filter-study-program">
+                            {#each study_programs as study_program}
+                                <div class="study-program" data-st-id="{study_program.id}" onclick={() => { toggle_study_program(study_program.id); }}>{study_program.title}</div>
+                            {/each}
+                        </div>
                     </div>
                 {/if}
             </div>
@@ -208,6 +212,17 @@
                 justify-content: flex-end;
                 position: relative;
 
+                .reset-filter {
+                    background-color: #F9F9F9;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    user-select: none;
+                    margin-right: 12px;
+                }
+
                 .show-filter {
                     background-color: #F9F9F9;
                     padding: 6px 12px;
@@ -222,26 +237,36 @@
                         padding: 0px 4px;
                     }
                 }
-
-                .filter-study-program {
+                
+                .filter-popup {
                     position: absolute;
                     width: 200px;
                     height: 300px;
                     top: 40px;
                     overflow: auto;
                     background-color: #FFFFFF;
-                    padding: 6px 12px;
                     border-radius: 6px;
-
-                    .study-program {
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        font-size: 12px;
-                        color: #3c3c3c;
-                        cursor: pointer;
-                        padding: 2px 0px;
+                    padding: 6px 6px;
+                    
+                    .filter-heading {
+                        font-weight: 700;
+                        color: #000000;
                         user-select: none;
+                    }
+
+                    .filter-study-program {
+                        
+    
+                        .study-program {
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            font-size: 12px;
+                            color: #3c3c3c;
+                            cursor: pointer;
+                            padding: 2px 0px;
+                            user-select: none;
+                        }
                     }
                 }
             }
