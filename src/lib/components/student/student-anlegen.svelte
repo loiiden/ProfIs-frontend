@@ -1,5 +1,5 @@
 <script>
-    import { POST } from "$lib/functions";
+    import { POST, PATCH, DELETE } from "$lib/functions";
 
     async function post_student(){
         let payload = {
@@ -9,14 +9,50 @@
             "email": email,
             "phoneNumber": telefon,
             "studentNumber": Number(matrikel),
+            "salutation": anrede,
             "academicLevel": abschluss,
+            "scientificWorksIds": []
         }
-        console.log(payload);
+
         let res = await POST("/api/student", payload);
         
-        if(res.status == 201){
+        console.log(res);
+
+        if(res.status == 200){
             console.log("Successfully Created Student");
-            // window.location = "/erstellen/student";
+            window.location = `/erstellen/student?id=${id}`;
+        }
+    }
+
+    async function patch_student(id){
+        let payload = {
+            "firstName": vorname,
+            "lastName": nachname,
+            "address": addresse,
+            "email": email,
+            "phoneNumber": telefon,
+            "studentNumber": Number(matrikel),
+            "salutation": anrede,
+            "academicLevel": abschluss,
+            "scientificWorksIds": []
+        }
+
+        let res = await PATCH(`/api/student/${id}`, payload);
+        
+        console.log(res);
+
+        if(res.status == 200){
+            console.log("Successfully Patched Student");
+            window.location = `/erstellen/student?id=${id}`;
+        }
+    }
+
+    async function delete_student(id){
+        let res = await DELETE(`/api/student/${id}`);
+
+        if(res.status == 204){
+            console.log("Successfully Deleted Student");
+            window.location = `/studenten`;
         }
     }
 
@@ -33,27 +69,30 @@
     let telefon = $derived(student_data.phoneNumber);
     let matrikel = $derived(student_data.studentNumber);
     let abschluss = $derived(student_data.academicLevel);
+    let anrede = $derived(student_data.salutation);
 
     let external_toggle = $state(false);
-    let anrede = $state("d")
 </script>
 
 <div class="student-anlegen-container">
-    <div class="headline">STUDENT ANLEGEN</div>
+    <div class="headline">{create ? "STUDENT ANLEGEN" : "STUDENT BEARBEITEN"}</div>
     <div class="student-name-container stroke-style">
         <div class="headline-s">Student</div>
         <div class="select-title">Titel</div>
         <div class="titel">
             <select class="stroke-style" bind:value={anrede} name="" id="">
-                <option value="m">Herr</option>
-                <option value="w">Frau</option>
-                <option value="d">Divers</option>
+                <option value="HERR">Herr</option>
+                <option value="FRAU">Frau</option>
+                <option value="DIVERS">Divers</option>
             </select>
             <select class="stroke-style" bind:value={abschluss} name="" id="">
-                <option value="0">kein Abschluss</option>
-                <option value="1">Bachelor</option>
-                <option value="2">Master</option>
-                <option value="2">Doktor</option>
+                <option value="NONE">kein Abschluss</option>
+                <option value="BACHELOR">Bachelor</option>
+                <option value="DIPLOMA">Diplom</option>
+                <option value="MASTER">Master</option>
+                <option value="DR">Doktor</option>
+                <option value="PROF">Prof.</option>
+                <option value="PROF_DOCTOR">Prof. Dr.</option>
             </select>
         </div>
         <div class="annotated-text-input">
@@ -85,8 +124,11 @@
         </div>
     </div>
     <div class="buttons">
-        <button class="cancel" onclick={() => { window.location = "/"; }}>Cancel</button>
-        <button class="submit" onclick={() => { post_student(); }}>Submit</button>
+        <button class="cancel stroke-style" onclick={() => { window.location = "/studenten"; }}>Abbrechen</button>
+        {#if !create}
+            <button class="delete stroke-style" onclick={() => { delete_student(student_id); }}>Löschen</button>
+        {/if}
+        <button class="submit" onclick={() => { create ? post_student() : patch_student(student_id); }}>{create ? "Erstellen" : "Aktualisieren"}</button>
     </div>
 </div>
 
@@ -104,9 +146,13 @@
         grid-column-start: 1;
         grid-column-end: 6;
         grid-row-start: 1;
-        grid-row-end: 3;
+        grid-row-end: 4;
         padding: 0px 30px;
-        font-size: 2em;
+        font-weight: 600;
+        font-size: 18px;
+        font-family: "Inter";
+        display: flex;
+        align-items: center;
     }
 }
 
@@ -213,13 +259,13 @@
 }
 
 .buttons {
-    grid-column-start: 10;
+    grid-column-start: 9;
     grid-column-end: 13;
     grid-row-start: 15;
     grid-row-end: 19;
 
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
 
     button {
@@ -227,10 +273,10 @@
         font-weight: 600;
         font-size: 14px;
         font-family: "Inter";
-        border: none;
         border-radius: 6px;
         padding: 12px;
         cursor: pointer;
+        min-width: 100px;
     }
 
     .cancel {
@@ -238,9 +284,15 @@
         background: none;
     }
 
+    .delete {
+        color: white;
+        background-color: $error;
+    }
+
     .submit {
         background-color: $primary;
         color: #FFFFFF;
+        border: none;
     }
 }
 

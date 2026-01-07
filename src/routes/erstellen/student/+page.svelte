@@ -19,6 +19,7 @@
         email: "",
         phoneNumber: "",
         studentNumber: null,
+        salutation: null,
         academicLevel: null,
         scientificWorksIds: []
     });

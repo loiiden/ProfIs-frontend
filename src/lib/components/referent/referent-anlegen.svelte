@@ -1,21 +1,50 @@
 <script>
-    import { POST } from "$lib/functions";
+    import { POST, PATCH, DELETE } from "$lib/functions";
 
     async function post_referent(){
         let payload = {
             "firstName": vorname,
             "lastName": nachname,
             "email": email,
+            "address": addresse,
             "phoneNumber": telefon,
             "academicLevel": abschluss,
-            "role": null
+            "role": external_toggle ? "EXTERNAL" : "PROFESSOR"
         }
-        console.log(payload);
+
         let res = await POST("/api/evaluator", payload);
         
-        if(res.status == 201){
+        if(res.status == 200){
             console.log("Successfully Created Referent");
-            // window.location = "/erstellen/referent";
+            window.location = `/erstellen/referent?id=${id}`;
+        }
+    }
+
+    async function patch_referent(id){
+        let payload = {
+            "firstName": vorname,
+            "lastName": nachname,
+            "email": email,
+            "address": addresse,
+            "phoneNumber": telefon,
+            "academicLevel": abschluss,
+            "role": external_toggle ? "EXTERNAL" : "PROFESSOR"
+        }
+
+        let res = await PATCH(`/api/evaluator/${id}`, payload);
+
+        if(res.status == 200){
+            console.log("Successfully Patched Referent");
+            window.location = `/erstellen/referent?id=${id}`;
+        }
+    }
+
+    async function delete_referent(id){
+        let res = await DELETE(`/api/evaluator/${id}`);
+
+        if(res.status == 204){
+            console.log("Successfully Deleted Referent");
+            window.location = `/referenten`;
         }
     }
 
@@ -29,29 +58,32 @@
     let nachname = $derived(referent_data.lastName);
     let telefon = $derived(referent_data.phoneNumber);
     let email = $derived(referent_data.email);
-    let addresse = $derived(referent_data.addresse);
+    let addresse = $derived(referent_data.address);
     let abschluss = $derived(referent_data.academicLevel);
+    let anrede = $derived(referent_data.salutation);
 
-    let external_toggle = $state(false);
-    let anrede = $state("d")
+    let external_toggle = $derived(referent_data.role === "EXTERNAL");
 </script>
 
 <div class="referent-anlegen-container">
-    <div class="headline">REFERENT ANLEGEN</div>
+    <div class="headline">{create ? "REFERENT ANLEGEN" : "REFERENT BEARBEITEN"}</div>
     <div class="referent-name-container stroke-style">
         <div class="headline-s">Referent</div>
         <div class="select-title">Titel</div>
         <div class="titel">
             <select class="stroke-style" bind:value={anrede} name="" id="">
-                <option value="m">Herr</option>
-                <option value="w">Frau</option>
-                <option value="d">Divers</option>
+                <option value="HERR">Herr</option>
+                <option value="FRAU">Frau</option>
+                <option value="DIVERS">Divers</option>
             </select>
             <select class="stroke-style" bind:value={abschluss} name="" id="">
-                <option value="0">kein Abschluss</option>
-                <option value="1">Bachelor</option>
-                <option value="2">Master</option>
-                <option value="2">Doktor</option>
+                <option value="NONE">kein Abschluss</option>
+                <option value="BACHELOR">Bachelor</option>
+                <option value="DIPLOMA">Diplom</option>
+                <option value="MASTER">Master</option>
+                <option value="DR">Doktor</option>
+                <option value="PROF">Prof.</option>
+                <option value="PROF_DOCTOR">Prof. Dr.</option>
             </select>
         </div>
         <div class="annotated-text-input">
@@ -84,8 +116,11 @@
         </div>
     </div>
     <div class="buttons">
-        <button class="cancel" onclick={() => { window.location = "/"; }}>Cancel</button>
-        <button class="submit" onclick={() => { post_referent(); }}>Submit</button>
+        <button class="cancel stroke-style" onclick={() => { window.location = "/referenten"; }}>Abbrechen</button>
+        {#if !create}
+            <button class="delete stroke-style" onclick={() => { delete_referent(referent_id); }}>Löschen</button>
+        {/if}
+        <button class="submit" onclick={() => { create ? post_referent() : patch_referent(referent_id); }}>{create ? "Erstellen" : "Aktualisieren"}</button>
     </div>
 </div>
 
@@ -103,9 +138,13 @@
         grid-column-start: 1;
         grid-column-end: 5;
         grid-row-start: 1;
-        grid-row-end: 3;
+        grid-row-end: 4;
         padding: 0px 30px;
-        font-size: 2em;
+        font-weight: 600;
+        font-size: 18px;
+        font-family: "Inter";
+        display: flex;
+        align-items: center;
     }
 }
 
@@ -217,13 +256,13 @@
 }
 
 .buttons {
-    grid-column-start: 10;
+    grid-column-start: 9;
     grid-column-end: 13;
     grid-row-start: 15;
     grid-row-end: 19;
 
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
 
     button {
@@ -231,10 +270,10 @@
         font-weight: 600;
         font-size: 14px;
         font-family: "Inter";
-        border: none;
         border-radius: 6px;
         padding: 12px;
         cursor: pointer;
+        min-width: 100px;
     }
 
     .cancel {
@@ -242,9 +281,15 @@
         background: none;
     }
 
+    .delete {
+        color: white;
+        background-color: $error;
+    }
+
     .submit {
         background-color: $primary;
         color: #FFFFFF;
+        border: none;
     }
 }
 

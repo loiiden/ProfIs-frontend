@@ -66,6 +66,8 @@ header {
     padding: 20px 0px;
     padding-bottom: 10px;
 
+    user-select: none;
+
     a {
         grid-column-start: 1;
         grid-column-end: 2;
