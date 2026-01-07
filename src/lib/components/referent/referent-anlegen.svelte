@@ -60,9 +60,9 @@
     let email = $derived(referent_data.email);
     let addresse = $derived(referent_data.address);
     let abschluss = $derived(referent_data.academicLevel);
+    let anrede = $derived(referent_data.salutation);
 
     let external_toggle = $derived(referent_data.role === "EXTERNAL");
-    let anrede = $state("d")
 </script>
 
 <div class="referent-anlegen-container">
