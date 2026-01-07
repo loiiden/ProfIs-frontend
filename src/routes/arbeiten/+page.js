@@ -1,0 +1,24 @@
+import { api_url } from '$lib/constants.js';
+
+export const ssr = false
+
+export const load = async ({ fetch, params }) => {
+    let res_1 = await fetch(`${api_url}/api/student`);
+	const students = await res_1.json();
+
+    let res_2 = await fetch(`${api_url}/api/study-program`);
+	const study_programs = await res_2.json();
+    
+    let res_3 = await fetch(`${api_url}/api/scientific-work`);
+	const sworks = await res_3.json();
+
+    let res_4 = await fetch(`${api_url}/api/evaluator`);
+	const referenten = await res_4.json();
+	
+    return {
+        students: students,
+        study_programs: study_programs,
+        sworks: sworks,
+        referenten: referenten
+    };
+};
