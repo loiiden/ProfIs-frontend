@@ -20,6 +20,11 @@
         student_mapping[student.id] = student;
     });
 
+    let referent_mapping = {};
+    data.referenten.forEach(referent => {
+        referent_mapping[referent.id] = referent;
+    });
+
     let search_value = $state("");
     let study_programs_selected = $state([]);
     let show_filter = $state(false);
@@ -59,7 +64,21 @@
         filter_search();
     }
 
-    
+    let current_swork = $state(0);
+
+    async function show_connected(sw_id){
+        current_swork = sworks_base.filter(sw => sw.id == sw_id)[0];
+    }
+
+    const alevel_to_title = {
+        "NONE": "",
+        "BACHELOR": "",
+        "MASTER": "",
+        "DR": "Dr. ",
+        "PROF": "Prof. ",
+        "PROF_DOCTOR": "Prof. Dr. ",
+        "DIPLOMA": ""
+    }
 </script>
 
 <div class="sworks-filter-table-container">
@@ -96,7 +115,7 @@
         <div class="sworks-table">
             {#each sworks_filtered as swork}
                 <div class="sworks-row">
-                    <span class="swork-name">
+                    <span class="swork-name" onclick={() => { show_connected(swork.id); }}>
                         <p>{swork.title}</p>
                         <span>{study_programs_mapping[swork.studyProgramId].title}, {student_mapping[swork.studentId].firstName + " " + student_mapping[swork.studentId].lastName}</span>
                     </span>
@@ -116,6 +135,31 @@
         </div>
     </div>
     <div class="sworks-short stroke-style">
+        {#if !(current_swork == 0)}
+        <div class="current-swork">
+            <span class="style-med">{current_swork.title}</span>
+            <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId].title}</span>
+            <span class="style-small">{student_mapping[current_swork.studentId].firstName + " " + student_mapping[current_swork.studentId].lastName}</span>
+            <span class="style-med top-gap">Kommentar: </span>
+            <span class="style-med">{current_swork.comment}</span>
+
+            <span class="style-small top-gap">Startdatum: {String(current_swork.startDate.toReversed()).replaceAll(",", ".")}</span>
+            <span class="style-small">Abgabedatum: {String(current_swork.endDate.toReversed()).replaceAll(",", ".")}</span>
+            
+            <span class="style-small top-gap">Kolloquiumsdatum: {String(current_swork.colloquium.toReversed().splice(2)).replaceAll(",", ".")}</span>
+            <span class="style-small">Kolloquiumsort: {current_swork.colloquiumLocation}</span>
+            <span class="style-small">Präsentation: {current_swork.presentationStart} - {current_swork.presentationEnd}</span>
+            <span class="style-small">Diskussions: {current_swork.discussionStart} - {current_swork.discussionEnd}</span>
+            
+            <span class="style-med top-gap">Referent: {alevel_to_title[referent_mapping[current_swork.mainEvaluatorId].academicLevel] + referent_mapping[current_swork.mainEvaluatorId].firstName + " " + referent_mapping[current_swork.mainEvaluatorId].lastName}</span>
+            <span class="style-small">Punkte Arbeit: {current_swork.mainEvaluatorWorkMark}</span>
+            <span class="style-small">Punkte Kolloquium: {current_swork.mainEvaluatorColloquiumMark}</span>
+            
+            <span class="style-med top-gap">Korreferent: {alevel_to_title[referent_mapping[current_swork.mainEvaluatorId].academicLevel] + referent_mapping[current_swork.secondEvaluatorId].firstName + " " + referent_mapping[current_swork.secondEvaluatorId].lastName}</span>
+            <span class="style-small">Punkte Arbeit: {current_swork.secondEvaluatorWorkMark}</span>
+            <span class="style-small">Punkte Kolloquium: {current_swork.secondEvaluatorColloquiumMark}</span>
+        </div>
+        {/if}
     </div>
 </div>
 
@@ -302,6 +346,7 @@
 
                 .swork-name {
                     width: 55%;
+                    cursor: pointer;
                     
                     p {
                         margin: 0px;
@@ -361,12 +406,49 @@
         grid-row-end: 16;
 
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: flex-start;
+        align-items: flex-start;
         flex-direction: column;
 
         padding: 12px;
         border-radius: 10px;
+
+        .current-swork {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+
+            width: 100%;
+
+            .ellipsis {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
+            }
+
+            .top-gap {
+                margin-top: 10px;
+            }
+
+            .style-small {
+                font-size: 14px;
+                font-family: 'Inter';
+            }
+
+            .style-med {
+                font-size: 14px;
+                font-family: 'Inter SB';
+            }
+
+            .style-large {
+                font-size: 22px;
+                font-weight: bold;
+                font-family: 'Inter SB';
+                padding: 6px 0px;
+            }
+        }
     }
 }
 

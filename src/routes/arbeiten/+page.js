@@ -11,10 +11,14 @@ export const load = async ({ fetch, params }) => {
     
     let res_3 = await fetch(`${api_url}/api/scientific-work`);
 	const sworks = await res_3.json();
+
+    let res_4 = await fetch(`${api_url}/api/evaluator`);
+	const referenten = await res_4.json();
 	
     return {
         students: students,
         study_programs: study_programs,
-        sworks: sworks
+        sworks: sworks,
+        referenten: referenten
     };
 };

@@ -101,6 +101,16 @@
     function show_connected(ref_id){
         connected_works = [ref_id];
     }
+
+    const alevel_to_title = {
+        "NONE": "",
+        "BACHELOR": "",
+        "MASTER": "",
+        "DR": "Dr. ",
+        "PROF": "Prof. ",
+        "PROF_DOCTOR": "Prof. Dr. ",
+        "DIPLOMA": ""
+    }
 </script>
 
 <div class="referent-filter-table-container">
@@ -142,7 +152,7 @@
         <div class="referent-table">
             {#each referent_filtered as referent}
                 <div class="referent-row">
-                    <span onclick={() => { show_connected(referent.id); }} class="ref-name">{referent.firstName + " " + referent.lastName}<a href="/erstellen/referent/?id={referent.id}"><img class="open-new" src={openblank} alt=""></a></span>
+                    <span onclick={() => { show_connected(referent.id); }} class="ref-name">{alevel_to_title[referent.academicLevel] + referent.firstName + " " + referent.lastName}<a href="/erstellen/referent/?id={referent.id}"><img class="open-new" src={openblank} alt=""></a></span>
                     <span class="current-works">{referent.numberOfOpenWorks}</span>
                     <span class="ref-email"><a href="mailto:{referent.email}">{referent.email}</a></span>
                     <span class="ref-phone">{referent.phoneNumber}</span>
