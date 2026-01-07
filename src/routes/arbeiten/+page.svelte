@@ -9,6 +9,7 @@
     let sworks_base = data.sworks
     let sworks_filtered = $state(data.sworks);
 
+    let study_programs = data.study_programs;
     let study_programs_mapping = {};
     data.study_programs.forEach(program => {
         study_programs_mapping[program.id] = program;
@@ -20,11 +21,45 @@
     });
 
     let search_value = $state("");
+    let study_programs_selected = $state([]);
     let show_filter = $state(false);
+    let filter_on = $derived(study_programs_selected.length > 0);
 
     function filter_search(){
         sworks_filtered = sworks_base.filter((work) => (work.title + " " + study_programs_mapping[work.studyProgramId].title + ", " + student_mapping[work.studentId].firstName + " " + student_mapping[work.studentId].lastName).includes(search_value))
+        if(study_programs_selected.length > 0)
+            sworks_filtered = sworks_filtered.filter((work) => study_programs_selected.includes(work.studyProgramId));
     }
+
+    function set_active_programs(){
+        let root = document.querySelector(".filter-study-program");
+        
+        if (root == null) return;
+        
+        for(let child of root.children){
+            let id = Number(child.getAttribute("data-st-id"));
+            if(study_programs_selected.includes(id)){
+                child.style.fontWeight = "700";
+                child.style.color = "#000000";
+            } else {
+                child.style.fontWeight = "400";
+                child.style.color = "#3c3c3c";
+            }
+        }
+    }
+
+    function toggle_study_program(sp_id){
+        if(study_programs_selected.includes(sp_id)){
+            study_programs_selected.splice(study_programs_selected.indexOf(sp_id), 1)
+        } else {
+            study_programs_selected.push(sp_id);
+        }
+
+        set_active_programs();
+        filter_search();
+    }
+
+    
 </script>
 
 <div class="sworks-filter-table-container">
@@ -37,11 +72,16 @@
                     bind:value={search_value} oninput={filter_search}>
             </div>
             <div class="filter-container">
-                <span class="reset-filter stroke-style" onclick={() => { }}>Zurücksetzen</span>
-                <span class="show-filter stroke-style" onclick={() => { show_filter = !show_filter; }}>Filter: Aus<img src={show_filter ? caretup : caretdown} alt=""></span>
+                <span class="reset-filter stroke-style" onclick={() => { study_programs_selected.splice(0); set_active_programs(); filter_search(); }}>Zurücksetzen</span>
+                <span class="show-filter stroke-style" onclick={() => { show_filter = !show_filter; setTimeout(() => { set_active_programs(); }, 10); }}>{ filter_on ? "Filter: Ein" : "Filter: Aus" }<img src={show_filter ? caretup : caretdown} alt=""></span>
                 {#if show_filter}
                     <div class="filter-popup stroke-style">
                         <span class="filter-heading">Studiengang</span>
+                        <div class="filter-study-program">
+                            {#each study_programs as study_program}
+                                <div class="study-program" data-st-id="{study_program.id}" onclick={() => { toggle_study_program(study_program.id); }}>{study_program.title}</div>
+                            {/each}
+                        </div>
                     </div>
                 {/if}
             </div>
@@ -183,6 +223,7 @@
                     width: 200px;
                     height: 230px;
                     top: 40px;
+                    overflow: auto;
                     background-color: #FFFFFF;
                     border-radius: 6px;
                     padding: 6px 6px;
@@ -196,8 +237,8 @@
                         padding: 4px 0px;
                     }
 
-                    .filter-status, .filter-alevel {
-                        .ref-status, .ref-alevel {
+                    .filter-study-program {
+                        .study-program {
                             white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;
