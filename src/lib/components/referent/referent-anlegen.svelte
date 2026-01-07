@@ -7,16 +7,17 @@
             "lastName": nachname,
             "email": email,
             "address": addresse,
+            "salutation": anrede,
             "phoneNumber": telefon,
             "academicLevel": abschluss,
             "role": external_toggle ? "EXTERNAL" : "PROFESSOR"
         }
 
-        let res = await POST("/api/evaluator", payload);
+        let res = await POST("/api/evaluator", payload);        
         
-        if(res.status == 200){
+        if(res.status == 201){
             console.log("Successfully Created Referent");
-            window.location = `/erstellen/referent?id=${id}`;
+            window.location = `/referenten`;
         }
     }
 
@@ -26,6 +27,7 @@
             "lastName": nachname,
             "email": email,
             "address": addresse,
+            "salutation": anrede,
             "phoneNumber": telefon,
             "academicLevel": abschluss,
             "role": external_toggle ? "EXTERNAL" : "PROFESSOR"
@@ -61,6 +63,9 @@
     let addresse = $derived(referent_data.address);
     let abschluss = $derived(referent_data.academicLevel);
     let anrede = $derived(referent_data.salutation);
+
+    console.log(anrede);
+    
 
     let external_toggle = $derived(referent_data.role === "EXTERNAL");
 </script>

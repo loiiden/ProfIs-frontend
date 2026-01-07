@@ -15,12 +15,10 @@
         }
 
         let res = await POST("/api/student", payload);
-        
-        console.log(res);
 
         if(res.status == 200){
             console.log("Successfully Created Student");
-            window.location = `/erstellen/student?id=${id}`;
+            window.location = `/studenten`;
         }
     }
 
@@ -70,6 +68,9 @@
     let matrikel = $derived(student_data.studentNumber);
     let abschluss = $derived(student_data.academicLevel);
     let anrede = $derived(student_data.salutation);
+
+    console.log(anrede);
+    
 
     let external_toggle = $state(false);
 </script>

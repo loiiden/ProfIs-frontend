@@ -17,7 +17,8 @@
         email: "",
         phoneNumber: "",
         academicLevel: null,
-        role: null
+        role: null,
+        salutation: null
     });
 
     onMount(async () => {
