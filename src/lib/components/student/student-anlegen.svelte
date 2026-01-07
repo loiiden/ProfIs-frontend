@@ -69,9 +69,6 @@
     let abschluss = $derived(student_data.academicLevel);
     let anrede = $derived(student_data.salutation);
 
-    console.log(anrede);
-    
-
     let external_toggle = $state(false);
 </script>
 
