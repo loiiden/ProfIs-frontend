@@ -38,7 +38,7 @@
                     <a href="/erstellen/student" onclick={toggle}>STUDENT</a>
                 </div>
             </div>
-            <button class="export">EINSTELLUNGEN</button>
+            <a href="/settings" class="export" class:active="{page.url.pathname == '/settings'}">EINSTELLUNGEN</a>
         </div>
     </header>
 
@@ -146,6 +146,14 @@ header {
             background-color: #FFFFFF;
             font-family: "Inter SB";
             font-size: 14px;
+            color: black;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .export.active {
+            color: #317B3B;
         }
 
         .anlegen, .export {
