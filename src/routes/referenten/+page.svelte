@@ -143,7 +143,7 @@
             {#each referent_filtered as referent}
                 <div class="referent-row">
                     <span onclick={() => { show_connected(referent.id); }} class="ref-name">{referent.firstName + " " + referent.lastName}<a href="/erstellen/referent/?id={referent.id}"><img class="open-new" src={openblank} alt=""></a></span>
-                    <span class="current-works">{Math.floor(Math.random() * 10)}</span>
+                    <span class="current-works">{referent.numberOfOpenWorks}</span>
                     <span class="ref-email"><a href="mailto:{referent.email}">{referent.email}</a></span>
                     <span class="ref-phone">{referent.phoneNumber}</span>
                 </div>
