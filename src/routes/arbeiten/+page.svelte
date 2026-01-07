@@ -27,6 +27,7 @@
 
     let search_value = $state("");
     let study_programs_selected = $state([]);
+    let status_selected = $state([]);
     let show_filter = $state(false);
     let filter_on = $derived(study_programs_selected.length > 0);
 
@@ -34,6 +35,8 @@
         sworks_filtered = sworks_base.filter((work) => (work.title + " " + study_programs_mapping[work.studyProgramId].title + ", " + student_mapping[work.studentId].firstName + " " + student_mapping[work.studentId].lastName).includes(search_value))
         if(study_programs_selected.length > 0)
             sworks_filtered = sworks_filtered.filter((work) => study_programs_selected.includes(work.studyProgramId));
+        if(status_selected.length > 0)
+            sworks_filtered = sworks_filtered.filter((work) => status_selected.includes(work.status));
     }
 
     function set_active_programs(){
@@ -64,6 +67,34 @@
         filter_search();
     }
 
+    function set_active_status(){
+        let root = document.querySelector(".filter-status");
+        
+        if (root == null) return;
+        
+        for(let child of root.children){
+            let status = child.getAttribute("data-status");
+            if(status_selected.includes(status)){
+                child.style.fontWeight = "700";
+                child.style.color = "#000000";
+            } else {
+                child.style.fontWeight = "400";
+                child.style.color = "#3c3c3c";
+            }
+        }
+    }
+
+    function toggle_status(status){
+        if(status_selected.includes(status)){
+            status_selected.splice(status_selected.indexOf(status), 1)
+        } else {
+            status_selected.push(status);
+        }
+
+        set_active_status();
+        filter_search();
+    }
+
     let current_swork = $state(0);
 
     async function show_connected(sw_id){
@@ -79,6 +110,49 @@
         "PROF_DOCTOR": "Prof. Dr. ",
         "DIPLOMA": ""
     }
+
+    const status_list = [
+        "PROPOSAL",
+        "DISCUSSION",
+        "FINAL_SUBMISSION",
+        "REVIEW",
+        "ARCHIVE",
+        "ABORT"
+    ]
+
+    const color_mapping = {
+        "PROPOSAL": "#7D8398",
+        "DISCUSSION": "#24B6D8",
+        "FINAL_SUBMISSION": "#65A839",
+        "REVIEW": "#2e5812",
+        "ARCHIVE": "#333C70",
+        "ABORT": "#AF4357"
+    }
+
+    const status_mapping = {
+        "PROPOSAL": "In Planung",
+        "DISCUSSION": "In Arbeit",
+        "FINAL_SUBMISSION": "Abgegeben",
+        "REVIEW": "Korrektur",
+        "ARCHIVE": "Archiviert",
+        "ABORT": "Abgebrochen"
+    }
+
+    import archive from '$lib/assets/archive.svg';
+    import bookmark from '$lib/assets/bookmark.svg';
+    import checkmark from '$lib/assets/checkmark.svg';
+    import cross from '$lib/assets/cross.svg';
+    import hourglasssplit from '$lib/assets/hourglass-split.svg';
+    import pen from '$lib/assets/pen.svg';
+
+    const img_mapping = {
+        "PROPOSAL": bookmark,
+        "DISCUSSION": pen,
+        "FINAL_SUBMISSION": checkmark,
+        "REVIEW": hourglasssplit,
+        "ARCHIVE": archive,
+        "ABORT": cross
+    }
 </script>
 
 <div class="sworks-filter-table-container">
@@ -91,10 +165,16 @@
                     bind:value={search_value} oninput={filter_search}>
             </div>
             <div class="filter-container">
-                <span class="reset-filter stroke-style" onclick={() => { study_programs_selected.splice(0); set_active_programs(); filter_search(); }}>Zurücksetzen</span>
-                <span class="show-filter stroke-style" onclick={() => { show_filter = !show_filter; setTimeout(() => { set_active_programs(); }, 10); }}>{ filter_on ? "Filter: Ein" : "Filter: Aus" }<img src={show_filter ? caretup : caretdown} alt=""></span>
+                <span class="reset-filter stroke-style" onclick={() => { study_programs_selected.splice(0); status_selected.splice(0); set_active_programs(); set_active_status(); filter_search(); }}>Zurücksetzen</span>
+                <span class="show-filter stroke-style" onclick={() => { show_filter = !show_filter; setTimeout(() => { set_active_programs(); set_active_status(); }, 10); }}>{ filter_on ? "Filter: Ein" : "Filter: Aus" }<img src={show_filter ? caretup : caretdown} alt=""></span>
                 {#if show_filter}
                     <div class="filter-popup stroke-style">
+                        <span class="filter-heading">Status</span>
+                        <div class="filter-status">
+                            {#each status_list as status}
+                                <div class="status" data-status="{status}" onclick={() => { toggle_status(status); }}>{status_mapping[status]}</div>
+                            {/each}
+                        </div>
                         <span class="filter-heading">Studiengang</span>
                         <div class="filter-study-program">
                             {#each study_programs as study_program}
@@ -119,9 +199,9 @@
                         <p>{swork.title}</p>
                         <span>{study_programs_mapping[swork.studyProgramId].title}, {student_mapping[swork.studentId].firstName + " " + student_mapping[swork.studentId].lastName}</span>
                     </span>
-                    <span class="swork-status">
-                        <p>XX</p>
-                        <p>In Besprechung</p>
+                    <span class="swork-status" style:color="{color_mapping[swork.status]}">
+                        <p><img src={img_mapping[swork.status]} alt=""></p>
+                        <p>{status_mapping[swork.status]}</p>
                         <p>24.03.2026</p>
                     </span>
                     <span class="swork-start">{String(swork.startDate.toReversed()).replaceAll(",", ".")}</span>
@@ -140,8 +220,11 @@
             <span class="style-med">{current_swork.title}</span>
             <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId].title}</span>
             <span class="style-small">{student_mapping[current_swork.studentId].firstName + " " + student_mapping[current_swork.studentId].lastName}</span>
+            
+            <span class="style-small top-gap">Status: {status_mapping[current_swork.status]}</span>
+
             <span class="style-med top-gap">Kommentar: </span>
-            <span class="style-med">{current_swork.comment}</span>
+            <span class="style-small">{current_swork.comment}</span>
 
             <span class="style-small top-gap">Startdatum: {String(current_swork.startDate.toReversed()).replaceAll(",", ".")}</span>
             <span class="style-small">Abgabedatum: {String(current_swork.endDate.toReversed()).replaceAll(",", ".")}</span>
@@ -265,7 +348,7 @@
                 .filter-popup {
                     position: absolute;
                     width: 200px;
-                    height: 230px;
+                    height: 300px;
                     top: 40px;
                     overflow: auto;
                     background-color: #FFFFFF;
@@ -281,8 +364,8 @@
                         padding: 4px 0px;
                     }
 
-                    .filter-study-program {
-                        .study-program {
+                    .filter-study-program, .filter-status {
+                        .study-program, .status {
                             white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;
@@ -366,6 +449,10 @@
 
                     p {
                         margin: 0px;
+
+                        img {
+                            width: 12px;
+                        }
                     }
 
                     * {
