@@ -165,7 +165,7 @@
         grid-row-end: 16;
         
         background-color: #FFFFFF;
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        border: 1px solid #E9E9E9;
         border-radius: 10px;
         
         padding: 30px;
