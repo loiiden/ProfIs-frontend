@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import { afterNavigate } from '$app/navigation';
     
     import StudentAnlegen from "$lib/components/student/student-anlegen.svelte";
     
@@ -24,12 +25,27 @@
         scientificWorksIds: []
     });
 
-    onMount(async () => {
+    afterNavigate(async () => {
         const url_params = new URLSearchParams(window.location.search);
         if(url_params.has('id')){
             student_id = url_params.get("id");
             create = false;
             student_data = await get_student(student_id);
+        } else {
+            create = true;
+            student_id = 0;
+            student_data = {
+                id: null,
+                firstName: "",
+                lastName: "",
+                address: "",
+                email: "",
+                phoneNumber: "",
+                studentNumber: null,
+                salutation: null,
+                academicLevel: null,
+                scientificWorksIds: []
+            };
         }
     });
 </script>

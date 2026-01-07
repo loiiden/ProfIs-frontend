@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte';
-    
+    import { afterNavigate } from '$app/navigation';
+
     import ReferentAnlegen from '$lib/components/referent/referent-anlegen.svelte';
     
     import { GET, POST } from '$lib/functions';
@@ -21,12 +22,24 @@
         salutation: null
     });
 
-    onMount(async () => {
+    afterNavigate(async () => {
         const url_params = new URLSearchParams(window.location.search);
         if(url_params.has('id')){
             referent_id = url_params.get("id");
             create = false;
             referent_data = await get_referent(referent_id);
+        } else {
+            referent_id = 0;
+            create = true;
+            referent_data = {
+                firstName: "",
+                lastName: "",
+                email: "",
+                phoneNumber: "",
+                academicLevel: null,
+                role: null,
+                salutation: null
+            };
         }
     });
 </script>

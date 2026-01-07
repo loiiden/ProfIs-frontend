@@ -64,9 +64,6 @@
     let abschluss = $derived(referent_data.academicLevel);
     let anrede = $derived(referent_data.salutation);
 
-    console.log(anrede);
-    
-
     let external_toggle = $derived(referent_data.role === "EXTERNAL");
 </script>
 
