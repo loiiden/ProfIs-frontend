@@ -1,6 +1,5 @@
 <script>
-    // optionales Icon (wie bei dir)
-    import searchIcon from '$lib/assets/search.svg';
+    import {invalidateAll} from "$app/navigation";
 
     let {
         data = [],
@@ -13,7 +12,6 @@
 
     let safeData = $derived(Array.isArray(data) ? data : []);
 
-    // exakt wie bei EvaluatorSearch
     let filtered = $derived(
         safeData.filter(s =>
             `${s.firstName ?? ""} ${s.lastName ?? ""}`
@@ -39,7 +37,6 @@
     <div class="input-container">
 
         {#if selectedStudent}
-            <!-- AUSGEWÄHLT → Button -->
             <button
                     class="display-value"
                     onclick={clear}
@@ -48,7 +45,6 @@
                 {selectedStudent.firstName} {selectedStudent.lastName}
             </button>
         {:else}
-            <!-- SUCHFELD -->
             <div class="input-wrapper">
                 <input
                         type="text"
@@ -59,14 +55,30 @@
                 />
 
                 {#if filtered.length === 0 && searchTerm.length > 0}
-                    <button type="button" class="create-btn">
+
+                    <a
+                            href="/erstellen/student"
+                            target="_blank"
+                            class="create-btn"
+                            style="text-decoration: none; display: inline-block; text-align: center;"
+                    >
                         erstellen
-                    </button>
+                    </a>
                 {/if}
             </div>
         {/if}
 
+
     </div>
+
+    <button
+            class="refresh-btn"
+            type="button"
+            onclick={() => invalidateAll()}
+            aria-label="Neu laden"
+    >
+        ⟳
+    </button>
 
     {#if showDropdown && !selectedStudent && searchTerm.length > 0 && filtered.length > 0}
         <div class="dropdown-list">
@@ -80,15 +92,19 @@
             {/each}
         </div>
     {/if}
+
 </div>
 
 <style lang="scss">
-  /* EXAKT aus deinem EvaluatorSearch übernommen */
 
   .search-component {
     position: relative;
     width: 100%;
     font-family: "Inter", sans-serif;
+
+    display: flex; // <- neu
+    align-items: center; // <- neu
+    gap: 16px; // <- wie bei dir optisch passend
   }
 
   .input-container {
@@ -101,6 +117,7 @@
     padding: 0 16px;
     box-sizing: border-box;
     transition: border-color 0.2s;
+    flex: 1;
 
     &:focus-within {
       border-color: #ccc;
@@ -165,7 +182,7 @@
     background: white;
     border: 1px solid #E9E9E9;
     border-radius: 6px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
     z-index: 20;
     max-height: 200px;
     overflow-y: auto;
@@ -183,8 +200,31 @@
       color: #3B4B55;
       font-family: "Inter";
 
-      &:last-child { border-bottom: none; }
-      &:hover { background-color: #f9f9f9; }
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background-color: #f9f9f9;
+      }
     }
   }
+
+  .refresh-btn {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    background: #FFFFFF;
+    border: 1px solid #E9E9E9;
+    border-radius: 6px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #3B4B55;
+    transition: background-color 0.2s;
+    font-family: "Inter", sans-serif;
+  }
+
 </style>
