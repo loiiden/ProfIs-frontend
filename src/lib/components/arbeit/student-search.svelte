@@ -1,10 +1,12 @@
 <script>
-    import {invalidateAll} from "$app/navigation";
 
     let {
         data = [],
         placeholder = "Student suchen",
-        selectedStudent = $bindable(null)
+        selectedStudent = $bindable(null),
+
+        refresh = () => {
+        }
     } = $props();
 
     let searchTerm = $state("");
@@ -34,80 +36,68 @@
 </script>
 
 <div class="search-component">
-    <div class="input-container">
+    <div class="search-wrapper">
+        <div class="input-container">
+            {#if selectedStudent}
+                <button class="display-value" type="button" onclick={clear} aria-label="Auswahl ändern">
+                    {selectedStudent.firstName} {selectedStudent.lastName}
+                </button>
+            {:else}
+                <div class="input-wrapper">
+                    <input
+                            type="text"
+                            {placeholder}
+                            bind:value={searchTerm}
+                            onfocus={() => showDropdown = true}
+                            oninput={() => showDropdown = true}
+                    />
 
-        {#if selectedStudent}
-            <button
-                    class="display-value"
-                    onclick={clear}
-                    aria-label="Auswahl ändern"
-            >
-                {selectedStudent.firstName} {selectedStudent.lastName}
-            </button>
-        {:else}
-            <div class="input-wrapper">
-                <input
-                        type="text"
-                        {placeholder}
-                        bind:value={searchTerm}
-                        onfocus={() => showDropdown = true}
-                        oninput={() => showDropdown = true}
-                />
+                    {#if filtered.length === 0 && searchTerm.length > 0}
+                        <a
+                                href="/erstellen/student"
+                                target="_blank"
+                                class="create-btn"
+                                style="text-decoration: none; display: inline-block; text-align: center;"
+                        >
+                            erstellen
+                        </a>
+                    {/if}
+                </div>
+            {/if}
+        </div>
 
-                {#if filtered.length === 0 && searchTerm.length > 0}
-
-                    <a
-                            href="/erstellen/student"
-                            target="_blank"
-                            class="create-btn"
-                            style="text-decoration: none; display: inline-block; text-align: center;"
-                    >
-                        erstellen
-                    </a>
-                {/if}
-            </div>
-        {/if}
-
-
+        <button class="refresh-btn" type="button" onclick={() => refresh()}>
+            ⟳
+        </button>
     </div>
-
-    <button
-            class="refresh-btn"
-            type="button"
-            onclick={() => invalidateAll()}
-            aria-label="Neu laden"
-    >
-        ⟳
-    </button>
 
     {#if showDropdown && !selectedStudent && searchTerm.length > 0 && filtered.length > 0}
         <div class="dropdown-list">
             {#each filtered as student}
-                <button
-                        class="list-item"
-                        onclick={() => select(student)}
-                >
+                <button class="list-item" type="button" onclick={() => select(student)}>
                     {student.firstName} {student.lastName}
                 </button>
             {/each}
         </div>
     {/if}
-
 </div>
 
 <style lang="scss">
-
   .search-component {
     position: relative;
     width: 100%;
     font-family: "Inter", sans-serif;
+  }
 
-    display: flex; // <- neu
-    align-items: center; // <- neu
-    gap: 16px; // <- wie bei dir optisch passend
+  .search-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
   }
 
   .input-container {
+    flex-grow: 1;
     height: 50px;
     background: #FFFFFF;
     border: 1px solid #E9E9E9;
@@ -117,10 +107,34 @@
     padding: 0 16px;
     box-sizing: border-box;
     transition: border-color 0.2s;
-    flex: 1;
 
     &:focus-within {
       border-color: #ccc;
+    }
+  }
+
+  .refresh-btn {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    background: #FFFFFF;
+    border: 1px solid #E9E9E9;
+    border-radius: 6px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #3B4B55;
+    transition: background-color 0.2s;
+    font-family: "Inter", sans-serif;
+
+    &:hover {
+      background-color: #f7f7f7;
+    }
+
+    &:active {
+      background-color: #e0e0e0;
     }
   }
 
@@ -209,22 +223,4 @@
       }
     }
   }
-
-  .refresh-btn {
-    flex-shrink: 0;
-    width: 50px;
-    height: 50px;
-    background: #FFFFFF;
-    border: 1px solid #E9E9E9;
-    border-radius: 6px;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #3B4B55;
-    transition: background-color 0.2s;
-    font-family: "Inter", sans-serif;
-  }
-
 </style>
