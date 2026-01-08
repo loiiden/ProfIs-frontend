@@ -1,5 +1,6 @@
 <script>
     import DetailView from "$lib/components/overview-arbeit.svelte";
+    import CommentArbeit from "$lib/components/overview/comment-arbeit.svelte";
 
     let search = "";
 
@@ -279,6 +280,7 @@
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 1rem;
+    outline: none;
   }
 
   .status {
@@ -341,3 +343,10 @@
         prev={prev}
         next={next}
 />
+
+<CommentArbeit kommentar="asdfas dfasd fasdfa sdfasd fasdf asdfas dfasdfasd fasdf asdfasdf
+asdfas dfasdfasdfa sdfasdfas dfasdfa sdfasdfa sdfasd fasdfasd fasdfasdf
+asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf
+asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf
+asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf
+asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf"/>

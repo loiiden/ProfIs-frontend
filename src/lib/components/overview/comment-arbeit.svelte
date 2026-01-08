@@ -1,4 +1,10 @@
-<div class="comment-arbeit-container">
+<script>
+    let props = $props();
+</script>
+
+<div class="comment-arbeit-container stroke-style">
+    <p class="style-med">Kommentar:</p>
+    <p class="style-small">{props.kommentar}</p>
 </div>
 
 <style lang="scss">
@@ -12,5 +18,21 @@
     background-color: #FFFFFF;
     padding: 12px;
     border-radius: 10px;
+
+    overflow: auto;
+
+    p {
+        margin: 0px;
+    }
+}
+
+.style-small {
+    font-size: 14px;
+    font-family: 'Inter';
+}
+
+.style-med {
+    font-size: 14px;
+    font-family: 'Inter SB';
 }
 </style>

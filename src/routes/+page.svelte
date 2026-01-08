@@ -1,8 +1,6 @@
 <script>
-    import OverviewArbeit from "$lib/components/overview-arbeit.svelte";
     import FilterArbeiten from "$lib/components/filter-arbeiten.svelte";
     import OverviewSws from "$lib/components/overview/overview-sws.svelte";
-    import CommentArbeit from "$lib/components/overview/comment-arbeit.svelte";
     import OverviewTermine from "$lib/components/overview/overview-termine.svelte";
     import NotenSkala from "$lib/components/overview/noten-skala.svelte";
 
@@ -11,10 +9,8 @@
 
 <main class="overview-container">
     <div class="headline-s">ÜBERSICHT</div>
-    <OverviewArbeit />
     <FilterArbeiten />
     <OverviewSws target={data.sws.target} count={data.sws.count} />
-    <CommentArbeit />
     <OverviewTermine />
     <NotenSkala bewertet={data.marks.marked} offen={data.marks.open} average={data.marks.average}/>
 </main>
