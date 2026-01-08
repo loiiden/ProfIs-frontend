@@ -18,18 +18,15 @@
             studentId: null,
             studyProgramId: null,
 
-            // evaluators (IDs kommen von links)
             mainEvaluatorId: null,
             secondEvaluatorId: null,
 
             comment: "",
 
-            // events
             events: [{eventType: "", eventDate: ""}]
         })
     } = $props();
 
-    // UI helper
     let kolloquiumUI = $state({tag: "", zeit: ""});
 
     let students = $state([]);
@@ -59,17 +56,6 @@
         {value: "ARCHIVE", label: "ARCHIVE"},
         {value: "ABORT", label: "ABORT"}
     ];
-
-    onMount(async () => {
-        try {
-            students = await GET('/api/student');
-            studyPrograms = await GET('/api/study-program');
-        } catch (e) {
-            console.error('Konnte Daten nicht laden:', e);
-            students = [];
-            studyPrograms = [];
-        }
-    });
 
     $effect(() => {
         data.studentId = selectedStudent?.id ?? null;
@@ -143,6 +129,24 @@
         copy[activeVeranstaltungIndex] = {...(copy[activeVeranstaltungIndex] ?? {}), eventDate: value};
         data.events = copy;
     }
+
+    async function loadStudents() {
+        console.log("loading students...");
+        students = await GET('/api/student');
+    }
+
+    async function loadStudyPrograms() {
+        try {
+            studyPrograms = await GET("/api/study-program");
+        } catch (e) {
+            console.error("Konnte Studiengänge nicht laden:", e);
+            studyPrograms = [];
+        }
+    }
+
+    onMount(async () => {
+        await Promise.all([loadStudents(), loadStudyPrograms()]);
+    });
 </script>
 
 <div class="erfassen-daten-arbeit-container">
@@ -157,6 +161,7 @@
                             data={students}
                             bind:selectedStudent={selectedStudent}
                             placeholder="Suche"
+                            refresh={loadStudents}
                     />
                 </div>
             </div>
