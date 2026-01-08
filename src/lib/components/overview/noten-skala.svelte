@@ -14,7 +14,7 @@
 
 </script>
 
-<div class="noten-skala-container">
+<div class="noten-skala-container stroke-style">
     <div class="mark-information">
         <AnnotatedNumber number={props.bewertet} annotation="Bewertet"/>
         <AnnotatedNumber number={props.offen} annotation="Offen"/>

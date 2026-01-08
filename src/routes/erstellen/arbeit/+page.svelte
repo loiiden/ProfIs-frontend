@@ -180,10 +180,10 @@
 
   .erstellen-arbeit-container {
     display: grid;
-    grid-template-rows: repeat(16, auto);
+    grid-template-rows: repeat(30, 4.5px);
     grid-template-columns: repeat(12, 1fr);
     column-gap: 20px;
-    row-gap: 30px;
+    row-gap: 25px;
     padding-bottom: 50px;
     font-family: "Inter";
   }
@@ -191,35 +191,38 @@
   .header-row {
     grid-column-start: 1;
     grid-column-end: 13;
+    grid-row-start: 1;
+    grid-row-end: 4;
     display: flex;
     align-items: center;
     padding: 0 30px;
-    margin-bottom: 20px;
   }
 
   .page-title {
-    font-size: 2em;
+    font-weight: 600;
+    font-size: 18px;
+    font-family: "Inter";
   }
 
   .action-bar {
     grid-column: 8 / 13;
-    grid-row: 16 / 17;
+    grid-row: 28 / 30;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 20px;
-    margin-top: 10px;
   }
 
   .save-btn {
     background-color: $primary;
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 12px 12px;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
+    min-width: 100px;
     cursor: pointer;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 
     &:hover {
       background-color: #1a9cb7;
@@ -235,10 +238,11 @@
     background-color: #FFFFFF;
     color: $error;
     border: 1px solid #E9E9E9;
-    padding: 12px 24px;
+    padding: 12px 12px;
     border-radius: 6px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
+    min-width: 100px;
     cursor: pointer;
     box-shadow: rgba(149, 157, 165, 0.1) 0px 4px 12px;
 

@@ -161,14 +161,14 @@
     .erfassen-noten-container {
         grid-column-start: 1;
         grid-column-end: 8;
-        grid-row-start: 9;
-        grid-row-end: 16;
+        grid-row-start: 11;
+        grid-row-end: 30;
         
         background-color: #FFFFFF;
         border: 1px solid #E9E9E9;
         border-radius: 10px;
         
-        padding: 30px;
+        padding: 18px;
         font-family: "Inter", sans-serif;
         display: flex;
         flex-direction: column;

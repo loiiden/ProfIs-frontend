@@ -1,4 +1,5 @@
-<div class="overview-termine-container">
+<div class="overview-termine-container stroke-style">
+    <p class="style-med">Nächste Termine</p>
 </div>
 
 <style lang="scss">
@@ -12,5 +13,19 @@
     background-color: #FFFFFF;
     padding: 12px;
     border-radius: 10px;
+    
+    p {
+        margin: 0px;
+    }
+}
+
+.style-small {
+    font-size: 14px;
+    font-family: 'Inter';
+}
+
+.style-med {
+    font-size: 14px;
+    font-family: 'Inter SB';
 }
 </style>
