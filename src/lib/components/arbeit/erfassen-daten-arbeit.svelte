@@ -33,7 +33,9 @@
 
     let studyPrograms = $state([]);
     let selectedStudyProgramId = $state(null);
+    let selectedStudyProgram = $state(null);
     let studyProgramText = $state("");
+    let studyProgramManuallySet = $state(false);
     let studyProgramById = $derived(
         new Map((Array.isArray(studyPrograms) ? studyPrograms : []).map(sp => [sp.id, sp.title]))
     );
