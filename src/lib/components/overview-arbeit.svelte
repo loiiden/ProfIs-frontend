@@ -12,7 +12,7 @@
     <div class="effect-el-1"></div>
     <div class="effect-el-2"></div>
 
-    <div class="overview-arbeit">
+    <div class="overview-arbeit stroke-style">
 
         {#if item}
 
@@ -69,6 +69,7 @@
     grid-column-end: 8;
     grid-row-start: 2;
     grid-row-end: 10;
+    border: none;
 
     display: flex;
     justify-content: left;
@@ -99,7 +100,6 @@
       width: 94%;
       height: 87%;
       background-color: #FFFFFF;
-      box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
       padding: 12px;
       box-sizing: border-box;
     }

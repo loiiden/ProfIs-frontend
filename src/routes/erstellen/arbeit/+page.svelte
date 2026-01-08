@@ -223,7 +223,6 @@
     font-weight: 600;
     min-width: 100px;
     cursor: pointer;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 
     &:hover {
       background-color: #1a9cb7;
