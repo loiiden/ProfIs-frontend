@@ -2,6 +2,7 @@
     import {onMount} from 'svelte';
     import StudentSearch from '$lib/components/arbeit/student-search.svelte';
     import {GET} from '$lib/functions.js';
+    import StudyProgramSearch from '$lib/components/arbeit/study-program-search.svelte';
 
     let {
         data = $bindable({
@@ -33,12 +34,8 @@
     let selectedStudent = $state(null);
 
     let studyPrograms = $state([]);
-    let selectedStudyProgramId = $state(null);
-    let studyProgramText = $state("");
-
-    let studyProgramById = $derived(
-        new Map((Array.isArray(studyPrograms) ? studyPrograms : []).map(sp => [sp.id, sp.title]))
-    );
+    let selectedStudyProgram = $state(null);
+    let studyProgramManuallySet = $state(false);
 
     let activeVeranstaltungIndex = $state(0);
 
@@ -61,18 +58,36 @@
         data.studentId = selectedStudent?.id ?? null;
 
         if (!selectedStudent) {
-            selectedStudyProgramId = null;
+            selectedStudyProgram = null;
             data.studyProgramId = null;
-            studyProgramText = "";
+            studyProgramManuallySet = false;
             return;
         }
 
-        const spId = selectedStudent.studyProgramId ?? null;
-        selectedStudyProgramId = spId;
-        data.studyProgramId = spId;
-
-        studyProgramText = spId ? (studyProgramById.get(spId) ?? "") : "";
+        if (!studyProgramManuallySet) {
+            const spId = selectedStudent.studyProgramId ?? null;
+            selectedStudyProgram = spId ? (studyPrograms.find(sp => sp.id === spId) ?? null) : null;
+            data.studyProgramId = selectedStudyProgram?.id ?? null;
+        }
     });
+
+    $effect(() => {
+        if (selectedStudyProgram && !studyProgramManuallySet) {
+        }
+        data.studyProgramId = selectedStudyProgram?.id ?? null;
+    });
+
+    function onStudyProgramSelected(sp) {
+        selectedStudyProgram = sp;
+        data.studyProgramId = sp?.id ?? null;
+        studyProgramManuallySet = true;
+    }
+
+    function onStudyProgramCleared() {
+        selectedStudyProgram = null;
+        data.studyProgramId = null;
+        studyProgramManuallySet = true;
+    }
 
     $effect(() => {
         if (!kolloquiumUI.tag || !kolloquiumUI.zeit) {
@@ -85,18 +100,6 @@
     function setDurationMinutes(minutesStr) {
         const minutes = Number(minutesStr);
         data.colloquiumDuration = Number.isFinite(minutes) && minutes > 0 ? `PT${minutes}M` : null;
-    }
-
-    function setStudyProgram(sp) {
-        selectedStudyProgramId = sp.id;
-        data.studyProgramId = sp.id;
-        studyProgramText = sp.title;
-    }
-
-    function onStudyProgramTextInput(value) {
-        studyProgramText = value;
-        selectedStudyProgramId = null;
-        data.studyProgramId = null;
     }
 
     function addVeranstaltung() {
@@ -169,26 +172,13 @@
             <div class="field">
                 <div class="label">Studiengang</div>
 
-                <div class="pills">
-                    {#each studyPrograms as sp}
-                        <button
-                                type="button"
-                                class="pill {selectedStudyProgramId === sp.id ? 'active' : ''}"
-                                on:click={() => setStudyProgram(sp)}
-                        >
-                            {sp.title}
-                        </button>
-                    {/each}
-                </div>
-
-                <div class="input-shell">
-                    <input
-                            type="text"
-                            placeholder="-"
-                            value={studyProgramText}
-                            on:input={(e) => onStudyProgramTextInput(e.target.value)}
-                    />
-                </div>
+                <StudyProgramSearch
+                        data={studyPrograms}
+                        placeholder="Studiengang suchen"
+                        selectedStudyProgram={selectedStudyProgram}
+                        onSelected={onStudyProgramSelected}
+                        onCleared={onStudyProgramCleared}
+                />
             </div>
         </div>
 
