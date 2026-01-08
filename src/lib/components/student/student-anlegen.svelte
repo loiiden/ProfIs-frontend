@@ -135,7 +135,7 @@
     display: grid;
     grid-template-rows: repeat(30, 4.5px);
     grid-template-columns: repeat(12, 1fr);
-    column-gap: 110px;
+    column-gap: 20px;
     row-gap: 25px;
 
     font-family: "Inter";

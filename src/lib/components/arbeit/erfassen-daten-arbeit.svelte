@@ -381,8 +381,8 @@
   .erfassen-daten-arbeit-container {
     grid-column-start: 8;
     grid-column-end: 13;
-    grid-row-start: 2;
-    grid-row-end: 16;
+    grid-row-start: 3;
+    grid-row-end: 28;
     border: 1px solid #E9E9E9;
     background-color: #FFFFFF;
     border-radius: 10px;

@@ -10,7 +10,7 @@
 </script>
 
 <main class="overview-container">
-    <div>ÜBERSICHT</div>
+    <div class="headline-s">ÜBERSICHT</div>
     <OverviewArbeit />
     <FilterArbeiten />
     <OverviewSws target={data.sws.target} count={data.sws.count} />
@@ -29,11 +29,20 @@
 
     font-family: "Inter";
 
-    div {
+    .headline-s {
         grid-column-start: 1;
-        grid-column-end: 5;
+        grid-column-end: 4;
+        grid-row-start: 1;
+        grid-row-end: 2;
+        position: relative;
+        top: 10px;
+
         padding: 0px 30px;
-        font-size: 2em;
+        font-weight: 600;
+        font-size: 18px;
+        font-family: "Inter";
+        display: flex;
+        align-items: center;
     }
 }
 
