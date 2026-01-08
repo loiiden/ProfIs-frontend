@@ -1,25 +1,24 @@
 <script>
-
+    import { onMount } from 'svelte';
+    import { afterNavigate } from '$app/navigation';
     import PreviewOverviewArbeit from "$lib/components/arbeit/preview-overview-arbeit.svelte";
     import ErfassenNoten from "$lib/components/arbeit/erfassen-noten.svelte";
     import ErfassenDatenArbeit from "$lib/components/arbeit/erfassen-daten-arbeit.svelte";
-
-
-    import {POST} from "$lib/functions";
+    import {POST, GET, PATCH, DELETE} from "$lib/functions";
     import {goto} from "$app/navigation";
 
     let {data} = $props();
 
-    let arbeitData = $state({
+    let create = $state(true);
+    let workId = $state(0);
 
+    let arbeitData = $state({
         mainEvaluator: null,
         secondEvaluator: null,
-
         mainEvaluatorWorkMark: null,
         mainEvaluatorColloquiumMark: null,
         secondEvaluatorWorkMark: null,
         secondEvaluatorColloquiumMark: null,
-
         title: "",
         startDate: "",
         endDate: "",
@@ -32,19 +31,144 @@
         discussionEnd: "",
         studentId: null,
         studyProgramId: null,
-
         comment: "",
-
         events: [{eventType: "", eventDate: ""}]
     });
-
+    
+    // Track event IDs loaded from backend to detect deletions
+    let loadedEventIds = $state([]);
+    
     let isSaving = $state(false);
+
+    function findEvaluator(id) {
+        if (!id || !data.referenten) return null;
+        return data.referenten.find(r => r.id === id) || { id: id };
+    }
+
+    // --- NEUE HELFER-FUNKTIONEN ---
+    // Wandelt [2025, 7, 9] in "2025-07-09" um
+    function formatBackendDate(d) {
+        if (!d) return null;
+        if (Array.isArray(d)) {
+            const [y, m, day] = d;
+            return `${y}-${m.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        }
+        return d;
+    }
+
+    // Wandelt [2025, 10, 12, 14, 30] in "2025-10-12T14:30" um
+    function formatBackendDateTime(d) {
+        if (!d) return null;
+        if (Array.isArray(d)) {
+            const [y, m, day, h, min] = d;
+            return `${y}-${m.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
+        }
+        return d;
+    }
+    // -----------------------------
+
+    async function loadWork(id) {
+        try {
+            const work = await GET(`/api/scientific-work/${id}`);
+            const workEvents = await GET(`/api/scientific-work/${id}/events`);
+
+            if (work) {
+                arbeitData = {
+                    ...arbeitData,
+                    title: work.title,
+                    // Hier wenden wir die Formatierung an:
+                    startDate: formatBackendDate(work.startDate),
+                    endDate: formatBackendDate(work.endDate),
+                    colloquium: formatBackendDateTime(work.colloquium),
+                    
+                    colloquiumLocation: work.colloquiumLocation,
+                    colloquiumDuration: work.colloquiumDuration,
+                    presentationStart: work.presentationStart,
+                    presentationEnd: work.presentationEnd,
+                    discussionStart: work.discussionStart,
+                    discussionEnd: work.discussionEnd,
+                    studentId: work.studentId,
+                    studyProgramId: work.studyProgramId,
+                    comment: work.comment,
+                    mainEvaluatorWorkMark: work.mainEvaluatorWorkMark,
+                    mainEvaluatorColloquiumMark: work.mainEvaluatorColloquiumMark,
+                    secondEvaluatorWorkMark: work.secondEvaluatorWorkMark,
+                    secondEvaluatorColloquiumMark: work.secondEvaluatorColloquiumMark,
+                    
+                    mainEvaluator: findEvaluator(work.mainEvaluatorId),
+                    secondEvaluator: findEvaluator(work.secondEvaluatorId),
+
+                    // Auch die Events müssen formatiert werden
+                    events: (workEvents && workEvents.length > 0) 
+                        ? workEvents.map(e => ({
+                            ...e,
+                            eventDate: formatBackendDate(e.eventDate)
+                          }))
+                        : [{eventType: "", eventDate: ""}]
+                };
+
+                // Remember IDs of events fetched from backend
+                loadedEventIds = (workEvents ?? [])
+                    .map(e => e?.id)
+                    .filter(id => id !== null && id !== undefined);
+            }
+        } catch (e) {
+            console.error("Fehler beim Laden der Arbeit:", e);
+        }
+    }
+
+    let previousWorkId = 0;
+
+    afterNavigate(async () => {
+        const url_params = new URLSearchParams(window.location.search);
+        if(url_params.has('id')){
+            workId = url_params.get("id");
+            create = false;
+            await loadWork(workId);
+            previousWorkId = workId;
+        } else {
+            const wasEditMode = previousWorkId !== 0;
+            create = true;
+            workId = 0;
+            // Reset data when switching to create mode
+            arbeitData = {
+                mainEvaluator: null,
+                secondEvaluator: null,
+                mainEvaluatorWorkMark: null,
+                mainEvaluatorColloquiumMark: null,
+                secondEvaluatorWorkMark: null,
+                secondEvaluatorColloquiumMark: null,
+                title: "",
+                startDate: "",
+                endDate: "",
+                colloquium: null,
+                colloquiumLocation: "",
+                colloquiumDuration: null,
+                presentationStart: "",
+                presentationEnd: "",
+                discussionStart: "",
+                discussionEnd: "",
+                studentId: null,
+                studyProgramId: null,
+                comment: "",
+                events: [{eventType: "", eventDate: ""}]
+            };
+            loadedEventIds = [];
+            previousWorkId = 0;
+            
+            // Auto-refresh nach Wechsel von Edit zu Create
+            if (wasEditMode) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 200);
+            }
+        }
+    });
 
     function toNullIfEmpty(v) {
         const s = (v ?? "").toString().trim();
         return s === "" ? null : s;
     }
-
 
     function buildScientificWorkCreateDTO() {
         return {
@@ -74,6 +198,7 @@
         return (arbeitData.events ?? [])
             .filter(e => e.eventType && e.eventDate)
             .map(e => ({
+                id: e.id,
                 eventType: e.eventType,
                 eventDate: e.eventDate,
                 scientificWorkId
@@ -84,7 +209,6 @@
         if (!arbeitData.title || arbeitData.title.trim() === "") {
             return "Bitte einen Titel eingeben.";
         }
-
         const invalidEvent = (arbeitData.events ?? []).some(e =>
             (e.eventType && !e.eventDate) || (!e.eventType && e.eventDate)
         );
@@ -103,41 +227,80 @@
 
         isSaving = true;
         try {
-
             const workPayload = buildScientificWorkCreateDTO();
-            const workRes = await POST("/api/scientific-work", workPayload);
+            let finalWorkId = workId;
 
-            if (!workRes?.ok) {
-                console.error("Work create failed:", workRes);
-                alert("Fehler beim Erstellen der Arbeit.");
-                return;
-            }
-
-            const created = await workRes.json();
-            const scientificWorkId = created?.id ?? created?.scientificWorkId;
-
-            if (!scientificWorkId) {
-                console.error("Create response ohne ID:", created);
-                alert("Fehler: Keine scientificWorkId vom Backend erhalten.");
-                return;
-            }
-
-            const events = buildEventDTOs(scientificWorkId);
-
-            for (const ev of events) {
-                const evRes = await POST("/api/event", ev);
-                if (!evRes?.ok) {
-                    console.error("Event create failed:", ev, evRes);
-                    alert("Fehler beim Speichern eines Events.");
+            if (create) {
+                const workRes = await POST("/api/scientific-work", workPayload);
+                if (!workRes?.ok) {
+                    alert("Fehler beim Erstellen der Arbeit.");
+                    return;
+                }
+                const created = await workRes.json();
+                finalWorkId = created?.id ?? created?.scientificWorkId;
+            } else {
+                const workRes = await PATCH(`/api/scientific-work/${workId}`, workPayload);
+                if (!workRes?.ok) {
+                    alert("Fehler beim Aktualisieren der Arbeit.");
                     return;
                 }
             }
 
-            alert("Erfolgreich gespeichert!");
+            if (!finalWorkId) {
+                alert("Fehler: Keine ID vorhanden.");
+                return;
+            }
+
+            const events = buildEventDTOs(finalWorkId);
+
+            // Detect deleted events: present before, missing now (after filtering invalid ones)
+            const currentValidIds = new Set(events.map(e => e.id).filter(Boolean));
+            const toDeleteIds = (loadedEventIds ?? []).filter(id => !currentValidIds.has(id));
+
+            console.debug("Speichern: Events (DTO)", events);
+            console.debug("Speichern: Zu löschende Event-IDs", toDeleteIds);
+
+            for (const id of toDeleteIds) {
+                try {
+                    const res = await DELETE(`/api/event/${id}`);
+                    if (!res?.ok) {
+                        const txt = await res.text().catch(() => "");
+                        console.error(`Event-DELETE fehlgeschlagen (${id}):`, res?.status, txt);
+                    } else {
+                        console.debug(`Event gelöscht: ${id}`);
+                    }
+                } catch (e) {
+                    console.error(`Fehler beim Löschen des Events ${id}:`, e);
+                }
+            }
+            for (const ev of events) {
+                try {
+                    if (ev.id) {
+                        const res = await PATCH(`/api/event/${ev.id}`, ev);
+                        if (!res?.ok) {
+                            const txt = await res.text().catch(() => "");
+                            console.error(`Event-PATCH fehlgeschlagen (${ev.id}):`, res?.status, txt);
+                        }
+                    } else {
+                        const res = await POST("/api/event", ev);
+                        if (!res?.ok) {
+                            const txt = await res.text().catch(() => "");
+                            console.error(`Event-POST fehlgeschlagen:`, res?.status, txt);
+                        }
+                    }
+                } catch (e) {
+                    console.error("Fehler beim Speichern/Aktualisieren eines Events:", e);
+                }
+            }
+
+            // Update local snapshot of event IDs to reflect current state
+            loadedEventIds = events.map(e => e.id).filter(Boolean);
+
+            alert(create ? "Erfolgreich gespeichert!" : "Erfolgreich aktualisiert!");
             goto("/arbeiten");
         } catch (e) {
-            console.error("Create failed:", e);
-            alert("Fehler beim Erstellen der Arbeit.");
+            console.error("Save failed:", e);
+            alert("Fehler beim Speichern der Arbeit.");
         } finally {
             isSaving = false;
         }
@@ -150,7 +313,7 @@
 
 <main class="erstellen-arbeit-container">
     <div class="header-row">
-        <div class="page-title">ARBEIT ANLEGEN</div>
+        <div class="page-title">{create ? "ARBEIT ANLEGEN" : "ARBEIT BEARBEITEN"}</div>
     </div>
 
     <PreviewOverviewArbeit/>
@@ -170,14 +333,13 @@
         </button>
 
         <button class="save-btn" type="button" on:click={arbeitSpeichern} disabled={isSaving}>
-            {isSaving ? "Speichern..." : "Speichern"}
+            {isSaving ? "Speichern..." : (create ? "Speichern" : "Aktualisieren")}
         </button>
     </div>
 </main>
 
 <style lang="scss">
   @import 'src/styles/colors.scss';
-
   .erstellen-arbeit-container {
     display: grid;
     grid-template-rows: repeat(16, auto);
@@ -220,7 +382,6 @@
     font-weight: 600;
     cursor: pointer;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
     &:hover {
       background-color: #1a9cb7;
     }
@@ -241,7 +402,6 @@
     font-weight: 600;
     cursor: pointer;
     box-shadow: rgba(149, 157, 165, 0.1) 0px 4px 12px;
-
     &:hover {
       background-color: #f9f9f9;
     }

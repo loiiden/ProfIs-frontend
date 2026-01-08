@@ -1,16 +1,21 @@
 import { api_url } from '$lib/constants.js';
 
-export const ssr = false
+export const ssr = false;
 
-export const load = async ({ fetch, params }) => {
-	let res = await fetch(`${api_url}/marks/average`);
-	const marks = await res.json();
-	
-	res = await fetch(`${api_url}/sws/info`);
-	const sws = await res.json();
+export const load = async ({ fetch }) => {
+    // Noten laden
+    let res = await fetch(`${api_url}/marks/average`);
+    const marks = await res.json();
+    
+    // SWS laden
+    res = await fetch(`${api_url}/api/sws/main-user/current`);
+    const currentSws = await res.json();
 
     return {
         marks: marks,
-        sws: sws
+        sws: {
+            current: currentSws, // SWS-Wert aus der API
+            target: 2.0 // ZIEL: Feste Zahl
+        }
     };
 };
