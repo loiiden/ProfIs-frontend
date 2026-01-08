@@ -10,7 +10,7 @@
 <main class="overview-container">
     <div class="headline-s">ÜBERSICHT</div>
     <FilterArbeiten />
-    <OverviewSws target={data.sws.target} count={data.sws.count} />
+    <OverviewSws target={data.sws.target} current={data.sws.current} />
     <OverviewTermine />
     <NotenSkala bewertet={data.marks.marked} offen={data.marks.open} average={data.marks.average}/>
 </main>

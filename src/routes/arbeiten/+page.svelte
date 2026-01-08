@@ -32,7 +32,7 @@
     let filter_on = $derived(study_programs_selected.length > 0);
 
     function filter_search(){
-        sworks_filtered = sworks_base.filter((work) => (work.title + " " + study_programs_mapping[work.studyProgramId].title + ", " + student_mapping[work.studentId].firstName + " " + student_mapping[work.studentId].lastName).includes(search_value))
+        sworks_filtered = sworks_base.filter((work) => (work.title + " " + (study_programs_mapping[work.studyProgramId]?.title ?? "") + ", " + (student_mapping[work.studentId]?.firstName ?? "") + " " + (student_mapping[work.studentId]?.lastName ?? "")).includes(search_value))
         if(study_programs_selected.length > 0)
             sworks_filtered = sworks_filtered.filter((work) => study_programs_selected.includes(work.studyProgramId));
         if(status_selected.length > 0)
@@ -197,18 +197,18 @@
                 <div class="sworks-row">
                     <span class="swork-name" onclick={() => { show_connected(swork.id); }}>
                         <p>{swork.title}</p>
-                        <span>{study_programs_mapping[swork.studyProgramId].title}, {student_mapping[swork.studentId].firstName + " " + student_mapping[swork.studentId].lastName}</span>
+                        <span>{study_programs_mapping[swork.studyProgramId]?.title ?? "-"}, {(student_mapping[swork.studentId]?.firstName ?? "") + " " + (student_mapping[swork.studentId]?.lastName ?? "-")}</span>
                     </span>
                     <span class="swork-status" style:color="{color_mapping[swork.status]}">
                         <p><img src={img_mapping[swork.status]} alt=""></p>
                         <p>{status_mapping[swork.status]}</p>
                         <p>24.03.2026</p>
                     </span>
-                    <span class="swork-start">{String(swork.startDate.toReversed()).replaceAll(",", ".")}</span>
-                    <span class="swork-end">{String(swork.endDate.toReversed()).replaceAll(",", ".")}</span>
+                    <span class="swork-start">{swork.startDate ? String(swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
+                    <span class="swork-end">{swork.endDate ? String(swork.endDate.toReversed()).replaceAll(",", ".") : "-"}</span>
                     <span class="swork-kolloq">
-                        <p>{String(swork.colloquium.toReversed().splice(2)).replaceAll(",", ".")}</p>
-                        <p>{swork.presentationStart + " " + swork.colloquiumLocation}</p>
+                        <p>{swork.colloquium ? String(swork.colloquium.toReversed().splice(2)).replaceAll(",", ".") : "-"}</p>
+                        <p>{(swork.presentationStart ?? "") + " " + (swork.colloquiumLocation ?? "")}</p>
                     </span>
                 </div>
             {/each}
@@ -218,21 +218,21 @@
         {#if !(current_swork == 0)}
         <div class="current-swork">
             <span class="style-med">{current_swork.title}</span>
-            <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId].title}</span>
-            <span class="style-small">{student_mapping[current_swork.studentId].firstName + " " + student_mapping[current_swork.studentId].lastName}</span>
+            <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId]?.title ?? "-"}</span>
+            <span class="style-small">{(student_mapping[current_swork.studentId]?.firstName ?? "") + " " + (student_mapping[current_swork.studentId]?.lastName ?? "-")}</span>
             
             <span class="style-small top-gap">Status: {status_mapping[current_swork.status]}</span>
 
             <span class="style-med top-gap">Kommentar: </span>
             <span class="style-small">{current_swork.comment}</span>
 
-            <span class="style-small top-gap">Startdatum: {String(current_swork.startDate.toReversed()).replaceAll(",", ".")}</span>
-            <span class="style-small">Abgabedatum: {String(current_swork.endDate.toReversed()).replaceAll(",", ".")}</span>
+            <span class="style-small top-gap">Startdatum: {current_swork.startDate ? String(current_swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
+            <span class="style-small">Abgabedatum: {current_swork.endDate ? String(current_swork.endDate.toReversed()).replaceAll(",", ".") : "-"}</span>
             
-            <span class="style-small top-gap">Kolloquiumsdatum: {String(current_swork.colloquium.toReversed().splice(2)).replaceAll(",", ".")}</span>
-            <span class="style-small">Kolloquiumsort: {current_swork.colloquiumLocation}</span>
-            <span class="style-small">Präsentation: {current_swork.presentationStart} - {current_swork.presentationEnd}</span>
-            <span class="style-small">Diskussions: {current_swork.discussionStart} - {current_swork.discussionEnd}</span>
+            <span class="style-small top-gap">Kolloquiumsdatum: {current_swork.colloquium ? String(current_swork.colloquium.toReversed().splice(2)).replaceAll(",", ".") : "-"}</span>
+            <span class="style-small">Kolloquiumsort: {current_swork.colloquiumLocation ?? "-"}</span>
+            <span class="style-small">Präsentation: {current_swork.presentationStart ?? "-"} - {current_swork.presentationEnd ?? "-"}</span>
+            <span class="style-small">Diskussions: {current_swork.discussionStart ?? "-"} - {current_swork.discussionEnd ?? "-"}</span>
             
             <span class="style-med top-gap">Referent: {alevel_to_title[referent_mapping[current_swork.mainEvaluatorId].academicLevel] + referent_mapping[current_swork.mainEvaluatorId].firstName + " " + referent_mapping[current_swork.mainEvaluatorId].lastName}</span>
             <span class="style-small">Punkte Arbeit: {current_swork.mainEvaluatorWorkMark}</span>

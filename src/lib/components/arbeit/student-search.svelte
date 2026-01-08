@@ -5,8 +5,8 @@
         placeholder = "Student suchen",
         selectedStudent = $bindable(null),
 
-        refresh = () => {
-        }
+      refresh = () => {},
+      onClear = () => {}
     } = $props();
 
     let searchTerm = $state("");
@@ -32,6 +32,7 @@
         selectedStudent = null;
         searchTerm = "";
         showDropdown = true;
+      onClear();
     }
 </script>
 
@@ -39,9 +40,9 @@
     <div class="search-wrapper">
         <div class="input-container">
             {#if selectedStudent}
-                <button class="display-value" type="button" onclick={clear} aria-label="Auswahl ändern">
-                    {selectedStudent.firstName} {selectedStudent.lastName}
-                </button>
+              <button class="display-value" type="button" onclick={clear} aria-label="Auswahl ändern">
+                {selectedStudent.firstName} {selectedStudent.lastName}
+              </button>
             {:else}
                 <div class="input-wrapper">
                     <input
@@ -74,9 +75,9 @@
     {#if showDropdown && !selectedStudent && searchTerm.length > 0 && filtered.length > 0}
         <div class="dropdown-list">
             {#each filtered as student}
-                <button class="list-item" type="button" onclick={() => select(student)}>
-                    {student.firstName} {student.lastName}
-                </button>
+              <button class="list-item" type="button" onclick={() => select(student)}>
+                {student.firstName} {student.lastName}
+              </button>
             {/each}
         </div>
     {/if}

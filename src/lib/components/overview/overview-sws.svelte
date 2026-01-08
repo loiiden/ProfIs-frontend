@@ -1,14 +1,15 @@
 <script>
     let props = $props();
 
-    // APIs [Number() wandelt Text zu Zahl um]
-    let ziel = $derived(Number(props.target ?? 2.0));
-    let jetzt = $derived(Number(props.count ?? 0) * 0.2);
-    let arbeiten = $derived(Number(props.count ?? 0));
+    // Ziel (feste Zahl)
+    let ziel = $derived(Number(props.target ?? null));
+    
+    // Jetzt Wert aus API
+    let jetzt = $derived(Number(props.current ?? 0));
 
     // Prozentberechnung für den Balken [geteilt durch 0 geht nicht]
     let prozent = $derived(ziel > 0 ? Math.min((jetzt / ziel) * 100, 100) : 0);
-
+    
     // Schauen ob über Limit
     let überLimit = $derived(jetzt > ziel);
 
@@ -39,10 +40,6 @@
             </div>
 
             <div class="spacer"></div>
-
-            <div class="footer-stat">
-                {arbeiten} Arbeiten
-            </div>
         </div>
     </div>
 </div>
@@ -168,14 +165,5 @@ h3 {
 //Drückt den Footer nach unten
 .spacer {
     flex-grow: 1;
-}
-
-//Anzeige der Anzahl Arbeiten unten
-.footer-stat {
-    font-size: 16px;
-    font-weight: 500;
-    color: $text-light;
-    border-top: 1px solid #F4F4F4; //Trennlinie
-    padding-top: 10px;
 }
 </style>

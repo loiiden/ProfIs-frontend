@@ -18,33 +18,31 @@
             endDate: "",
             studentId: null,
             studyProgramId: null,
-
             mainEvaluatorId: null,
             secondEvaluatorId: null,
-
             comment: "",
-
             events: [{eventType: "", eventDate: ""}]
         })
     } = $props();
 
     let kolloquiumUI = $state({tag: "", zeit: ""});
+    let durationMinutes = $state("");
 
     let students = $state([]);
     let selectedStudent = $state(null);
 
     let studyPrograms = $state([]);
-    let selectedStudyProgram = $state(null);
-    let studyProgramManuallySet = $state(false);
-
+    let selectedStudyProgramId = $state(null);
+    let studyProgramText = $state("");
+    let studyProgramById = $derived(
+        new Map((Array.isArray(studyPrograms) ? studyPrograms : []).map(sp => [sp.id, sp.title]))
+    );
     let activeVeranstaltungIndex = $state(0);
 
     let activeVeranstaltung = $derived(
         data.events?.[activeVeranstaltungIndex] ?? {eventType: "", eventDate: ""}
     );
-
     let isLastVeranstaltung = $derived(activeVeranstaltungIndex === (data.events?.length ?? 1) - 1);
-
     const EVENT_OPTIONS = [
         {value: "PROPOSAL", label: "PROPOSAL"},
         {value: "DISCUSSION", label: "DISCUSSION"},
@@ -55,8 +53,48 @@
     ];
 
     $effect(() => {
-        data.studentId = selectedStudent?.id ?? null;
+        if (data.studentId && !selectedStudent && students.length > 0) {
+            const found = students.find(s => s.id === data.studentId);
+            if (found) selectedStudent = found;
+        }
+    });
 
+    // Sicherheitsprüfung hinzugefügt
+    $effect(() => {
+        if (data.colloquium && (!kolloquiumUI.tag || !kolloquiumUI.zeit)) {
+            // Check ob es ein String ist, bevor wir split aufrufen
+            if (typeof data.colloquium === 'string') {
+                const parts = data.colloquium.split('T');
+                if (parts.length >= 2) {
+                    kolloquiumUI.tag = parts[0];
+                    kolloquiumUI.zeit = parts[1].substring(0, 5);
+                }
+            }
+        }
+        if (data.colloquiumDuration) {
+             const match = data.colloquiumDuration.match(/\d+/);
+             if (match) durationMinutes = match[0];
+        }
+    });
+
+    $effect(() => {
+        const selectedId = selectedStudent?.id ?? null;
+
+        if (selectedId !== null) {
+            data.studentId = selectedId;
+            const spId = selectedStudent.studyProgramId ?? null;
+            selectedStudyProgramId = spId;
+            data.studyProgramId = spId;
+            studyProgramText = spId ? (studyProgramById.get(spId) ?? "") : "";
+            return;
+        }
+
+        // Only clear selection when nothing is selected and no prefilled value exists
+        if (!data.studentId) {
+            selectedStudyProgramId = null;
+            data.studyProgramId = null;
+            studyProgramText = "";
+        }
         if (!selectedStudent) {
             selectedStudyProgram = null;
             data.studyProgramId = null;
@@ -91,15 +129,35 @@
 
     $effect(() => {
         if (!kolloquiumUI.tag || !kolloquiumUI.zeit) {
-            data.colloquium = null;
-            return;
+            if (!data.colloquium) return;
+        } else {
+             data.colloquium = `${kolloquiumUI.tag}T${kolloquiumUI.zeit}`;
         }
-        data.colloquium = `${kolloquiumUI.tag}T${kolloquiumUI.zeit}`;
     });
 
     function setDurationMinutes(minutesStr) {
+        durationMinutes = minutesStr;
         const minutes = Number(minutesStr);
         data.colloquiumDuration = Number.isFinite(minutes) && minutes > 0 ? `PT${minutes}M` : null;
+    }
+
+    function setStudyProgram(sp) {
+        selectedStudyProgramId = sp.id;
+        data.studyProgramId = sp.id;
+        studyProgramText = sp.title;
+    }
+
+    function onStudyProgramTextInput(value) {
+        studyProgramText = value;
+        selectedStudyProgramId = null;
+        data.studyProgramId = null;
+    }
+
+    function handleStudentClear() {
+        data.studentId = null;
+        selectedStudyProgramId = null;
+        data.studyProgramId = null;
+        studyProgramText = "";
     }
 
     function addVeranstaltung() {
@@ -154,8 +212,7 @@
 
 <div class="erfassen-daten-arbeit-container">
     <div class="card">
-
-        <div class="section">
+    <div class="section">
             <div class="section-title">Student</div>
 
             <div class="row-inline student-row">
@@ -165,6 +222,7 @@
                             bind:selectedStudent={selectedStudent}
                             placeholder="Suche"
                             refresh={loadStudents}
+                            onClear={handleStudentClear}
                     />
                 </div>
             </div>
@@ -234,7 +292,7 @@
                 <div class="field">
                     <div class="sub-label">Dauer</div>
                     <div class="input-shell">
-                        <select on:change={(e) => setDurationMinutes(e.target.value)}>
+                        <select value={durationMinutes} on:change={(e) => setDurationMinutes(e.target.value)}>
                             <option value="">Bitte wählen</option>
                             <option value="30">30 Min</option>
                             <option value="45">45 Min</option>
