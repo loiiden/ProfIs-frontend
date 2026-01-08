@@ -131,7 +131,7 @@
 
     const status_mapping = {
         "PROPOSAL": "In Planung",
-        "DISCUSSION": "In Arbeit",
+        "DISCUSSION": "Besprochen",
         "FINAL_SUBMISSION": "Abgegeben",
         "REVIEW": "Korrektur",
         "ARCHIVE": "Archiviert",

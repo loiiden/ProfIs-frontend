@@ -2,6 +2,7 @@
     import {onMount} from 'svelte';
     import StudentSearch from '$lib/components/arbeit/student-search.svelte';
     import {GET} from '$lib/functions.js';
+    import StudyProgramSearch from '$lib/components/arbeit/study-program-search.svelte';
 
     let {
         data = $bindable({
@@ -94,7 +95,37 @@
             data.studyProgramId = null;
             studyProgramText = "";
         }
+        if (!selectedStudent) {
+            selectedStudyProgram = null;
+            data.studyProgramId = null;
+            studyProgramManuallySet = false;
+            return;
+        }
+
+        if (!studyProgramManuallySet) {
+            const spId = selectedStudent.studyProgramId ?? null;
+            selectedStudyProgram = spId ? (studyPrograms.find(sp => sp.id === spId) ?? null) : null;
+            data.studyProgramId = selectedStudyProgram?.id ?? null;
+        }
     });
+
+    $effect(() => {
+        if (selectedStudyProgram && !studyProgramManuallySet) {
+        }
+        data.studyProgramId = selectedStudyProgram?.id ?? null;
+    });
+
+    function onStudyProgramSelected(sp) {
+        selectedStudyProgram = sp;
+        data.studyProgramId = sp?.id ?? null;
+        studyProgramManuallySet = true;
+    }
+
+    function onStudyProgramCleared() {
+        selectedStudyProgram = null;
+        data.studyProgramId = null;
+        studyProgramManuallySet = true;
+    }
 
     $effect(() => {
         if (!kolloquiumUI.tag || !kolloquiumUI.zeit) {
@@ -199,26 +230,13 @@
             <div class="field">
                 <div class="label">Studiengang</div>
 
-                <div class="pills">
-                    {#each studyPrograms as sp}
-                        <button
-                                type="button"
-                                class="pill {selectedStudyProgramId === sp.id ? 'active' : ''}"
-                                on:click={() => setStudyProgram(sp)}
-                        >
-                            {sp.title}
-                        </button>
-                    {/each}
-                </div>
-
-                <div class="input-shell">
-                    <input
-                            type="text"
-                            placeholder="-"
-                            value={studyProgramText}
-                            on:input={(e) => onStudyProgramTextInput(e.target.value)}
-                    />
-                </div>
+                <StudyProgramSearch
+                        data={studyPrograms}
+                        placeholder="Studiengang suchen"
+                        selectedStudyProgram={selectedStudyProgram}
+                        onSelected={onStudyProgramSelected}
+                        onCleared={onStudyProgramCleared}
+                />
             </div>
         </div>
 
@@ -411,8 +429,8 @@
   .erfassen-daten-arbeit-container {
     grid-column-start: 8;
     grid-column-end: 13;
-    grid-row-start: 2;
-    grid-row-end: 16;
+    grid-row-start: 3;
+    grid-row-end: 28;
     border: 1px solid #E9E9E9;
     background-color: #FFFFFF;
     border-radius: 10px;

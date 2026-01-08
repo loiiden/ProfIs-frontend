@@ -15,7 +15,7 @@
 
 </script>
 
-<div class="overview-sws-container">
+<div class="overview-sws-container stroke-style">
     <h3>SWS</h3>
 
     <div class="content-row">
