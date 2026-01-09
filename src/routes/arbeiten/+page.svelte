@@ -1,8 +1,11 @@
 <script>
+    import { invalidateAll } from '$app/navigation';
+    import { api_url } from '$lib/constants.js';
     import search from '$lib/assets/search.svg';
     import openblank from '$lib/assets/open-blank.svg';
     import caretdown from '$lib/assets/caret-down.svg';
     import caretup from '$lib/assets/caret-up.svg';
+    import trash from '$lib/assets/trash.svg'; // Löschen-Icon (Mülltonne)
 
     let { data } = $props();
 
@@ -99,6 +102,16 @@
 
     async function show_connected(sw_id){
         current_swork = sworks_base.filter(sw => sw.id == sw_id)[0];
+    }
+
+    // Löscht eine Arbeit über API und aktualisiert die Listen
+    async function delete_swork(sw_id){
+        if(!confirm("Arbeit wirklich löschen?")) return;
+        await fetch(`${api_url}/api/scientific-work/${sw_id}`, { method: 'DELETE' });
+        sworks_base = sworks_base.filter(sw => sw.id != sw_id); // aus Basisliste entfernen
+        sworks_filtered = sworks_filtered.filter(sw => sw.id != sw_id); // aus gefilterter Liste entfernen
+        current_swork = 0; // setzt variable zurück, sodass rechts nicht mehr angezeigt wird
+        await invalidateAll();
     }
 
     const alevel_to_title = {
@@ -217,6 +230,12 @@
     <div class="sworks-short stroke-style">
         {#if !(current_swork == 0)}
         <div class="current-swork">
+            <!-- Bearbeiten und Löschen Buttons -->
+            <div class="action-btns">
+                <span class="action-label">Bearbeiten / Löschen?</span>
+                <a class="edit-btn" href="/erstellen/arbeit?id={current_swork.id}"><img src={pen} alt="Bearbeiten"></a>
+                <button class="delete-btn" onclick={() => delete_swork(current_swork.id)}><img src={trash} alt="Löschen"></button>
+            </div>
             <span class="style-med">{current_swork.title}</span>
             <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId]?.title ?? "-"}</span>
             <span class="style-small">{(student_mapping[current_swork.studentId]?.firstName ?? "") + " " + (student_mapping[current_swork.studentId]?.lastName ?? "-")}</span>
@@ -507,6 +526,41 @@
             flex-direction: column;
 
             width: 100%;
+
+            .action-btns {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-bottom: 10px;
+                width: 100%;
+
+                .action-label {
+                    margin-right: auto;
+                    font-size: 12px;
+                    color: #666;
+                }
+
+                .edit-btn, .delete-btn {
+                    cursor: pointer;
+                    background: #F9F9F9;
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    padding: 8px 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    &:hover {
+                        background: #eee;
+                    }
+
+                    img {
+                        width: 18px;
+                        height: 18px;
+                    }
+                }
+            }
 
             .ellipsis {
                 white-space: nowrap;
