@@ -7,6 +7,7 @@
     import caretup from '$lib/assets/caret-up.svg';
     import trash from '$lib/assets/trash.svg'; // Löschen-Icon (Mülltonne)
     import { color_mapping, status_mapping } from '$lib/mappings';
+    import { GET } from '$lib/functions.js';
 
     let { data } = $props();
 
@@ -102,9 +103,15 @@
     }
 
     let current_swork = $state(0);
+    let events = $state(0);
+
+    async function get_events(id){
+        return GET(`/api/scientific-work/${id}/events`);
+    }
 
     async function show_connected(sw_id){
         current_swork = sworks_base.filter(sw => sw.id == sw_id)[0];
+        events = await get_events(sw_id);
     }
 
     // Löscht eine Arbeit über API und aktualisiert die Listen
@@ -225,12 +232,24 @@
             <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId]?.title ?? "-"}</span>
             <span class="style-small">{(student_mapping[current_swork.studentId]?.firstName ?? "") + " " + (student_mapping[current_swork.studentId]?.lastName ?? "-")}</span>
             
-            <span class="style-small top-gap">Status: {current_swork.status ? status_mapping[current_swork.status.eventType] : "-"}</span>
+            <span class="style-med top-gap">Verlauf:</span>
+            <div class="events-verlauf">
+                {#each events as event}
+                    <div class="work-status">
+                        <span class="color" style:background-color="{event.eventType ? color_mapping[event.eventType]: "#3B4B55"}"></span>
+                        <span class="work-event">
+                            <p>{event.eventType ? status_mapping[event.eventType] : "-"}</p>
+                            <p>{event.eventDate ? String(event.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
+                        </span>
+                    </div>
+                {/each}
+            </div>
 
             <span class="style-med top-gap">Kommentar: </span>
             <span class="style-small">{current_swork.comment ?? "-"}</span>
 
-            <span class="style-small top-gap">Startdatum: {current_swork.startDate ? String(current_swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
+            <span class="style-med top-gap">Termine: </span>
+            <span class="style-small">Startdatum: {current_swork.startDate ? String(current_swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
             <span class="style-small">Abgabedatum: {current_swork.endDate ? String(current_swork.endDate.toReversed()).replaceAll(",", ".") : "-"}</span>
             
             <span class="style-small top-gap">Kolloquiumsdatum: {current_swork.colloquium ? String(current_swork.colloquium.toReversed().splice(2)).replaceAll(",", ".") : "-"}</span>
@@ -544,6 +563,35 @@
                     img {
                         width: 18px;
                         height: 18px;
+                    }
+                }
+            }
+
+            .events-verlauf {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+
+                .work-status {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-bottom: 3px;
+
+                    .color {
+                        width: 40px;
+                        height: 20px;
+                        border-radius: 6px;
+                        display: inline-block;
+                        margin-right: 10px;
+                    }
+
+                    .work-event {
+                        p {
+                            margin: 0px;
+                            font-size: 10px;
+                            font-family: 'Inter SB';
+                        }
                     }
                 }
             }
