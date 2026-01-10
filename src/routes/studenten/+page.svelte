@@ -372,6 +372,7 @@
 
         padding: 12px;
         border-radius: 10px;
+        overflow-y: auto;
 
         .current-student {
             display: flex;
