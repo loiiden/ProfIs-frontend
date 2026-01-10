@@ -9,7 +9,7 @@
 
 <main class="overview-container">
     <div class="headline-s">ÜBERSICHT</div>
-    <FilterArbeiten />
+    <FilterArbeiten sworks={data.sworks} study_programs={data.study_programs} students={data.students}/>
     <OverviewSws target={data.sws.target} current={data.sws.current} />
     <OverviewTermine termine={data.termine} />
     <NotenSkala bewertet={data.marks.marked} offen={data.marks.open} average={data.marks.average}/>
