@@ -40,7 +40,9 @@
         if(study_programs_selected.length > 0)
             sworks_filtered = sworks_filtered.filter((work) => study_programs_selected.includes(work.studyProgramId));
         if(status_selected.length > 0)
-            sworks_filtered = sworks_filtered.filter((work) => status_selected.includes(work.status));
+            sworks_filtered = sworks_filtered.filter((work) => {
+                return work.status ? status_selected.includes(work.status.eventType) : false;
+            });
     }
 
     function set_active_programs(){
@@ -195,10 +197,10 @@
                         <p>{swork.title}</p>
                         <span>{study_programs_mapping[swork.studyProgramId]?.title ?? "-"}, {(student_mapping[swork.studentId]?.firstName ?? "") + " " + (student_mapping[swork.studentId]?.lastName ?? "-")}</span>
                     </span>
-                    <span class="swork-status" style:color="{color_mapping[swork.status]}">
-                        <p><img src={img_mapping[swork.status]} alt=""></p>
-                        <p>{status_mapping[swork.status]}</p>
-                        <p>24.03.2026</p>
+                    <span class="swork-status" style:color="{swork.status ? color_mapping[swork.status.eventType] : "#3B4B55"}">
+                        <p><img src={swork.status ? img_mapping[swork.status.eventType] : bookmark} alt=""></p>
+                        <p>{swork.status ? status_mapping[swork.status.eventType] : "-"}</p>
+                        <p>{swork.status ? String(swork.status.eventDate.toReversed()).replaceAll(",", ".") : "-"}</p>
                     </span>
                     <span class="swork-start">{swork.startDate ? String(swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
                     <span class="swork-end">{swork.endDate ? String(swork.endDate.toReversed()).replaceAll(",", ".") : "-"}</span>
@@ -223,7 +225,7 @@
             <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId]?.title ?? "-"}</span>
             <span class="style-small">{(student_mapping[current_swork.studentId]?.firstName ?? "") + " " + (student_mapping[current_swork.studentId]?.lastName ?? "-")}</span>
             
-            <span class="style-small top-gap">Status: {current_swork.status ? status_mapping[current_swork.status] : "-"}</span>
+            <span class="style-small top-gap">Status: {current_swork.status ? status_mapping[current_swork.status.eventType] : "-"}</span>
 
             <span class="style-med top-gap">Kommentar: </span>
             <span class="style-small">{current_swork.comment ?? "-"}</span>
