@@ -1,4 +1,6 @@
 <script>
+    import { color_mapping, status_mapping } from '$lib/mappings.js';
+
     import search from '$lib/assets/search.svg';
     import openblank from '$lib/assets/open-blank.svg';
     import caretdown from '$lib/assets/caret-down.svg';
@@ -71,7 +73,6 @@
             connected_works = cache[stu_id];
         } else {
             let works = await get_connected_works(stu_id);
-            console.log(works);
             cache[stu_id] = works;
             connected_works = works;
         }
@@ -132,6 +133,13 @@
             <div class="connected-works-list">
                 {#each connected_works as work}
                     <div class="work">
+                        <div class="work-status">
+                            <span class="color" style:background-color="{work.status ? color_mapping[work.status.eventType]: "#3B4B55"}"></span>
+                            <span class="work-event">
+                                <p>{work.status ? status_mapping[work.status.eventType] : "-"}</p>
+                                <p>{work.status ? String(work.status.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
+                            </span>
+                        </div>
                         <span class="work-program">{work.StudyProgramTitle}</span>
                         <span class="work-title">{work.title}</span>
                     </div>
@@ -403,6 +411,7 @@
             justify-content: center;
             align-items: flex-start;
             flex-direction: column;
+            max-width: 100%;
 
             .work {
                 padding: 6px;
@@ -410,12 +419,42 @@
                 justify-content: flex-start;
                 align-items: flex-start;
                 flex-direction: column;
+                max-width: 100%;
+
+                .work-status {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-bottom: 3px;
+
+                    .color {
+                        width: 40px;
+                        height: 20px;
+                        border-radius: 6px;
+                        display: inline-block;
+                        margin-right: 10px;
+                    }
+
+                    .work-event {
+                        p {
+                            margin: 0px;
+                            font-size: 10px;
+                            font-family: 'Inter SB';
+                        }
+                    }
+                }
 
                 .work-program {
                     font-size: 12px;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    width: 100%;
                 }
 
                 .work-title {
+                    width: 100%;
+                    max-width: 100%;
                     font-size: 14px;
                     font-family: 'Inter SB';
                 }
