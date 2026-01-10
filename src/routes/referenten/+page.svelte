@@ -4,6 +4,9 @@
     import caretdown from '$lib/assets/caret-down.svg';
     import caretup from '$lib/assets/caret-up.svg';
 
+    import { GET } from '$lib/functions';
+    import { color_mapping, status_mapping } from '$lib/mappings.js';
+
     let { data } = $props();
 
     let referent_base = data.referenten
@@ -11,7 +14,7 @@
 
     const status_options = ["PROFESSOR", "EXTERNAL"];
     const academic_levels = ["NONE", "BACHELOR", "MASTER", "DR", "PROF", "PROF_DOCTOR", "DIPLOMA"];
-    const status_mapping = {
+    const extern_mapping = {
         "PROFESSOR": "Intern (Hochschulpersonal)",
         "EXTERNAL": "Extern (Gastdozent / Partner)"
     }
@@ -96,10 +99,34 @@
         filter_search();
     }
 
-    let connected_works = $state([]);
+    let current_referent = $state(0);
+    let connected_worksm = $state([]);
+    let connected_workss = $state([]);
+    let mcache = {};
+    let scache = {};
 
-    function show_connected(ref_id){
-        connected_works = [ref_id];
+    async function get_connected_works_main(id){
+        return GET(`/api/scientific-work/filter/mainEvaluator/${id}`);
+    }
+
+    async function get_connected_works_second(id){
+        return GET(`/api/scientific-work/filter/secondEvaluator/${id}`);
+    }
+
+    async function show_connected(ref_id){
+        current_referent = referent_base.filter(ref => ref.id == ref_id)[0];
+
+        if(ref_id in mcache){
+            connected_worksm = mcache[ref_id];
+            connected_workss = scache[ref_id];
+        } else {
+            let worksm = await get_connected_works_main(ref_id);
+            let workss = await get_connected_works_second(ref_id);
+            mcache[ref_id] = worksm;
+            scache[ref_id] = workss;
+            connected_worksm = worksm;
+            connected_workss = workss;
+        }
     }
 
     const alevel_to_title = {
@@ -130,7 +157,7 @@
                         <span class="filter-heading">Status</span>
                         <div class="filter-status">
                             {#each status_options as status}
-                                <div class="ref-status" data-status="{status}" onclick={() => { toggle_status(status); }}>{status_mapping[status]}</div>
+                                <div class="ref-status" data-status="{status}" onclick={() => { toggle_status(status); }}>{extern_mapping[status]}</div>
                             {/each}
                         </div>
                         <span class="filter-heading">Akademischer Grad</span>
@@ -161,9 +188,48 @@
         </div>
     </div>
     <div class="connected-works stroke-style">
-        {#each connected_works as work}
-            {work}
-        {/each}
+        {#if !(current_referent == 0)}
+            <div class="current-referent">
+                <span class="cur-anrede">{current_referent.salutation !== null ? String(current_referent.salutation).toLowerCase().charAt(0).toUpperCase() + String(current_referent.salutation).toLowerCase().slice(1) : "-"}</span>
+                <span class="cur-name">{current_referent.firstName + " " + current_referent.lastName}</span>
+                <span class="cur-email">E-Mail: {current_referent.email}</span>
+                <span class="cur-tel">Telefon: {current_referent.phoneNumber}</span>
+                <span class="extern-status">[ {extern_mapping[current_referent.role]} ]</span>
+            </div>
+            <div class="aktuelle-arbeiten">Referent für</div>
+            <div class="connected-works-list">
+                {#each connected_worksm as work}
+                    <div class="work">
+                        <div class="work-status">
+                            <span class="color" style:background-color="{work.status ? color_mapping[work.status.eventType]: "#3B4B55"}"></span>
+                            <span class="work-event">
+                                <p>{work.status ? status_mapping[work.status.eventType] : "-"}</p>
+                                <p>{work.status ? String(work.status.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
+                            </span>
+                        </div>
+                        <span class="work-student">{work.studentFirstName + " " + work.studentLastName}</span>
+                        <span class="work-program">{work.studyProgramTitle}</span>
+                        <span class="work-title">{work.title}</span>
+                    </div>
+                {/each}
+            </div>
+            <div class="aktuelle-arbeiten">Korreferent für</div>
+            <div class="connected-works-list">
+                {#each connected_workss as work}
+                    <div class="work">
+                        <div class="work-status">
+                            <span class="color" style:background-color="{work.status ? color_mapping[work.status.eventType]: "#3B4B55"}"></span>
+                            <span class="work-event">
+                                <p>{work.status ? status_mapping[work.status.eventType] : "-"}</p>
+                                <p>{work.status ? String(work.status.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
+                            </span>
+                        </div>
+                        <span class="work-program">{work.studyProgramTitle}</span>
+                        <span class="work-title">{work.title}</span>
+                    </div>
+                {/each}
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -384,12 +450,113 @@
         grid-row-end: 16;
 
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: flex-start;
+        align-items: flex-start;
         flex-direction: column;
 
         padding: 12px;
         border-radius: 10px;
+        overflow-y: auto;
+
+        .current-referent {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+
+            width: 100%;
+
+            .cur-anrede {
+                font-size: 14px;
+                font-family: 'Inter SB';
+            }
+
+            .cur-name {
+                font-size: 22px;
+                font-weight: bold;
+                font-family: 'Inter SB';
+                padding: 6px 0px;
+            }
+
+            .extern-status, .cur-email, .cur-tel {
+                font-size: 14px;
+                font-family: 'Inter';
+            }
+
+            .extern-status {
+                font-weight: bold;
+                margin-top: 10px;
+            }
+        }
+
+        .aktuelle-arbeiten {
+            background-color: #F9F9F9;
+            padding: 8px;
+            margin: 8px 0px;
+            border-radius: 6px;
+        }
+
+        .connected-works-list {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+            max-width: 100%;
+
+            .work {
+                padding: 6px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: flex-start;
+                flex-direction: column;
+                max-width: 100%;
+
+                .work-status {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-bottom: 3px;
+
+                    .color {
+                        width: 40px;
+                        height: 20px;
+                        border-radius: 6px;
+                        display: inline-block;
+                        margin-right: 10px;
+                    }
+
+                    .work-event {
+                        p {
+                            margin: 0px;
+                            font-size: 10px;
+                            font-family: 'Inter SB';
+                        }
+                    }
+                }
+
+                .work-student {
+                    width: 100%;
+                    max-width: 100%;
+                    font-size: 14px;
+                    font-family: 'Inter SB';
+                }
+
+                .work-program {
+                    font-size: 12px;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    width: 100%;
+                }
+
+                .work-title {
+                    width: 100%;
+                    max-width: 100%;
+                    font-size: 14px;
+                    font-family: 'Inter SB';
+                }
+            }
+        }
     }
 }
 

@@ -6,6 +6,8 @@
     import caretdown from '$lib/assets/caret-down.svg';
     import caretup from '$lib/assets/caret-up.svg';
     import trash from '$lib/assets/trash.svg'; // Löschen-Icon (Mülltonne)
+    import { color_mapping, status_mapping } from '$lib/mappings';
+    import { GET } from '$lib/functions.js';
 
     let { data } = $props();
 
@@ -39,7 +41,9 @@
         if(study_programs_selected.length > 0)
             sworks_filtered = sworks_filtered.filter((work) => study_programs_selected.includes(work.studyProgramId));
         if(status_selected.length > 0)
-            sworks_filtered = sworks_filtered.filter((work) => status_selected.includes(work.status));
+            sworks_filtered = sworks_filtered.filter((work) => {
+                return work.status ? status_selected.includes(work.status.eventType) : false;
+            });
     }
 
     function set_active_programs(){
@@ -99,9 +103,15 @@
     }
 
     let current_swork = $state(0);
+    let events = $state(0);
+
+    async function get_events(id){
+        return GET(`/api/scientific-work/${id}/events`);
+    }
 
     async function show_connected(sw_id){
         current_swork = sworks_base.filter(sw => sw.id == sw_id)[0];
+        events = await get_events(sw_id);
     }
 
     // Löscht eine Arbeit über API und aktualisiert die Listen
@@ -132,24 +142,6 @@
         "ARCHIVE",
         "ABORT"
     ]
-
-    const color_mapping = {
-        "PROPOSAL": "#7D8398",
-        "DISCUSSION": "#24B6D8",
-        "FINAL_SUBMISSION": "#65A839",
-        "REVIEW": "#2e5812",
-        "ARCHIVE": "#333C70",
-        "ABORT": "#AF4357"
-    }
-
-    const status_mapping = {
-        "PROPOSAL": "In Planung",
-        "DISCUSSION": "Besprochen",
-        "FINAL_SUBMISSION": "Abgegeben",
-        "REVIEW": "Korrektur",
-        "ARCHIVE": "Archiviert",
-        "ABORT": "Abgebrochen"
-    }
 
     import archive from '$lib/assets/archive.svg';
     import bookmark from '$lib/assets/bookmark.svg';
@@ -212,10 +204,10 @@
                         <p>{swork.title}</p>
                         <span>{study_programs_mapping[swork.studyProgramId]?.title ?? "-"}, {(student_mapping[swork.studentId]?.firstName ?? "") + " " + (student_mapping[swork.studentId]?.lastName ?? "-")}</span>
                     </span>
-                    <span class="swork-status" style:color="{color_mapping[swork.status]}">
-                        <p><img src={img_mapping[swork.status]} alt=""></p>
-                        <p>{status_mapping[swork.status]}</p>
-                        <p>24.03.2026</p>
+                    <span class="swork-status" style:color="{swork.status ? color_mapping[swork.status.eventType] : "#3B4B55"}">
+                        <p><img src={swork.status ? img_mapping[swork.status.eventType] : bookmark} alt=""></p>
+                        <p>{swork.status ? status_mapping[swork.status.eventType] : "-"}</p>
+                        <p>{swork.status ? String(swork.status.eventDate.toReversed()).replaceAll(",", ".") : "-"}</p>
                     </span>
                     <span class="swork-start">{swork.startDate ? String(swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
                     <span class="swork-end">{swork.endDate ? String(swork.endDate.toReversed()).replaceAll(",", ".") : "-"}</span>
@@ -240,12 +232,24 @@
             <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId]?.title ?? "-"}</span>
             <span class="style-small">{(student_mapping[current_swork.studentId]?.firstName ?? "") + " " + (student_mapping[current_swork.studentId]?.lastName ?? "-")}</span>
             
-            <span class="style-small top-gap">Status: {current_swork.status ? status_mapping[current_swork.status] : "-"}</span>
+            <span class="style-med top-gap">Verlauf:</span>
+            <div class="events-verlauf">
+                {#each events as event}
+                    <div class="work-status">
+                        <span class="color" style:background-color="{event.eventType ? color_mapping[event.eventType]: "#3B4B55"}"></span>
+                        <span class="work-event">
+                            <p>{event.eventType ? status_mapping[event.eventType] : "-"}</p>
+                            <p>{event.eventDate ? String(event.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
+                        </span>
+                    </div>
+                {/each}
+            </div>
 
             <span class="style-med top-gap">Kommentar: </span>
             <span class="style-small">{current_swork.comment ?? "-"}</span>
 
-            <span class="style-small top-gap">Startdatum: {current_swork.startDate ? String(current_swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
+            <span class="style-med top-gap">Termine: </span>
+            <span class="style-small">Startdatum: {current_swork.startDate ? String(current_swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
             <span class="style-small">Abgabedatum: {current_swork.endDate ? String(current_swork.endDate.toReversed()).replaceAll(",", ".") : "-"}</span>
             
             <span class="style-small top-gap">Kolloquiumsdatum: {current_swork.colloquium ? String(current_swork.colloquium.toReversed().splice(2)).replaceAll(",", ".") : "-"}</span>
@@ -559,6 +563,35 @@
                     img {
                         width: 18px;
                         height: 18px;
+                    }
+                }
+            }
+
+            .events-verlauf {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+
+                .work-status {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-bottom: 3px;
+
+                    .color {
+                        width: 40px;
+                        height: 20px;
+                        border-radius: 6px;
+                        display: inline-block;
+                        margin-right: 10px;
+                    }
+
+                    .work-event {
+                        p {
+                            margin: 0px;
+                            font-size: 10px;
+                            font-family: 'Inter SB';
+                        }
                     }
                 }
             }
