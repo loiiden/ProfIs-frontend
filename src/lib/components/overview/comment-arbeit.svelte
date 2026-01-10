@@ -4,7 +4,7 @@
 
 <div class="comment-arbeit-container stroke-style">
     <p class="style-med">Kommentar:</p>
-    <p class="style-small">{props.kommentar}</p>
+    <div class="style-small">{props.kommentar}</div>
 </div>
 
 <style lang="scss">
@@ -19,10 +19,13 @@
     padding: 12px;
     border-radius: 10px;
 
-    overflow: auto;
-
     p {
         margin: 0px;
+    }
+
+    div {
+        overflow: auto;
+        max-height: 86%;
     }
 }
 

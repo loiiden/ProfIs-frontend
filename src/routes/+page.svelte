@@ -11,7 +11,7 @@
     <div class="headline-s">ÜBERSICHT</div>
     <FilterArbeiten />
     <OverviewSws target={data.sws.target} current={data.sws.current} />
-    <OverviewTermine />
+    <OverviewTermine termine={data.termine} />
     <NotenSkala bewertet={data.marks.marked} offen={data.marks.open} average={data.marks.average}/>
 </main>
 
