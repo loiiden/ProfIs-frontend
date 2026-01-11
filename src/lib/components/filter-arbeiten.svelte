@@ -9,7 +9,7 @@
 
     let study_programs_mapping = {};
     props.study_programs.forEach(program => {
-        study_programs_mapping[program.id] = program.title;
+        study_programs_mapping[program.id] = program.degreeType + " in " + program.title;
     });
 
     let student_mapping = {};

@@ -18,7 +18,7 @@
     let study_programs = data.study_programs;
     let study_programs_mapping = {};
     data.study_programs.forEach(program => {
-        study_programs_mapping[program.id] = program;
+        study_programs_mapping[program.id] = (program.degreeType ?? "-") + " in " + (program.title ?? "-");
     });
 
     let student_mapping = {};
@@ -38,7 +38,7 @@
     let filter_on = $derived(study_programs_selected.length > 0);
 
     function filter_search(){
-        sworks_filtered = sworks_base.filter((work) => (work.title + " " + (study_programs_mapping[work.studyProgramId]?.title ?? "") + ", " + (student_mapping[work.studentId]?.firstName ?? "") + " " + (student_mapping[work.studentId]?.lastName ?? "")).includes(search_value))
+        sworks_filtered = sworks_base.filter((work) => (work.title + " " + (study_programs_mapping[work.studyProgramId]) + ", " + (student_mapping[work.studentId]?.firstName ?? "") + " " + (student_mapping[work.studentId]?.lastName ?? "")).includes(search_value))
         if(study_programs_selected.length > 0)
             sworks_filtered = sworks_filtered.filter((work) => study_programs_selected.includes(work.studyProgramId));
         if(status_selected.length > 0)
@@ -177,7 +177,7 @@
                 <div class="sworks-row">
                     <span class="swork-name" onclick={() => { show_connected(swork.id); }}>
                         <p>{swork.title}</p>
-                        <span>{study_programs_mapping[swork.studyProgramId]?.title ?? "-"}, {(student_mapping[swork.studentId]?.firstName ?? "") + " " + (student_mapping[swork.studentId]?.lastName ?? "-")}</span>
+                        <span>{study_programs_mapping[swork.studyProgramId]}, {(student_mapping[swork.studentId]?.firstName ?? "") + " " + (student_mapping[swork.studentId]?.lastName ?? "-")}</span>
                     </span>
                     <span class="swork-status" style:color="{swork.status ? color_mapping[swork.status.eventType] : "#3B4B55"}">
                         <p><img src={swork.status?.eventType ? img_mapping[swork.status.eventType] : bookmark} alt=""></p>
@@ -204,7 +204,7 @@
                 <button class="delete-btn" onclick={() => delete_swork(current_swork.id)}><img src={trash} alt="Löschen"></button>
             </div>
             <span class="style-med">{current_swork.title ?? "-"}</span>
-            <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId]?.title ?? "-"}</span>
+            <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId]}</span>
             <span class="style-small">{(student_mapping[current_swork.studentId]?.firstName ?? "") + " " + (student_mapping[current_swork.studentId]?.lastName ?? "-")}</span>
             
             <span class="style-med top-gap">Verlauf:</span>
