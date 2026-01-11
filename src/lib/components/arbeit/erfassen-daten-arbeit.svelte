@@ -20,6 +20,13 @@
             studyProgramId: null,
             mainEvaluatorId: null,
             secondEvaluatorId: null,
+
+            // Noten (optional) - wichtig: Backend validiert 0..100
+            mainEvaluatorWorkMark: null,
+            mainEvaluatorColloquiumMark: null,
+            secondEvaluatorWorkMark: null,
+            secondEvaluatorColloquiumMark: null,
+
             comment: "",
             events: [{eventType: "", eventDate: ""}]
         })
@@ -39,6 +46,59 @@
     let studyProgramById = $derived(
         new Map((Array.isArray(studyPrograms) ? studyPrograms : []).map(sp => [sp.id, sp.title]))
     );
+
+    // Mapping Studiengang-ID -> Abschluss (degreeType) für Anzeige im Hint
+    let studyProgramDegreeById = $derived(
+        new Map((Array.isArray(studyPrograms) ? studyPrograms : []).map(sp => [sp.id, sp.degreeType]))
+    );
+
+    let studentStudyProgramTitle = $derived(
+        selectedStudent?.studyProgramId
+            ? (studyProgramById.get(selectedStudent.studyProgramId) ?? "")
+            : ""
+    );
+
+    let studentStudyProgramDegree = $derived(
+        selectedStudent?.studyProgramId
+            ? (studyProgramDegreeById.get(selectedStudent.studyProgramId) ?? "")
+            : ""
+    );
+
+    // Anzeige-Format für Studiengang-Suche: M.Sc. in Studienfach
+    const DEGREE_SHORT = {
+        B_A: "B.A.",
+        B_ENG: "B.Eng.",
+        B_SC: "B.Sc.",
+        B_LAWS: "B.Laws.",
+        BBA: "BBA",
+        M_A: "M.A.",
+        M_SC: "M.Sc.",
+        M_ENG: "M.Eng.",
+        M_LAWS: "M.Laws.",
+        MBA: "MBA"
+    };
+
+    function formatDegreeShort(degreeType) {
+        if (!degreeType) return "";
+        return DEGREE_SHORT[degreeType] ?? String(degreeType).replaceAll("_", ".");
+    }
+
+    function formatStudyProgramDisplay(sp) {
+        const title = sp?.title ?? "";
+        const degreeShort = formatDegreeShort(sp?.degreeType);
+
+        if (degreeShort && title) return `${degreeShort} in ${title}`;
+        return degreeShort || title || "";
+    }
+
+    // Eigene Liste nur für die Suche/Anzeige (damit Titel + Degree zusammen angezeigt werden)
+    let studyProgramsSearchData = $derived(
+        (Array.isArray(studyPrograms) ? studyPrograms : []).map(sp => ({
+            ...sp,
+            title: formatStudyProgramDisplay(sp)
+        }))
+    );
+
     let activeVeranstaltungIndex = $state(0);
 
     let activeVeranstaltung = $derived(
@@ -60,6 +120,26 @@
             if (found) selectedStudent = found;
         }
     });
+
+    // Prefill Studiengang (wenn bereits in der API gespeichert)
+    $effect(() => {
+        if (data.studyProgramId && !selectedStudyProgram && studyProgramsSearchData.length > 0 && !studyProgramManuallySet) {
+            const found = studyProgramsSearchData.find(sp => sp.id === data.studyProgramId);
+            if (found) {
+                selectedStudyProgram = found;
+                selectedStudyProgramId = found.id;
+                studyProgramText = found.title ?? "";
+            }
+        }
+
+        // Wenn von außen geleert wurde (API/Prefill), UI auch leeren (nur wenn nicht manuell gesetzt)
+        if (!data.studyProgramId && selectedStudyProgram && !studyProgramManuallySet) {
+            selectedStudyProgram = null;
+            selectedStudyProgramId = null;
+            studyProgramText = "";
+        }
+    });
+
 
     // Sicherheitsprüfung hinzugefügt
     $effect(() => {
@@ -84,37 +164,53 @@
 
         if (selectedId !== null) {
             data.studentId = selectedId;
-            const spId = selectedStudent.studyProgramId ?? null;
-            selectedStudyProgramId = spId;
-            data.studyProgramId = spId;
-            studyProgramText = spId ? (studyProgramById.get(spId) ?? "") : "";
-            return;
-        }
-
-        // Only clear selection when nothing is selected and no prefilled value exists
-        if (!data.studentId) {
-            selectedStudyProgramId = null;
-            data.studyProgramId = null;
-            studyProgramText = "";
-        }
-        if (!selectedStudent) {
-            selectedStudyProgram = null;
-            data.studyProgramId = null;
-            studyProgramManuallySet = false;
-            return;
-        }
-
-        if (!studyProgramManuallySet) {
-            const spId = selectedStudent.studyProgramId ?? null;
-            selectedStudyProgram = spId ? (studyPrograms.find(sp => sp.id === spId) ?? null) : null;
-            data.studyProgramId = selectedStudyProgram?.id ?? null;
         }
     });
 
-    $effect(() => {
-        if (selectedStudyProgram && !studyProgramManuallySet) {
+    // Noten: Backend validiert 0 bis 100.
+    // Wenn im UI "-" angezeigt wird, darf im data-Objekt NICHT noch z.B. 150 stehen -> sonst wird es trotzdem an die API gesendet. (Hinweis von Maksim)
+    function normalizeMark(value) {
+        if (value === null || value === undefined) return null;
+
+        // wenn im UI "-" genutzt wird
+        if (value === "-" || value === "") return null;
+
+        // NEU: Komma unterstützen (z.B. "78,8") und Nachkommastellen entfernen ("78.8" -> 78)
+        let raw = value;
+        if (typeof raw === "string") {
+            raw = raw.trim();
+            if (raw === "-" || raw === "") return null;
+            raw = raw.replace(",", "."); // nur erste reicht hier
         }
-        data.studyProgramId = selectedStudyProgram?.id ?? null;
+
+        const n = Number(raw);
+        if (!Number.isFinite(n)) return null;
+
+        // Backend erwartet int -> Nachkommastellen entfernen, damit garantiert nur int ans Backend geht
+        const intVal = Math.trunc(n);
+
+        // Constraint: 0..100
+        if (intVal < 0 || intVal > 100) return null;
+
+        return intVal;
+    }
+
+    $effect(() => {
+        const fields = [
+            "mainEvaluatorWorkMark",
+            "mainEvaluatorColloquiumMark",
+            "secondEvaluatorWorkMark",
+            "secondEvaluatorColloquiumMark"
+        ];
+
+        fields.forEach((f) => {
+            if (data && data[f] !== undefined) {
+                const fixed = normalizeMark(data[f]);
+                if (data[f] !== fixed) {
+                    data[f] = fixed;
+                }
+            }
+        });
     });
 
     function onStudyProgramSelected(sp) {
@@ -157,9 +253,7 @@
 
     function handleStudentClear() {
         data.studentId = null;
-        selectedStudyProgramId = null;
-        data.studyProgramId = null;
-        studyProgramText = "";
+        selectedStudent = null;
     }
 
     function addVeranstaltung() {
@@ -233,12 +327,20 @@
                 <div class="label">Studiengang</div>
 
                 <StudyProgramSearch
-                        data={studyPrograms}
+                        data={studyProgramsSearchData}
                         placeholder="Studiengang suchen"
                         selectedStudyProgram={selectedStudyProgram}
                         onSelected={onStudyProgramSelected}
                         onCleared={onStudyProgramCleared}
                 />
+
+                {#if selectedStudent && selectedStudent.studyProgramId}
+                    <div class="student-studyprogram-hint">
+                        <strong>
+                            {selectedStudent.firstName} {selectedStudent.lastName} studiert {studentStudyProgramTitle || "-"}{studentStudyProgramDegree ? ` (${studentStudyProgramDegree})` : ""}.
+                        </strong>
+                    </div>
+                {/if}
             </div>
         </div>
 
@@ -491,6 +593,13 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+  }
+
+  .student-studyprogram-hint {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.75;
+    margin-top: 4px;
   }
 
   .input-shell {
