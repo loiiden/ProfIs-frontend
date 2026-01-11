@@ -28,7 +28,7 @@
         {#each termine as termin}
             <div class="termin">
                 <p><span class="color" style:background-color="{color_mapping[termin.eventType]}"></span>
-                    <span class="style-med">{convert_date_to_text(termin.eventDate)}, {String(termin.eventDate.toReversed().splice(0, 2)).replaceAll(",", ".")}</span>
+                    <span class="style-med">{termin.eventDate ? convert_date_to_text(termin.eventDate) : "-"}, {termin.eventDate ? String(termin.eventDate.toReversed().splice(0, 2)).replaceAll(",", ".") : "-"}</span>
                     {termin.eventType ? status_mapping[termin.eventType] : "-"},</p>
                 <p>{(termin.studentFirstName ?? "") + " " + (termin.studentLastName ?? "")}</p>
             </div>

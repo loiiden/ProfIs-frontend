@@ -10,7 +10,7 @@
         let num = Math.round(number * multiple) / multiple;
         num = num.toFixed(2)
         
-        if (num[2] == "0" && num[3] == "0")
+        if (num[3] == "0")
             return num.substring(0, num.length - 1);
         
         return num;
@@ -59,10 +59,12 @@
             <div class="distri one">{distribution.fromOneToTwo}</div>
         </div>
 
+        {#if parseFloat(average) !== 0}
         <div class="average-mark" style="left: {position}px;">
             <AnnotatedNumber number={average} annotation="Durchschnitt"/>
             <div class="vertical-long-line" style="height: {vheight}px;margin-top: {vmargin}px;"></div>
         </div>
+        {/if}
     </div>
     <div class="annotation-marks">
         <p>Grundnote</p>

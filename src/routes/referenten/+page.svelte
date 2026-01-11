@@ -194,7 +194,7 @@
                             <span class="color" style:background-color="{work.status ? color_mapping[work.status.eventType]: "#3B4B55"}"></span>
                             <span class="work-event">
                                 <p>{work.status ? status_mapping[work.status.eventType] : "-"}</p>
-                                <p>{work.status ? String(work.status.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
+                                <p>{work.status?.eventDate ? String(work.status.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
                             </span>
                         </div>
                         <span class="work-student">{work.studentFirstName + " " + work.studentLastName}</span>
@@ -211,7 +211,7 @@
                             <span class="color" style:background-color="{work.status ? color_mapping[work.status.eventType]: "#3B4B55"}"></span>
                             <span class="work-event">
                                 <p>{work.status ? status_mapping[work.status.eventType] : "-"}</p>
-                                <p>{work.status ? String(work.status.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
+                                <p>{work.status?.eventDate ? String(work.status.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
                             </span>
                         </div>
                         <span class="work-program">{work.studyProgramTitle}</span>

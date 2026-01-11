@@ -180,9 +180,9 @@
                         <span>{study_programs_mapping[swork.studyProgramId]?.title ?? "-"}, {(student_mapping[swork.studentId]?.firstName ?? "") + " " + (student_mapping[swork.studentId]?.lastName ?? "-")}</span>
                     </span>
                     <span class="swork-status" style:color="{swork.status ? color_mapping[swork.status.eventType] : "#3B4B55"}">
-                        <p><img src={swork.status ? img_mapping[swork.status.eventType] : bookmark} alt=""></p>
-                        <p>{swork.status ? status_mapping[swork.status.eventType] : "-"}</p>
-                        <p>{swork.status ? String(swork.status.eventDate.toReversed()).replaceAll(",", ".") : "-"}</p>
+                        <p><img src={swork.status?.eventType ? img_mapping[swork.status.eventType] : bookmark} alt=""></p>
+                        <p>{swork.status?.eventType ? status_mapping[swork.status.eventType] : "-"}</p>
+                        <p>{swork.status?.eventDate ? String(swork.status.eventDate.toReversed()).replaceAll(",", ".") : "-"}</p>
                     </span>
                     <span class="swork-start">{swork.startDate ? String(swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
                     <span class="swork-end">{swork.endDate ? String(swork.endDate.toReversed()).replaceAll(",", ".") : "-"}</span>

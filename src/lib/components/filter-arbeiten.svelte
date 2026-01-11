@@ -72,8 +72,8 @@
                 
                 <span class="swork-status" style:color="{swork.status ? color_mapping[swork.status.eventType] : "#3B4B55"}">
                         <p><img src={swork.status ? img_mapping[swork.status.eventType] : bookmark} alt=""></p>
-                        <p>{swork.status ? status_mapping[swork.status.eventType] : "-"}</p>
-                        <p>{swork.status ? String(swork.status.eventDate.toReversed()).replaceAll(",", ".") : "-"}</p>
+                        <p>{swork.status?.eventType ? status_mapping[swork.status.eventType] : "-"}</p>
+                        <p>{swork.status?.eventDate ? String(swork.status.eventDate.toReversed()).replaceAll(",", ".") : "-"}</p>
                     </span>
             </div>
         {/each}
