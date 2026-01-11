@@ -6,8 +6,9 @@
     import caretdown from '$lib/assets/caret-down.svg';
     import caretup from '$lib/assets/caret-up.svg';
     import trash from '$lib/assets/trash.svg'; // Löschen-Icon (Mülltonne)
-    import { color_mapping, status_mapping, img_mapping } from '$lib/mappings';
+    import { color_mapping, status_mapping, img_mapping, alevel_to_title } from '$lib/mappings';
     import { GET } from '$lib/functions.js';
+    import pen from '$lib/assets/pen.svg';
 
     let { data } = $props();
 
@@ -122,16 +123,6 @@
         sworks_filtered = sworks_filtered.filter(sw => sw.id != sw_id); // aus gefilterter Liste entfernen
         current_swork = 0; // setzt variable zurück, sodass rechts nicht mehr angezeigt wird
         await invalidateAll();
-    }
-
-    const alevel_to_title = {
-        "NONE": "",
-        "BACHELOR": "",
-        "MASTER": "",
-        "DR": "Dr. ",
-        "PROF": "Prof. ",
-        "PROF_DOCTOR": "Prof. Dr. ",
-        "DIPLOMA": ""
     }
 
     const status_list = [

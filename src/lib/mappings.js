@@ -35,3 +35,13 @@ export const img_mapping = {
     "ARCHIVE": archive,
     "ABORT": cross
 }
+
+export const alevel_to_title = {
+    "NONE": "",
+    "BACHELOR": "",
+    "MASTER": "",
+    "DR": "Dr. ",
+    "PROF": "Prof. ",
+    "PROF_DOCTOR": "Prof. Dr. ",
+    "DIPLOMA": ""
+}

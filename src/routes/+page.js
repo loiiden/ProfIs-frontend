@@ -19,6 +19,9 @@ export const load = async ({ fetch }) => {
     res = await fetch(`${api_url}/api/student`);
 	const students = await res.json();
 
+    res = await fetch(`${api_url}/api/evaluator`);
+	const referents = await res.json();
+
     res = await fetch(`${api_url}/api/mark/info`);
 	const marks = await res.json();
 
@@ -31,6 +34,7 @@ export const load = async ({ fetch }) => {
         termine: termine,
         sworks: sworks,
         study_programs: study_programs,
-        students: students
+        students: students,
+        referents: referents
     };
 };

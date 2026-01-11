@@ -1,10 +1,34 @@
 <script>
-    export let item = null;
+    let props = $props()
 
-    export let prev;
-    export let next;
-    export let index;
-    export let count;
+    import { alevel_to_title } from "$lib/mappings";
+
+    let swork = $derived(props.swork);
+    let studmap = $derived(props.studmap);
+    let progmap = $derived(props.progmap);
+    let refmap = $derived(props.refmap);
+
+    function convert_mark(mark) {
+        console.log(mark);
+
+        let gmark = 0;
+
+        if (mark >= 95)
+            gmark = 1.0;
+        if (mark < 50)
+            gmark = 5.0;
+
+        gmark = 1.0;
+        let n = 95;
+        while (mark < n) {
+            n -= 1.5;
+            gmark += 0.1;
+        }
+
+        let multiple = Math.pow(10, 1);
+        let num = Math.round(gmark * multiple) / multiple;
+        return num.toFixed(1);
+    }
 </script>
 
 <div class="overview-arbeit-container">
@@ -14,57 +38,44 @@
 
     <div class="overview-arbeit stroke-style">
 
-        {#if item}
-
-            <div class="header">
-                <div>
-                    <h2>{item.title}</h2>
-                    <p class="arbeit">{item.arbeit}</p>
-                </div>
-
-                <div class="right-header">
-                    <p class="course">{item.course}</p>
-
-                    <div class="arrow-controls">
-                        <button class="arrow-btn" on:click={prev} disabled={index === 0}>◀</button>
-                        <button class="arrow-btn" on:click={next} disabled={index === count - 1}>▶</button>
-                    </div>
-                </div>
+        <div class="header">
+            <div class="left">
+                <p class="student">{swork ? studmap[swork.studentId].firstName + " " + studmap[swork.studentId].lastName : "-"}</p>
+                <p class="title">{swork ? swork.title : "-"}</p>
             </div>
-
-            <div class="grades">
-
-                <div class="line">
-                    <span>Referent:</span> {item.referent}
-                    <div class="Note green">{item.referentNote}</div>
-                </div>
-
-                <div class="line">
-                    <span>Korreferent:</span> {item.korreferent}
-                    <div class="Note blue">{item.koNote}</div>
-                </div>
-
-                <div class="line">
-                    <span>Gesamtnote:</span>
-                    <div class="Note green">{item.gesamtnote}</div>
-                </div>
-
+            <div class="right">
+                <p class="course">{swork ? progmap[swork.studyProgramId] : "-"}</p>
             </div>
-
-        {:else}
-
-            <div class="placeholder">
-
+        </div>
+        <div class="timeline">
+        </div>
+        <div class="grades">
+            <div class="mark">
+                <div class="referent">
+                    <p class="ref-head">Referent:</p>
+                    <p>{swork ?  alevel_to_title[refmap[swork.mainEvaluatorId].academicLevel] + refmap[swork.mainEvaluatorId].firstName + " " + refmap[swork.mainEvaluatorId].lastName : "-"}</p>
+                </div>
+                <div class="note green">{swork ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark) / 2) : "-"}</div>
             </div>
-
-        {/if}
-
+            <div class="mark">
+                <div class="referent">
+                    <p class="ref-head">Korreferent:</p>
+                    <p>{swork ?  alevel_to_title[refmap[swork.secondEvaluatorId].academicLevel] + refmap[swork.secondEvaluatorId].firstName + " " + refmap[swork.secondEvaluatorId].lastName : "-"}</p>
+                </div>
+                <div class="note blue">{swork ? convert_mark((swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 2) : "-"}</div>
+            </div>
+            <div class="mark">
+                <div class="referent">
+                    <p class="ref-head total-mark">Gesamtnote:</p>
+                </div>
+                <div class="note green">{swork ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark + swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 4) : "-"}</div>
+            </div>
+        </div>
     </div>
 </div>
 
 <style lang="scss">
-
-  .overview-arbeit-container {
+.overview-arbeit-container {
     grid-column-start: 1;
     grid-column-end: 8;
     grid-row-start: 2;
@@ -78,132 +89,125 @@
     position: relative;
 
     .effect-el-1, .effect-el-2, .overview-arbeit {
-      position: absolute;
-      border-radius: 10px;
+        position: absolute;
+        border-radius: 10px;
     }
 
     .effect-el-1, .effect-el-2 {
-      background-color: #41525A66;
-      width: 95.5%;
-      height: 87%;
+        background-color: #41525A66;
+        width: 95.5%;
+        height: 87%;
     }
 
     .effect-el-1 {
-      transform: rotate(-2.85deg);
+        transform: rotate(-2.85deg);
     }
 
     .effect-el-2 {
-      transform: rotate(-6.37deg);
+        transform: rotate(-6.37deg);
     }
 
     .overview-arbeit {
-      width: 94%;
-      height: 87%;
-      background-color: #FFFFFF;
-      padding: 12px;
-      box-sizing: border-box;
+        width: 94%;
+        height: 87%;
+        background-color: #FFFFFF;
+        padding: 12px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
     }
-  }
+}
 
-  .header {
+.header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-  }
+    
+    .left {
+        width: 70%;
 
-  .header .left {
+        p {
+            margin: 0px;
+            padding: 6px;
+        }
+
+        .student {
+            font-family: 'Inter EB';
+            font-size: 30px;
+        }
+
+        .title {
+            font-size: 16px;
+            font-family: 'Inter MB';
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* number of lines to show */
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+    }
+
+    .right {
+        width: 25%;
+
+        .course {
+            font-family: 'Inter MB';
+            margin-top: 25px;
+            font-size: 14px;
+            color: #4a4f58;
+        }
+    }
+}
+
+.grades {
     display: flex;
-    flex-direction: column;
-  }
+    margin-bottom: 10px;
+    margin-left: 10px;
+    padding: 6px;
+    width: 95%;
 
-  .header .right {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #6b7280;
-  }
+    .mark {
+        display: flex;
+        align-items: center;
 
-  h2 {
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: 600;
-  }
+        .referent {
+            position: relative;
 
-  .arbeit {
-    margin-top: .4rem;
-    color: #6b7280;
-  }
+            .ref-head {
+                font-family: 'Inter MB';
+            }
 
-  .course {
-    margin-top: .4rem;
-    color: #6b7280;
-    left: 50px;
-  }
+            .total-mark {
+                position: relative;
+                top: -10px;
+            }
 
-  .grades {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-  }
+            p {
+                font-size: 15px;
+                margin: 0px;
+            }
+        }
 
-  .line {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    font-size: .88rem;
-  }
+        .note {
+            width: 40px;
+            height: 40px;
+            margin: 0px 25px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter EB';
+            color: #FFFFFF;
+        }
+    }
+}
 
-  .line span {
-    font-weight: 600;
-  }
+.green {
+    background-color: #317B3B;
+}
 
-  .Note {
-    min-width: 48px;
-    height: 48px;
-    border-radius: .8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    color: #fff;
-  }
-
-  .green {
-    background: $note1;
-  }
-
-  .blue {
-    background: $note2;
-  }
-
-  .placeholder {
-    padding: 2rem;
-    color: #6b7280;
-    font-size: 1.1rem;
-  }
-
-  .right-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .arrow-controls {
-    display: flex;
-    gap: .4rem;
-  }
-
-  .arrow-btn {
-    border: none;
-    background: #e2e8f0;
-    padding: .3rem .5rem;
-    font-size: 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .arrow-btn:disabled {
-    opacity: .4;
-    cursor: default;
-  }
-
+.blue {
+    background-color: #24B6D8;
+}
 </style>

@@ -1,7 +1,7 @@
 <script>
     import searchimg from '$lib/assets/search.svg';
 
-    import DetailView from "$lib/components/overview-arbeit.svelte";
+    import OverviewArbeit from "$lib/components/overview-arbeit.svelte";
     import CommentArbeit from "$lib/components/overview/comment-arbeit.svelte";
     import { color_mapping, status_mapping, img_mapping } from '$lib/mappings';
 
@@ -15,6 +15,11 @@
     let student_mapping = {};
     props.students.forEach(student => {
         student_mapping[student.id] = student;
+    });
+
+    let referent_mapping = {};
+    props.referents.forEach(referent => {
+        referent_mapping[referent.id] = referent;
     });
 
     let search = $state("");
@@ -75,13 +80,8 @@
     </div>
 </div>
 
-<DetailView
-        item={current_item}
-        index={index}
-        count={filtered_items.length}
-        prev={prev}
-        next={next}
-/>
+<OverviewArbeit swork={current_item} studmap={student_mapping}
+    progmap={study_programs_mapping} refmap={referent_mapping}/>
 
 <CommentArbeit kommentar="{current_item ? current_item.comment : ""}"/>
 
