@@ -7,28 +7,29 @@
     let { data } = $props();
 
     // --- TEIL 1: BENUTZER ---
-    let selectedUser = $state(data.currentUser || null);
+    let selectedUser = $state(data.currentUser || null); // aktuell ausgewählter Benutzer (Evaluator)
 
     async function saveUser() {
-        if(!selectedUser) return;
+        if(!selectedUser) return; // ohne Auswahl nichts speichern
         
         // ENDPUNKT: /api/evaluator/main-user/{id}
+        // Speichert den aktuell ausgewählten Benutzer als "Main User"
         let res = await POST(`/api/evaluator/main-user/${selectedUser.id}`);
         
         if (res.ok) {
             //alert(`Benutzer ${selectedUser.firstName} ${selectedUser.lastName} erfolgreich gespeichert!`); // Optional: Bestätigungspopup
-            invalidateAll(); 
+            invalidateAll(); // lädt Settings-Daten neu (damit UI direkt aktualisiert wird)
         } else {
             alert("Fehler beim Speichern des Benutzers.");
         }
     }
 
     // --- TEIL 2: STUDIENGÄNGE ---
-    let newProgramName = $state("");
-    let newProgramSws = $state("");
-    let newProgramDegree = $state("");
+    let newProgramName = $state("");    // Eingabefeld: Titel
+    let newProgramSws = $state("");     // Eingabefeld: SWS
+    let newProgramDegree = $state("");  // Eingabefeld: Abschluss (Enum-String)
 
-    // Mapping auf API-Werte
+    // Mapping auf API-Werte (degreeType wird als String an Backend gesendet)
     const degreeOptions = [
         // Bachelor
         { value: 'B_A', label: 'Bachelor of Arts (B.A.)' },
@@ -44,7 +45,7 @@
         { value: 'MBA', label: 'Master of Business Admin. (MBA)' }
     ];
 
-    // Kürzel-Mapping für die Titelpräfixe
+    // Kürzel-Mapping für die Titelpräfixe (wird aktuell nicht zum Speichern verwendet, bleibt aber erhalten)
     const degreeShortMap = {
         B_A: 'B.A.',
         B_ENG: 'B.Eng.',
@@ -69,6 +70,11 @@
         return short ? `${short} in ${title}` : title;
     }
 
+    // Helper für UI: Prüft, ob Studiengänge vorhanden sind
+    function hasStudyPrograms() {
+        return Array.isArray(data?.studyPrograms) && data.studyPrograms.length > 0;
+    }
+
     async function addStudyProgram() {
         // Validierung: Alle Felder müssen gefüllt sein
         if(newProgramName.trim() === "" || newProgramSws === "" || newProgramDegree === "") {
@@ -76,17 +82,19 @@
             return;
         }
 
+        // Payload so wie Backend es erwartet
         let payload = { 
             // title: formatProgramTitle(newProgramName, newProgramDegree), // Titel mit Abschluss-Kürzel präfixen, nach Anruf mit Loick entfernt
             title: newProgramName, //Stattdessen nur der Titel
-            sws: Number(newProgramSws),
+            sws: Number(newProgramSws), // String -> Number (Backend erwartet Zahl)
             degreeType: newProgramDegree // Sendet z.B. "B_SC"
         };
         
-        // API Call 
+        // API Call: legt Studiengang an
         let res = await POST('/api/study-program', payload);
         
         if(res.ok) {
+            // Felder leeren + UI neu laden
             newProgramName = "";
             newProgramSws = "";
             newProgramDegree = "";
@@ -99,14 +107,14 @@
     async function deleteStudyProgram(id) {
         //if(!confirm("Diesen Studiengang wirklich löschen?")) return; // Optional: Bestätigungspopup
 
-        // Fetch direkt hier, da DELETE Helper in functions.js fehlt
+        // Löscht Studiengang per REST-DELETE (Fetch direkt, weil DELETE Helper in functions.js fehlt)
         try {
             let res = await fetch(`${api_url}/api/study-program/${id}`, {
                 method: 'DELETE'
             });
 
             if(res.ok) {
-                invalidateAll();
+                invalidateAll(); // Liste neu laden
             } else {
                 alert("Konnte nicht gelöscht werden.");
             }
@@ -116,77 +124,120 @@
         }
     }
 
-// --- TEIL 3: EXCEL IMPORT/EXPORT ---
-let serverFilePath = $state("");
+    // --- TEIL 3: EXCEL IMPORT/EXPORT ---
+    let excelFile = $state(null);       // ausgewählte Excel-Datei (File Objekt)
+    let isDragging = $state(false);     // UI-State für Drag&Drop Highlight
+    let fileInput;                      // Referenz auf verstecktes <input type="file">
 
-//Funktion um Pfad zu formatieren und zu validieren
-function normalizePath(input) {
-    const raw = (input ?? "").trim();
-    if (!raw) return { ok: false, error: "Bitte geben Sie den Pfad zur Datei an." };
-
-    // 1) ohne Quotes
-    if (!raw.startsWith('"') && !raw.startsWith("'") && !raw.endsWith('"') && !raw.endsWith("'")) {
-        return { ok: true, path: raw };
+    // Öffnet den System-Dateidialog (Explorer)
+    function openFilePicker() {
+        fileInput?.click();
     }
 
-    // 2) mit "..."
-    if (raw.length >= 2 && raw.startsWith('"') && raw.endsWith('"')) {
-        const inner = raw.slice(1, -1).trim();
-        if (!inner) return { ok: false, error: "Bitte geben Sie den Pfad zur Datei an." };
-        return { ok: true, path: inner };
-    }
+    // Setzt die Datei + minimale Validierung (nur .xlsx zulassen)
+    function setExcelFile(file) {
+        if (!file) return;
 
-    // 3) mit '...'
-    if (raw.length >= 2 && raw.startsWith("'") && raw.endsWith("'")) {
-        const inner = raw.slice(1, -1).trim();
-        if (!inner) return { ok: false, error: "Bitte geben Sie den Pfad zur Datei an." };
-        return { ok: true, path: inner };
-    }
-
-    // alles andere
-    return { ok: false, error: "Ungültiger Pfad: Bitte entweder ohne Anführungszeichen oder mit passenden \"...\" bzw. '...' einfügen." };
-}
-
-async function importExcel() {
-    const normalized = normalizePath(serverFilePath);
-
-    if (!normalized.ok) {
-        alert(normalized.error);
-        return;
-    }
-
-    try {
-        let res = await POST(`/api/data/import?file=${encodeURIComponent(normalized.path)}`, {});
-        if (res.ok) {
-            let msg = await res.text();
-            // Übersetze englische Erfolgsmeldung ins Deutsche
-            if (msg && msg.trim() === "Successfully imported Excel data to database") {
-                alert("Excel-Daten wurden erfolgreich importiert!");
-            } else {
-                alert(msg || "Import erfolgreich!");
-            }
-            invalidateAll();
-        } else {
-            alert("Fehler beim Importieren (Prüfen Sie den Pfad).");
+        // Minimal-Validierung: nur .xlsx
+        const name = (file?.name || "").toLowerCase();
+        if (!name.endsWith(".xlsx")) {
+            alert("Bitte eine .xlsx Datei auswählen.");
+            return;
         }
-    } catch (e) {
-        console.error(e);
-        alert("Verbindungsfehler beim Import.");
+
+        excelFile = file;
     }
-}
 
-function exportExcel() {
-    window.open(`${api_url}/api/data/export`, '_blank');
-}
+    // Input-Change Handler (Datei über Explorer ausgewählt)
+    function onFileChange(e) {
+        const file = e?.target?.files?.[0];
+        setExcelFile(file);
+    }
 
+    // Drag&Drop: sobald Datei in Dropzone kommt -> UI markieren
+    function onDragEnter(e) {
+        e.preventDefault();
+        isDragging = true;
+    }
+
+    // Drag&Drop: über Dropzone halten -> UI markieren
+    function onDragOver(e) {
+        e.preventDefault();
+        isDragging = true;
+    }
+
+    // Drag&Drop: Dropzone verlassen -> UI-Markierung entfernen
+    function onDragLeave(e) {
+        e.preventDefault();
+        isDragging = false;
+    }
+
+    // Drag&Drop: Datei fallen lassen -> Datei übernehmen
+    function onDrop(e) {
+        e.preventDefault();
+        isDragging = false;
+
+        const file = e?.dataTransfer?.files?.[0];
+        setExcelFile(file);
+    }
+
+    // Upload der Excel-Datei als multipart/form-data an /api/data/import
+    async function importExcel() {
+        if (!excelFile) {
+            alert("Bitte wählen Sie eine Excel-Datei aus.");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append("excelFile", excelFile); // Backend erwartet key: excelFile
+
+            let res = await fetch(`${api_url}/api/data/import`, {
+                method: "POST",
+                body: formData
+            });
+
+            if (res.ok) {
+                let msg = await res.text();
+
+                // Übersetze englische Erfolgsmeldung ins Deutsche
+                if (msg && msg.trim() === "Successfully imported Excel data to database") {
+                    alert("Excel-Daten wurden erfolgreich importiert!");
+                } else {
+                    alert(msg || "Import erfolgreich!");
+                }
+
+                // File-State resetten (damit danach auch die gleiche Datei erneut gewählt werden kann)
+                excelFile = null;
+                if (fileInput) fileInput.value = ""; // Reset, damit gleiche Datei erneut gewählt werden kann
+
+                invalidateAll(); // lädt nach dem Import alle Daten neu (Studiengänge etc.)
+            } else {
+                // Backend liefert ggf. Textfehler zurück
+                let err = "";
+                try { err = await res.text(); } catch (_) {}
+                alert(err ? `Fehler beim Importieren: ${err}` : "Fehler beim Importieren.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Verbindungsfehler beim Import.");
+        }
+    }
+
+    // Export startet einen Datei-Download in neuem Tab
+    function exportExcel() {
+        window.open(`${api_url}/api/data/export`, '_blank');
+    }
 
     // --- TEIL 4: DATENBANK ZURÜCKSETZEN ---
     async function resetDatabase() {
+        // Sicherheitsabfrage
         if(!confirm('Sind Sie sicher, dass Sie alle Daten löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden!')) {
             return;
         }
 
         try {
+            // Löscht die kompletten DB
             let res = await fetch(`${api_url}/api/data/reset`, {
                 method: 'DELETE'
             });
@@ -194,11 +245,11 @@ function exportExcel() {
             if(res.ok) {
                 alert('Datenbank wurde erfolgreich zurückgesetzt.');
                 invalidateAll();
-                window.location.reload();
+                window.location.reload(); // Hard-Reload, damit UI sicher "clean" ist
             } else {
                 alert('Fehler beim Zurücksetzen der Datenbank.');
                 invalidateAll();
-                window.location.reload();
+                window.location.reload(); // ebenfalls reload, um evtl. inkonsistente UI zu vermeiden
             }
         } catch (e) {
             console.error(e);
@@ -241,19 +292,25 @@ function exportExcel() {
     <div class="card program-section">
         <div class="headline-s">Studiengänge verwalten</div>
         
+        <!-- Liste hat fixe Höhe + Scroll -->
         <div class="program-list">
             <div class="list-header">
                 <span></span>
                 <span></span>
             </div>
 
-            <!-- Anzeige: der (ggf. bereits mit Kürzel) zusammengesetzte Titel -->
-            {#each data.studyPrograms as program}
-                <div class="program-row">
-                    <span class="program-name">{program.title}</span>
-                    <button class="delete-btn" onclick={() => deleteStudyProgram(program.id)}>Löschen</button>
-                </div>
-            {/each}
+            {#if hasStudyPrograms()}
+                <!-- Anzeige: vorhandene Studiengänge -->
+                {#each data.studyPrograms as program}
+                    <div class="program-row">
+                        <span class="program-name">{program.title}</span>
+                        <button class="delete-btn" onclick={() => deleteStudyProgram(program.id)}>Löschen</button>
+                    </div>
+                {/each}
+            {:else}
+                <!-- Effekt: Wird angezeigt, wenn keine Studiengänge vorhanden sind -->
+                <div class="empty-programs">Keine Studiengänge vorhanden.</div>
+            {/if}
         </div>
 
         <!-- Eingabe: Neue Studiengänge hinzufügen -->
@@ -277,31 +334,51 @@ function exportExcel() {
                 {/each}
             </select>
 
+            <!-- Button: Studiengang hinzufügen -->
             <button class="add-btn" onclick={addStudyProgram}>+</button>
         </div>
     </div>
 
     <div class="card excel-section">
         <div class="headline-s">Daten Import/Export</div>
-        <p class="description">
-            Hier können Sie Daten über Excel-Listen importieren und exportieren. <br>
-            <span style="font-size: 0.9em; opacity: 0.8;">Hinweis: Um eine Datei zu importieren, geben Sie bitte den Pfad zu der Datei an.</span>
-        </p>
 
         <div class="excel-row">
-            <input 
-                class="input-path" 
-                type="text" 
-                placeholder="Datei-Pfad (z.B. C:\Users\mena2\Documents\ProfisExcel.xlsx)" 
-                bind:value={serverFilePath} 
-            />
-            <button class="save-btn" onclick={importExcel}>Importieren</button>
+            <div
+                class="dropzone"
+                class:dragover={isDragging}
+                onclick={openFilePicker}
+                ondragenter={onDragEnter}
+                ondragover={onDragOver}
+                ondragleave={onDragLeave}
+                ondrop={onDrop}
+            >
+                <!-- Excel-Datei für den Import auswählen (Drag & Drop oder Klick) -->
+                <input
+                    bind:this={fileInput}
+                    type="file"
+                    accept=".xlsx"
+                    style="display: none;"
+                    onchange={onFileChange}
+                />
+
+                {#if excelFile}
+                    <!-- Anzeige: ausgewählte Datei -->
+                    <span class="dropzone-text">{excelFile.name}</span>
+                {:else}
+                    <!-- Placeholder: keine Datei ausgewählt -->
+                    <span class="dropzone-text dropzone-placeholder">Excel-Datei auswählen / Drag & Drop</span>
+                {/if}
+            </div>
+
+            <!-- Import startet Upload, Button deaktiviert ohne Datei -->
+            <button class="save-btn" onclick={importExcel} disabled={!excelFile}>Importieren</button>
         </div>
 
-        <div class="excel-row" style="margin-top: 15px;">
+        <div class="excel-row" style="margin-top: 10px;">
             <span class="export-label">
                 Datenbankstand sichern:
             </span>
+            <!-- Export öffnet Download-Endpoint -->
             <button class="secondary-btn" onclick={exportExcel}>Exportieren</button>
         </div>
     </div>
@@ -315,6 +392,7 @@ function exportExcel() {
             Wenn Sie die Daten später noch benötigen, exportieren Sie diese bitte vorher als Backup. Bitte beachten Sie, dass Events nicht mitgesichert werden.<br><br>
             <strong class="danger-warning">Diese Aktion kann nicht rückgängig gemacht werden.</strong>
         </p>
+        <!-- Reset löscht DB komplett -->
         <button class="danger-btn" onclick={resetDatabase}>Alle Daten löschen</button>
     </div>
 </main>
@@ -322,7 +400,7 @@ function exportExcel() {
 <style lang="scss">
     @import 'src/styles/colors.scss'; // Für $primary, $error etc.
 
-    /* --- Gesamt-Layout --- */
+    /* --- Gesamt-Layout (12-Spalten Grid) --- */
     .settings-container {
         display: grid;
         grid-template-rows: repeat(16, auto);
@@ -333,7 +411,7 @@ function exportExcel() {
         font-family: "Inter", sans-serif;
     }
 
-    /* Seitentitel-Bereich */
+    /* Seitentitel-Bereich (oben) */
     .page-header {
         grid-column: 1 / 13;
         display: flex;
@@ -347,6 +425,7 @@ function exportExcel() {
         font-size: 2em;
     }
 
+    /* Help-Link als Button */
     .help-btn {
         background-color: #FDF8F8;
         color: black;
@@ -362,7 +441,7 @@ function exportExcel() {
         &:hover { background-color: #FFF0F0; }
     }
 
-    /* Genereller Karten-Style (wie bei den anderen Seiten) */
+    /* Genereller Karten-Style (alle Sections) */
     .card {
         background-color: #FFFFFF;
         border: 1px solid #E9E9E9;
@@ -372,13 +451,14 @@ function exportExcel() {
         flex-direction: column;
     }
 
-    /* --- Überschriften & Beschreibungen --- */
+    /* Überschriften in Cards */
     .headline-s {
         font-weight: 700;
         font-size: 18px;
         margin-bottom: 10px;
     }
 
+    /* Standard Beschreibungstext (grau) */
     .description {
         color: $tertiary; /* Grau aus colors.scss */
         font-size: 14px;
@@ -389,16 +469,18 @@ function exportExcel() {
 
     /* --- User Section --- */
     .user-section {
-        grid-column: 1 / 7;
+        grid-column: 1 / 7;  /* linke Hälfte */
         grid-row: 2 / 3;
     }
 
+    /* Row: Suche + Button */
     .input-row {
         display: flex;
         gap: 15px;
         align-items: stretch;
     }
 
+    /* Wrapper um die Suchkomponente (damit Höhe/Styles passen) */
     .search-wrapper {
         flex-grow: 1;
         
@@ -432,19 +514,35 @@ function exportExcel() {
 
     /* --- Program Section Layout --- */
     .program-section {
-        grid-column: 7 / 13;
+        grid-column: 7 / 13; /* rechte Hälfte */
         grid-row: 2 / 4; 
     }
 
+    /* Liste der Studiengänge (fixe Höhe + Scroll, um Layout-Sprünge zu vermeiden) */
     .program-list {
         display: flex;
         flex-direction: column;
         gap: 10px;
         margin-bottom: 20px;
-        max-height: 300px; 
+        height: 250px;
+        //max-height: 300px; //mal schauen ob nötig
         overflow-y: auto;
     }
 
+    /* Empty-State wenn keine Studiengänge existieren */
+    .empty-programs {
+        padding: 12px;
+        border: 1px dashed #E9E9E9;
+        border-radius: 6px;
+        color: $tertiary;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80px;
+    }
+
+    /* Header-Zeile über der Liste (aktuell ohne Labels) */
     .list-header {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -455,6 +553,7 @@ function exportExcel() {
         margin-bottom: 5px;
     }
 
+    /* Einzelner Eintrag in der Studiengang-Liste */
     .program-row {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -507,13 +606,14 @@ function exportExcel() {
         }
     }
 
-    /* --- Excel Section (angepasst) --- */
+    /* --- Excel Section --- */
     .excel-section {
-        grid-column: 1 / 7;
-        grid-row: 3 / 4; /* Auch länger gemacht, passend zur rechten Seite */
-        justify-content: center; /* Inhalt vertikal mittig, wenn Platz da ist */
+        grid-column: 1 / 7; /* linke Hälfte unter User */
+        grid-row: 3 / 4;
+        //justify-content: center; /* Inhalt vertikal mittig, wenn Platz da ist */
     }
     
+    /* Row-Layout innerhalb Excel-Card */
     .excel-row {
         display: flex;
         align-items: center;
@@ -521,26 +621,50 @@ function exportExcel() {
         width: 100%;
     }
 
-    .input-path {
+    /* Dropzone: kompakt, gleiche Höhe wie Buttons */
+    .dropzone {
         flex-grow: 1;
-        padding: 10px;
-        border: 1px solid #E9E9E9;
+        height: 38px;
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
+        border: 1px dashed #E9E9E9;
         border-radius: 6px;
-        font-family: "Inter";
-        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+        background-color: #FFFFFF;
+        overflow: hidden;
+
+        /* Highlight wenn Drag&Drop aktiv */
+        &.dragover {
+            background-color: #FDF8F8;
+            border-color: #CCC;
+        }
+    }
+
+    /* Text innerhalb Dropzone */
+    .dropzone-text {
+        font-size: 13px;
         color: black;
-        &::placeholder { color: #A0A0A0; }
-        &:focus { border-color: #ccc; outline: none; }
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Placeholder-Styling */
+    .dropzone-placeholder {
+        color: $tertiary;
     }
     
+    /* Label vor dem Export-Button */
     .export-label {
         flex-grow: 1;
         font-size: 14px;
         font-weight: 500;
-        color: $secondary; /* Dunkelgrau/Schwarz */
+        color: $secondary;
     }
 
-    /* --- Buttons --- */
+    /* --- Buttons (global) --- */
     button {
         cursor: pointer;
         border-radius: 6px;
@@ -552,7 +676,7 @@ function exportExcel() {
         transition: background 0.2s;
     }
 
-    /* Gemeinsame Styles für Speichern- und Hinzufügen-Button */
+    /* Primary Buttons (Speichern/Import/Add) */
     .save-btn, .add-btn {
         background-color: $primary;
         color: white;
@@ -564,9 +688,10 @@ function exportExcel() {
         box-sizing: border-box;
 
         &:hover { opacity: 0.9; }
+        &:disabled { opacity: 0.5; cursor: not-allowed; }
     }
 
-    /* Löschen-Button */
+    /* Delete-Button in Liste */
     .delete-btn {
         background-color: white;
         color: $error;
@@ -579,7 +704,7 @@ function exportExcel() {
 
     /* --- Danger Section --- */
     .danger-section {
-        grid-column: 1 / 13;
+        grid-column: 1 / 13; /* volle Breite */
         grid-row: 4 / 5;
         border: 1px solid #FFCDD2;
         background-color: #FFFAFA;
@@ -593,6 +718,7 @@ function exportExcel() {
         color: #D32F2F;
     }
 
+    /* Danger Button */
     .danger-btn {
         background-color: #D32F2F;
         color: white;
