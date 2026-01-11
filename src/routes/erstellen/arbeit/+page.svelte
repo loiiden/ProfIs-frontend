@@ -296,7 +296,8 @@
             // Update local snapshot of event IDs to reflect current state
             loadedEventIds = events.map(e => e.id).filter(Boolean);
 
-            alert(create ? "Erfolgreich gespeichert!" : "Erfolgreich aktualisiert!");
+            //remove alert for save/update success
+            //alert(create ? "Erfolgreich gespeichert!" : "Erfolgreich aktualisiert!");
             goto("/arbeiten");
         } catch (e) {
             console.error("Save failed:", e);

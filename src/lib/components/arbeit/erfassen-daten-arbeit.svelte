@@ -60,6 +60,12 @@
             if (found) selectedStudent = found;
         }
     });
+    $effect(() => {
+        if (data.studyProgramId && !selectedStudyProgram && studyPrograms.length > 0) {
+            const found = studyPrograms.find(s => s.id === data.studyProgramId);
+            if (found) selectedStudyProgram = found;
+        }
+    });
 
     // Sicherheitsprüfung hinzugefügt
     $effect(() => {
@@ -79,43 +85,6 @@
         }
     });
 
-    $effect(() => {
-        const selectedId = selectedStudent?.id ?? null;
-
-        if (selectedId !== null) {
-            data.studentId = selectedId;
-            const spId = selectedStudent.studyProgramId ?? null;
-            selectedStudyProgramId = spId;
-            data.studyProgramId = spId;
-            studyProgramText = spId ? (studyProgramById.get(spId) ?? "") : "";
-            return;
-        }
-
-        // Only clear selection when nothing is selected and no prefilled value exists
-        if (!data.studentId) {
-            selectedStudyProgramId = null;
-            data.studyProgramId = null;
-            studyProgramText = "";
-        }
-        if (!selectedStudent) {
-            selectedStudyProgram = null;
-            data.studyProgramId = null;
-            studyProgramManuallySet = false;
-            return;
-        }
-
-        if (!studyProgramManuallySet) {
-            const spId = selectedStudent.studyProgramId ?? null;
-            selectedStudyProgram = spId ? (studyPrograms.find(sp => sp.id === spId) ?? null) : null;
-            data.studyProgramId = selectedStudyProgram?.id ?? null;
-        }
-    });
-
-    $effect(() => {
-        if (selectedStudyProgram && !studyProgramManuallySet) {
-        }
-        data.studyProgramId = selectedStudyProgram?.id ?? null;
-    });
 
     function onStudyProgramSelected(sp) {
         selectedStudyProgram = sp;
