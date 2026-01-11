@@ -5,6 +5,7 @@
 	import { onMount } from "svelte";
     import { date_to_string } from "$lib/functions";
     import { status_mapping } from "$lib/mappings";
+	import { page } from "$app/state";
 
     let swork = $derived(props.swork);
     let studmap = $derived(props.studmap);
@@ -53,7 +54,17 @@
 
         let snapshot = $state.snapshot(swork);
         let events = snapshot.events;
-        events.push({eventDate: snapshot.colloquium.splice(0, 3)});
+        if(snapshot.colloquium !== null){
+            if(typeof snapshot.colloquium === "string"){
+                let splitted = snapshot.colloquium.split("T");
+                let colq = splitted[0].split("-").map(x => parseInt(x, 10));
+                console.log(colq);
+                
+                events.push({eventDate: colq});
+            } else {
+                events.push({eventDate: snapshot.colloquium.splice(0, 3)});
+            }
+        }
 
         const today = new Date();
         let events_count = events.length + 2;
@@ -83,18 +94,32 @@
         let config = { childList: true, subtree:true };
         observer.observe(timeline, config);
     })
+
+    function format_datestring(datestring){
+        return datestring.split("-").toReversed().toString().replaceAll(",", ".");
+    }
+
+    function format_datetime(datetime){
+        let splitted = datetime.split("T");
+
+        return [
+            format_datestring(splitted[0]),
+            splitted[1]
+        ]
+    }
+
 </script>
 
-<div class="overview-arbeit-container">
+<div class="overview-arbeit-container {page.url.pathname == "/" ? "grid-layout-home": "grid-layout-preview"}">
 
-    <div class="effect-el-1"></div>
-    <div class="effect-el-2"></div>
+    <div class="effect-el-1" style:display={page.url.pathname == "/" ? "" : "none"}></div>
+    <div class="effect-el-2" style:display={page.url.pathname == "/" ? "" : "none"}></div>
 
-    <div class="overview-arbeit stroke-style">
+    <div class="overview-arbeit stroke-style" style:width={page.url.pathname == "/"  ? "94%" : "100%"}>
 
         <div class="header">
             <div class="left">
-                <p class="student">{swork ? studmap[swork.studentId].firstName + " " + studmap[swork.studentId].lastName : "-"}</p>
+                <p class="student">{swork.studentId ? studmap[swork.studentId].firstName + " " + studmap[swork.studentId].lastName : "-"}</p>
                 <p class="title">{swork ? swork.title : "-"}</p>
             </div>
             <div class="right">
@@ -109,19 +134,19 @@
                     <div class="event">
                         <div class="line"></div>
                         <p class="ev-head">Startdatum:</p>
-                        <p>{swork.startDate ? date_to_string(swork.startDate) : "-"}</p>
+                        <p>{swork.startDate ? (typeof swork.startDate === "string" ? format_datestring(swork.startDate) : date_to_string(swork.startDate)) : "-"}</p>
                     </div>
                     {#each swork.events as event}
                         <div class="event">
                             <div class="line"></div>
-                            <p class="ev-head">{status_mapping[event.eventType]}:</p>
-                            <p>{date_to_string(event.eventDate)}</p>
+                            <p class="ev-head">{event.eventType ? status_mapping[event.eventType] + ":" : "-"}</p>
+                            <p>{event.eventDate ? (typeof event.eventDate === "string" ? format_datestring(event.eventDate) : date_to_string(event.eventDate)) : "-"}</p>
                         </div>
                     {/each}
                     <div class="event">
                         <div class="line"></div>
                         <p class="ev-head">Kolloquium:</p>
-                        <p>{swork.colloquium ? String(swork.colloquium.toReversed().splice(2)).replaceAll(",", ".") : "-"}, {swork.colloquiumLocation ?? "-"}, {swork.presentationStart ?? "-"}</p>
+                        <p>{swork.colloquium ? (typeof swork.colloquium === "string" ? format_datetime(swork.colloquium)[0]: String(swork.colloquium.toReversed().splice(2)).replaceAll(",", ".")) : "-"}, {swork.colloquiumLocation ? swork.colloquiumLocation : "-"}, {swork.colloquium ? (typeof swork.colloquium === "string" ? format_datetime(swork.colloquium)[1] : String(swork.colloquium.slice().splice(3)).replaceAll(",", ":")) : "-"}</p>
                     </div>
                 </div>
             {/if}
@@ -130,33 +155,43 @@
             <div class="mark">
                 <div class="referent">
                     <p class="ref-head">Referent:</p>
-                    <p>{swork ?  alevel_to_title[refmap[swork.mainEvaluatorId].academicLevel] + refmap[swork.mainEvaluatorId].firstName + " " + refmap[swork.mainEvaluatorId].lastName : "-"}</p>
+                    <p>{swork.mainEvaluatorId ?  alevel_to_title[refmap[swork.mainEvaluatorId].academicLevel] + refmap[swork.mainEvaluatorId].firstName + " " + refmap[swork.mainEvaluatorId].lastName : (swork.mainEvaluator ? swork.mainEvaluator.firstName + " " + swork.mainEvaluator.lastName : "-")}</p>
                 </div>
-                <div class="note green">{swork ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark) / 2) : "-"}</div>
+                <div class="note green">{swork.mainEvaluatorWorkMark !== null && swork.mainEvaluatorColloquiumMark !== null ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark) / 2) : "-"}</div>
             </div>
             <div class="mark">
                 <div class="referent">
                     <p class="ref-head">Korreferent:</p>
-                    <p>{swork ?  alevel_to_title[refmap[swork.secondEvaluatorId].academicLevel] + refmap[swork.secondEvaluatorId].firstName + " " + refmap[swork.secondEvaluatorId].lastName : "-"}</p>
+                    <p>{swork.secondEvaluatorId ?  alevel_to_title[refmap[swork.secondEvaluatorId].academicLevel] + refmap[swork.secondEvaluatorId].firstName + " " + refmap[swork.secondEvaluatorId].lastName : (swork.secondEvaluator ? swork.secondEvaluator.firstName + " " + swork.secondEvaluator.lastName : "-")}</p>
                 </div>
-                <div class="note blue">{swork ? convert_mark((swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 2) : "-"}</div>
+                <div class="note blue">{swork.secondEvaluatorWorkMark !== null && swork.secondEvaluatorColloquiumMark !== null ? convert_mark((swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 2) : "-"}</div>
             </div>
             <div class="mark">
                 <div class="referent">
                     <p class="ref-head total-mark">Gesamtnote:</p>
                 </div>
-                <div class="note green">{swork ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark + swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 4) : "-"}</div>
+                <div class="note green">{swork.mainEvaluatorWorkMark !== null && swork.mainEvaluatorColloquiumMark !== null && swork.secondEvaluatorWorkMark !== null && swork.secondEvaluatorColloquiumMark !== null ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark + swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 4) : "-"}</div>
             </div>
         </div>
     </div>
 </div>
 
 <style lang="scss">
-.overview-arbeit-container {
+.grid-layout-home {
     grid-column-start: 1;
     grid-column-end: 8;
     grid-row-start: 2;
     grid-row-end: 10;
+}
+
+.grid-layout-preview {
+    grid-column-start: 1;
+    grid-column-end: 8;
+    grid-row-start: 3;
+    grid-row-end: 19;
+}
+
+.overview-arbeit-container {
     border: none;
 
     display: flex;
@@ -185,7 +220,6 @@
     }
 
     .overview-arbeit {
-        width: 94%;
         height: 87%;
         background-color: #FFFFFF;
         padding: 12px;
@@ -200,6 +234,7 @@
 .header {
     display: flex;
     justify-content: space-between;
+    width: 100%;
     
     .left {
         width: 70%;

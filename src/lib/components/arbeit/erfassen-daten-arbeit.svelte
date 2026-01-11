@@ -432,11 +432,10 @@
     grid-column-start: 8;
     grid-column-end: 13;
     grid-row-start: 3;
-    grid-row-end: 28;
+    grid-row-end: 36;
     border: 1px solid #E9E9E9;
     background-color: #FFFFFF;
     border-radius: 10px;
-    max-height: 800px;
     overflow-y: auto;
     font-family: "Inter", sans-serif;
   }

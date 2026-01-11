@@ -10,8 +10,17 @@ export const load = async ({ fetch }) => {
         
         if (res.ok) {
             const referenten = await res.json();
+
+            let res1 = await fetch(`${api_url}/api/study-program`);
+            const study_programs = await res1.json();
+
+            res1 = await fetch(`${api_url}/api/student`);
+            const students = await res1.json();
+
             return {
-                referenten: referenten
+                referenten: referenten,
+                students: students,
+                study_programs: study_programs
             };
         } else {
             console.error("Fehler beim Laden der Referenten:", res.status);

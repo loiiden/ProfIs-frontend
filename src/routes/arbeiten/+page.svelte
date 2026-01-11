@@ -280,6 +280,8 @@
         padding: 12px;
         border-radius: 10px;
         padding-right: 0px;
+        box-sizing: border-box;
+        padding-bottom: 20px;
 
         .search-bar {
             display: flex;
