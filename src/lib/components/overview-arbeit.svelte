@@ -118,17 +118,19 @@
     <div class="overview-arbeit stroke-style" style:width={page.url.pathname == "/"  ? "94%" : "100%"}>
 
         <div class="header">
-            <div class="left">
-                <p class="student">{swork.studentId ? studmap[swork.studentId].firstName + " " + studmap[swork.studentId].lastName : "-"}</p>
-                <p class="title">{swork ? swork.title : "-"}</p>
-            </div>
-            <div class="right">
-                <p class="course">{swork ? progmap[swork.studyProgramId] : "-"}</p>
-            </div>
+            {#if swork}
+                <div class="left">
+                    <p class="student">{swork.studentId ? studmap[swork.studentId].firstName + " " + studmap[swork.studentId].lastName : "-"}</p>
+                    <p class="title">{swork ? swork.title : "-"}</p>
+                </div>
+                <div class="right">
+                    <p class="course">{swork ? progmap[swork.studyProgramId] : "-"}</p>
+                </div>
+            {/if}
         </div>
         <div class="timeline">
             {#if swork}
-            <div class="progress-bar-back grey"></div>
+                <div class="progress-bar-back grey"></div>
                 <div class="progress-bar green"></div>
                 <div class="events-container">
                     <div class="event">
@@ -152,26 +154,28 @@
             {/if}
         </div>
         <div class="grades">
-            <div class="mark">
-                <div class="referent">
-                    <p class="ref-head">Referent:</p>
-                    <p>{swork.mainEvaluatorId ?  alevel_to_title[refmap[swork.mainEvaluatorId].academicLevel] + refmap[swork.mainEvaluatorId].firstName + " " + refmap[swork.mainEvaluatorId].lastName : (swork.mainEvaluator ? swork.mainEvaluator.firstName + " " + swork.mainEvaluator.lastName : "-")}</p>
+            {#if swork}
+                <div class="mark">
+                    <div class="referent">
+                        <p class="ref-head">Referent:</p>
+                        <p>{swork.mainEvaluatorId ?  alevel_to_title[refmap[swork.mainEvaluatorId].academicLevel] + refmap[swork.mainEvaluatorId].firstName + " " + refmap[swork.mainEvaluatorId].lastName : (swork.mainEvaluator ? swork.mainEvaluator.firstName + " " + swork.mainEvaluator.lastName : "-")}</p>
+                    </div>
+                    <div class="note green">{swork.mainEvaluatorWorkMark !== null && swork.mainEvaluatorColloquiumMark !== null ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark) / 2) : "-"}</div>
                 </div>
-                <div class="note green">{swork.mainEvaluatorWorkMark !== null && swork.mainEvaluatorColloquiumMark !== null ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark) / 2) : "-"}</div>
-            </div>
-            <div class="mark">
-                <div class="referent">
-                    <p class="ref-head">Korreferent:</p>
-                    <p>{swork.secondEvaluatorId ?  alevel_to_title[refmap[swork.secondEvaluatorId].academicLevel] + refmap[swork.secondEvaluatorId].firstName + " " + refmap[swork.secondEvaluatorId].lastName : (swork.secondEvaluator ? swork.secondEvaluator.firstName + " " + swork.secondEvaluator.lastName : "-")}</p>
+                <div class="mark">
+                    <div class="referent">
+                        <p class="ref-head">Korreferent:</p>
+                        <p>{swork.secondEvaluatorId ?  alevel_to_title[refmap[swork.secondEvaluatorId].academicLevel] + refmap[swork.secondEvaluatorId].firstName + " " + refmap[swork.secondEvaluatorId].lastName : (swork.secondEvaluator ? swork.secondEvaluator.firstName + " " + swork.secondEvaluator.lastName : "-")}</p>
+                    </div>
+                    <div class="note blue">{swork.secondEvaluatorWorkMark !== null && swork.secondEvaluatorColloquiumMark !== null ? convert_mark((swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 2) : "-"}</div>
                 </div>
-                <div class="note blue">{swork.secondEvaluatorWorkMark !== null && swork.secondEvaluatorColloquiumMark !== null ? convert_mark((swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 2) : "-"}</div>
-            </div>
-            <div class="mark">
-                <div class="referent">
-                    <p class="ref-head total-mark">Gesamtnote:</p>
+                <div class="mark">
+                    <div class="referent">
+                        <p class="ref-head total-mark">Gesamtnote:</p>
+                    </div>
+                    <div class="note green">{swork.mainEvaluatorWorkMark !== null && swork.mainEvaluatorColloquiumMark !== null && swork.secondEvaluatorWorkMark !== null && swork.secondEvaluatorColloquiumMark !== null ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark + swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 4) : "-"}</div>
                 </div>
-                <div class="note green">{swork.mainEvaluatorWorkMark !== null && swork.mainEvaluatorColloquiumMark !== null && swork.secondEvaluatorWorkMark !== null && swork.secondEvaluatorColloquiumMark !== null ? convert_mark((swork.mainEvaluatorWorkMark + swork.mainEvaluatorColloquiumMark + swork.secondEvaluatorWorkMark + swork.secondEvaluatorColloquiumMark) / 4) : "-"}</div>
-            </div>
+            {/if}
         </div>
     </div>
 </div>
