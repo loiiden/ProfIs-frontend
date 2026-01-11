@@ -70,6 +70,17 @@
         return short ? `${short} in ${title}` : title;
     }
 
+    // Baut den Titel für die Anzeige (Studiengang-Liste): "<Kürzel> in <Titel>"
+    function formatProgramDisplay(program) {
+        const title = (program?.title || "").trim();
+        const short = getDegreeShort(program?.degreeType);
+
+        if (!short) return title;
+
+        return `${short} in ${title}`;
+    }
+
+
     // Helper für UI: Prüft, ob Studiengänge vorhanden sind
     function hasStudyPrograms() {
         return Array.isArray(data?.studyPrograms) && data.studyPrograms.length > 0;
@@ -303,7 +314,7 @@
                 <!-- Anzeige: vorhandene Studiengänge -->
                 {#each data.studyPrograms as program}
                     <div class="program-row">
-                        <span class="program-name">{program.title}</span>
+                        <span class="program-name">{formatProgramDisplay(program)}</span>
                         <button class="delete-btn" onclick={() => deleteStudyProgram(program.id)}>Löschen</button>
                     </div>
                 {/each}
