@@ -101,10 +101,12 @@
 
     let activeVeranstaltungIndex = $state(0);
 
+    let eventsLen = $derived((data.events ?? []).length);
+
     let activeVeranstaltung = $derived(
-        data.events?.[activeVeranstaltungIndex] ?? {eventType: "", eventDate: ""}
+        (data.events ?? [])[activeVeranstaltungIndex] ?? { eventType: "", eventDate: "" }
     );
-    let isLastVeranstaltung = $derived(activeVeranstaltungIndex === (data.events?.length ?? 1) - 1);
+
     const EVENT_OPTIONS = [
         {value: "PROPOSAL", label: "PROPOSAL"},
         {value: "DISCUSSION", label: "DISCUSSION"},
@@ -262,11 +264,20 @@
     }
 
     function removeVeranstaltung() {
-        if ((data.events?.length ?? 0) <= 1) return;
-        if (isLastVeranstaltung) return;
+        const events = data.events ?? [];
+        const len = events.length;
 
-        data.events = (data.events ?? []).filter((_, i) => i !== activeVeranstaltungIndex);
-        activeVeranstaltungIndex = Math.max(0, activeVeranstaltungIndex - 1);
+        if (len === 0) return;
+
+        const next = events.filter((_, i) => i !== activeVeranstaltungIndex);
+
+        data.events = next;
+
+        if (next.length === 0) {
+            activeVeranstaltungIndex = 0;
+        } else {
+            activeVeranstaltungIndex = Math.min(activeVeranstaltungIndex, next.length - 1);
+        }
     }
 
     function goToVeranstaltung(index) {
@@ -468,7 +479,7 @@
                         ←
                     </button>
 
-                    {#each Array.from({length: data.events?.length ?? 0}, (_, i) => i) as i}
+                    {#each Array.from({ length: eventsLen }, (_, i) => i) as i}
                         <button
                                 type="button"
                                 class="pager-num {i === activeVeranstaltungIndex ? 'active' : ''}"
@@ -511,17 +522,17 @@
 
                 <div class="field">
                     <div class="sub-label">&nbsp;</div>
-
-                    {#if isLastVeranstaltung}
+                    <div class="event-actions">
                         <button type="button" class="input-shell action-shell plus-shell" on:click={addVeranstaltung}>
                             +
                         </button>
-                    {:else}
-                        <button type="button" class="input-shell action-shell remove-shell"
-                                on:click={removeVeranstaltung}>
-                            entfernen
-                        </button>
-                    {/if}
+
+                        {#if (data.events?.length ?? 0) > 0}
+                            <button type="button" class="input-shell action-shell remove-shell" on:click={removeVeranstaltung}>
+                                entfernen
+                            </button>
+                        {/if}
+                    </div>
                 </div>
             </div>
         </div>
@@ -748,4 +759,14 @@
   .action-shell:hover {
     background: #fafafa;
   }
+
+  .event-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .event-actions .input-shell {
+    width: 100%;
+  }
+
 </style>
