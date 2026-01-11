@@ -99,12 +99,7 @@
         next={next}
 />
 
-<CommentArbeit kommentar="asdfas dfasd fasdfa sdfasd fasdf asdfas dfasdfasd fasdf asdfasdf
-asdfas dfasdfasdfa sdfasdfas dfasdfa sdfasdfa sdfasd fasdfasd fasdfasdf
-asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf
-asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf
-asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf
-asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf"/>
+<CommentArbeit kommentar="{current_item ? current_item.comment : ""}"/>
 
 <style lang="scss">
   .filter-arbeiten-container {
