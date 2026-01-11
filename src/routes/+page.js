@@ -3,12 +3,8 @@ import { api_url } from '$lib/constants.js';
 export const ssr = false;
 
 export const load = async ({ fetch }) => {
-    // Noten laden
-    let res = await fetch(`${api_url}/marks/average`);
-    const marks = await res.json();
-    
     // SWS laden
-    res = await fetch(`${api_url}/api/sws/main-user/current`);
+    let res = await fetch(`${api_url}/api/sws/main-user/current`);
     const currentSws = await res.json();
 
     res = await fetch(`${api_url}/api/event/next`);
@@ -22,6 +18,9 @@ export const load = async ({ fetch }) => {
 
     res = await fetch(`${api_url}/api/student`);
 	const students = await res.json();
+
+    res = await fetch(`${api_url}/api/mark/info`);
+	const marks = await res.json();
 
     return {
         marks: marks,

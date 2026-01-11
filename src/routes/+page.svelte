@@ -12,7 +12,8 @@
     <FilterArbeiten sworks={data.sworks} study_programs={data.study_programs} students={data.students}/>
     <OverviewSws target={data.sws.target} current={data.sws.current} />
     <OverviewTermine termine={data.termine} />
-    <NotenSkala bewertet={data.marks.marked} offen={data.marks.open} average={data.marks.average}/>
+    <NotenSkala bewertet={data.marks.countArchivedScientificWorks} offen={data.marks.countsOpenScientificWorks}
+        average={data.marks.averageMarkForAllScientificWorks} distribution={data.marks.distribution}/>
 </main>
 
 <style lang="scss">

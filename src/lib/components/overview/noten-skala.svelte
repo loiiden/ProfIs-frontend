@@ -3,12 +3,26 @@
     import AnnotatedNumber from "../blocks/annotated-number.svelte";
 
     let props = $props();
+    let distribution = $derived(props.distribution)
 
-    let position = -35 + ((5.0 - props.average) / 4) * 532.5;
-    let vheight = $state(68);
+    function roundNumber(number, digits) {
+        let multiple = Math.pow(10, digits);
+        let num = Math.round(number * multiple) / multiple;
+        num = num.toFixed(2)
+        
+        if (num[2] == "0" && num[3] == "0")
+            return num.substring(0, num.length - 1);
+        
+        return num;
+    }
+
+    let average = $derived(roundNumber(props.average, 2));
+
+    let position = -37 + ((5.0 - average) / 4) * 532.0;
+    let vheight = $state(67);
     let vmargin = $state(0);
-    if((props.average % 1) < 0.14 || (props.average % 1) > 0.86){
-        vheight = 24;
+    if((average % 1) < 0.14 || (average % 1) > 0.86){
+        vheight = 23;
         vmargin = 44;
     };
 
@@ -38,8 +52,15 @@
             <div class="horizontal mark1"></div>
             <div class="vertical"></div>
         </div>
+        <div class="distribution">
+            <div class="distri four">{distribution.fromFourToFive}</div>
+            <div class="distri three">{distribution.fromThreeToFour}</div>
+            <div class="distri two">{distribution.fromTwoToThree}</div>
+            <div class="distri one">{distribution.fromOneToTwo}</div>
+        </div>
+
         <div class="average-mark" style="left: {position}px;">
-            <AnnotatedNumber number={props.average} annotation="Durchschnitt"/>
+            <AnnotatedNumber number={average} annotation="Durchschnitt"/>
             <div class="vertical-long-line" style="height: {vheight}px;margin-top: {vmargin}px;"></div>
         </div>
     </div>
@@ -68,12 +89,13 @@
 .skala {
     margin-left: 30px;
     width: 70%;
-    height: 70%;
+    height: 85%;
 
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    align-items: center;
 
     .marks {
         width: 100%;
@@ -99,6 +121,19 @@
             width: 112px;
             height: 6px;
             border-radius: 5px;
+        }
+    }
+
+    .distribution {
+        width: 74%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+
+        .distri {
+            font-size: 20px;
+            font-family: 'Inter SB';
+            padding-top: 4px;
         }
     }
 }
