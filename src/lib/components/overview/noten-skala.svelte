@@ -64,6 +64,10 @@
             <div class="vertical-long-line" style="height: {vheight}px;margin-top: {vmargin}px;"></div>
         </div>
     </div>
+    <div class="annotation-marks">
+        <p>Grundnote</p>
+        <p class="s-count">Anzahl Studenten</p>
+    </div>
 </div>
 
 <style lang="scss">
@@ -135,6 +139,25 @@
             font-family: 'Inter SB';
             padding-top: 4px;
         }
+    }
+}
+
+.annotation-marks {
+    height: 85%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    flex-direction: column;
+
+    p {
+        font-size: 12px;
+        padding-left: 12px;
+        padding-bottom: 6px;
+        margin: 0px;
+    }
+
+    .s-count {
+        margin-top: 45px;
     }
 }
 
