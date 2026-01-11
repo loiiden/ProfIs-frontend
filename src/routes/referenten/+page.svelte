@@ -5,7 +5,7 @@
     import caretup from '$lib/assets/caret-up.svg';
 
     import { GET } from '$lib/functions';
-    import { color_mapping, status_mapping } from '$lib/mappings.js';
+    import { color_mapping, status_mapping, alevel_to_title } from '$lib/mappings.js';
 
     let { data } = $props();
 
@@ -127,16 +127,6 @@
             connected_worksm = worksm;
             connected_workss = workss;
         }
-    }
-
-    const alevel_to_title = {
-        "NONE": "",
-        "BACHELOR": "",
-        "MASTER": "",
-        "DR": "Dr. ",
-        "PROF": "Prof. ",
-        "PROF_DOCTOR": "Prof. Dr. ",
-        "DIPLOMA": ""
     }
 </script>
 
@@ -551,6 +541,9 @@
 
                 .work-title {
                     width: 100%;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
                     max-width: 100%;
                     font-size: 14px;
                     font-family: 'Inter SB';

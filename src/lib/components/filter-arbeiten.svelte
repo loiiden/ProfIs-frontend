@@ -1,9 +1,9 @@
 <script>
     import searchimg from '$lib/assets/search.svg';
 
-    import DetailView from "$lib/components/overview-arbeit.svelte";
+    import OverviewArbeit from "$lib/components/overview-arbeit.svelte";
     import CommentArbeit from "$lib/components/overview/comment-arbeit.svelte";
-    import { color_mapping, status_mapping } from '$lib/mappings';
+    import { color_mapping, status_mapping, img_mapping } from '$lib/mappings';
 
     let props = $props();
 
@@ -15,6 +15,11 @@
     let student_mapping = {};
     props.students.forEach(student => {
         student_mapping[student.id] = student;
+    });
+
+    let referent_mapping = {};
+    props.referents.forEach(referent => {
+        referent_mapping[referent.id] = referent;
     });
 
     let search = $state("");
@@ -34,22 +39,6 @@
 
     function next() {
         if (index < filtered_items.length - 1) index++;
-    }
-
-    import archive from '$lib/assets/archive.svg';
-    import bookmark from '$lib/assets/bookmark.svg';
-    import checkmark from '$lib/assets/checkmark.svg';
-    import cross from '$lib/assets/cross.svg';
-    import hourglasssplit from '$lib/assets/hourglass-split.svg';
-    import pen from '$lib/assets/pen.svg';
-
-    const img_mapping = {
-        "PROPOSAL": bookmark,
-        "DISCUSSION": pen,
-        "FINAL_SUBMISSION": checkmark,
-        "REVIEW": hourglasssplit,
-        "ARCHIVE": archive,
-        "ABORT": cross
     }
 </script>
 
@@ -91,20 +80,10 @@
     </div>
 </div>
 
-<DetailView
-        item={current_item}
-        index={index}
-        count={filtered_items.length}
-        prev={prev}
-        next={next}
-/>
+<OverviewArbeit swork={current_item} studmap={student_mapping}
+    progmap={study_programs_mapping} refmap={referent_mapping}/>
 
-<CommentArbeit kommentar="asdfas dfasd fasdfa sdfasd fasdf asdfas dfasdfasd fasdf asdfasdf
-asdfas dfasdfasdfa sdfasdfas dfasdfa sdfasdfa sdfasd fasdfasd fasdfasdf
-asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf
-asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf
-asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf
-asdfas dfasdfas dfasdfas dfasd fas dfasdfa sdfasd fasd fasdf asdf asdfasdf"/>
+<CommentArbeit kommentar="{current_item ? current_item.comment : ""}"/>
 
 <style lang="scss">
   .filter-arbeiten-container {

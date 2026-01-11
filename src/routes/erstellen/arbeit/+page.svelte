@@ -1,13 +1,28 @@
 <script>
     import { onMount } from 'svelte';
     import { afterNavigate } from '$app/navigation';
-    import PreviewOverviewArbeit from "$lib/components/arbeit/preview-overview-arbeit.svelte";
+    import PreviewOverviewArbeit from "$lib/components/overview-arbeit.svelte";
     import ErfassenNoten from "$lib/components/arbeit/erfassen-noten.svelte";
     import ErfassenDatenArbeit from "$lib/components/arbeit/erfassen-daten-arbeit.svelte";
     import {POST, GET, PATCH, DELETE} from "$lib/functions";
     import {goto} from "$app/navigation";
 
     let {data} = $props();
+
+    let study_programs_mapping = {};
+    data.study_programs.forEach(program => {
+        study_programs_mapping[program.id] = program.title;
+    });
+
+    let student_mapping = {};
+    data.students.forEach(student => {
+        student_mapping[student.id] = student;
+    });
+
+    let referent_mapping = {};
+    data.referenten.forEach(referent => {
+        referent_mapping[referent.id] = referent;
+    });
 
     let create = $state(true);
     let workId = $state(0);
@@ -316,7 +331,8 @@
         <div class="page-title">{create ? "ARBEIT ANLEGEN" : "ARBEIT BEARBEITEN"}</div>
     </div>
 
-    <PreviewOverviewArbeit/>
+    <PreviewOverviewArbeit swork={arbeitData} studmap={student_mapping}
+        progmap={study_programs_mapping} refmap={referent_mapping}/>
 
     <ErfassenNoten
             evaluators={data?.referenten ?? []}
@@ -342,7 +358,7 @@
   @import 'src/styles/colors.scss';
   .erstellen-arbeit-container {
     display: grid;
-    grid-template-rows: repeat(30, 4.5px);
+    grid-template-rows: repeat(40, 4.5px);
     grid-template-columns: repeat(12, 1fr);
     column-gap: 20px;
     row-gap: 25px;
@@ -368,7 +384,7 @@
 
   .action-bar {
     grid-column: 8 / 13;
-    grid-row: 28 / 30;
+    grid-row: 36 / 38;
     display: flex;
     justify-content: flex-end;
     align-items: center;

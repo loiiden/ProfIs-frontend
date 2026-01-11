@@ -6,8 +6,9 @@
     import caretdown from '$lib/assets/caret-down.svg';
     import caretup from '$lib/assets/caret-up.svg';
     import trash from '$lib/assets/trash.svg'; // Löschen-Icon (Mülltonne)
-    import { color_mapping, status_mapping } from '$lib/mappings';
+    import { color_mapping, status_mapping, img_mapping, alevel_to_title } from '$lib/mappings';
     import { GET } from '$lib/functions.js';
+    import pen from '$lib/assets/pen.svg';
 
     let { data } = $props();
 
@@ -124,16 +125,6 @@
         await invalidateAll();
     }
 
-    const alevel_to_title = {
-        "NONE": "",
-        "BACHELOR": "",
-        "MASTER": "",
-        "DR": "Dr. ",
-        "PROF": "Prof. ",
-        "PROF_DOCTOR": "Prof. Dr. ",
-        "DIPLOMA": ""
-    }
-
     const status_list = [
         "PROPOSAL",
         "DISCUSSION",
@@ -142,22 +133,6 @@
         "ARCHIVE",
         "ABORT"
     ]
-
-    import archive from '$lib/assets/archive.svg';
-    import bookmark from '$lib/assets/bookmark.svg';
-    import checkmark from '$lib/assets/checkmark.svg';
-    import cross from '$lib/assets/cross.svg';
-    import hourglasssplit from '$lib/assets/hourglass-split.svg';
-    import pen from '$lib/assets/pen.svg';
-
-    const img_mapping = {
-        "PROPOSAL": bookmark,
-        "DISCUSSION": pen,
-        "FINAL_SUBMISSION": checkmark,
-        "REVIEW": hourglasssplit,
-        "ARCHIVE": archive,
-        "ABORT": cross
-    }
 </script>
 
 <div class="sworks-filter-table-container">
@@ -305,6 +280,8 @@
         padding: 12px;
         border-radius: 10px;
         padding-right: 0px;
+        box-sizing: border-box;
+        padding-bottom: 20px;
 
         .search-bar {
             display: flex;

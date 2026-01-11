@@ -161,8 +161,8 @@
     .erfassen-noten-container {
         grid-column-start: 1;
         grid-column-end: 8;
-        grid-row-start: 11;
-        grid-row-end: 30;
+        grid-row-start: 17;
+        grid-row-end: 36;
         
         background-color: #FFFFFF;
         border: 1px solid #E9E9E9;

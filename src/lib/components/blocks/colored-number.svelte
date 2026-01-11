@@ -7,7 +7,7 @@
 <style lang="scss">
 .colored-number {
     color: #FFFFFF;
-    font-family: "Inter";
+    font-family: "Inter EB";
     font-size: 15px;
     width: 35px;
     height: 35px;
