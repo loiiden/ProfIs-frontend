@@ -6,7 +6,7 @@
     import caretdown from '$lib/assets/caret-down.svg';
     import caretup from '$lib/assets/caret-up.svg';
     import trash from '$lib/assets/trash.svg'; // Löschen-Icon (Mülltonne)
-    import { color_mapping, status_mapping } from '$lib/mappings';
+    import { color_mapping, status_mapping, img_mapping } from '$lib/mappings';
     import { GET } from '$lib/functions.js';
 
     let { data } = $props();
@@ -142,22 +142,6 @@
         "ARCHIVE",
         "ABORT"
     ]
-
-    import archive from '$lib/assets/archive.svg';
-    import bookmark from '$lib/assets/bookmark.svg';
-    import checkmark from '$lib/assets/checkmark.svg';
-    import cross from '$lib/assets/cross.svg';
-    import hourglasssplit from '$lib/assets/hourglass-split.svg';
-    import pen from '$lib/assets/pen.svg';
-
-    const img_mapping = {
-        "PROPOSAL": bookmark,
-        "DISCUSSION": pen,
-        "FINAL_SUBMISSION": checkmark,
-        "REVIEW": hourglasssplit,
-        "ARCHIVE": archive,
-        "ABORT": cross
-    }
 </script>
 
 <div class="sworks-filter-table-container">

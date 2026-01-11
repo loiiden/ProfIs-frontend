@@ -3,7 +3,7 @@
 
     import DetailView from "$lib/components/overview-arbeit.svelte";
     import CommentArbeit from "$lib/components/overview/comment-arbeit.svelte";
-    import { color_mapping, status_mapping } from '$lib/mappings';
+    import { color_mapping, status_mapping, img_mapping } from '$lib/mappings';
 
     let props = $props();
 
@@ -34,22 +34,6 @@
 
     function next() {
         if (index < filtered_items.length - 1) index++;
-    }
-
-    import archive from '$lib/assets/archive.svg';
-    import bookmark from '$lib/assets/bookmark.svg';
-    import checkmark from '$lib/assets/checkmark.svg';
-    import cross from '$lib/assets/cross.svg';
-    import hourglasssplit from '$lib/assets/hourglass-split.svg';
-    import pen from '$lib/assets/pen.svg';
-
-    const img_mapping = {
-        "PROPOSAL": bookmark,
-        "DISCUSSION": pen,
-        "FINAL_SUBMISSION": checkmark,
-        "REVIEW": hourglasssplit,
-        "ARCHIVE": archive,
-        "ABORT": cross
     }
 </script>
 
