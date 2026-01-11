@@ -2,7 +2,7 @@
     import EvaluatorSearch from '$lib/components/arbeit/evaluator-search.svelte';  //wiederverwenden von Referentensuche
     import { POST } from '$lib/functions';
     import { invalidateAll } from '$app/navigation';
-    import { api_url } from '$lib/constants'; // Annahme: api_url importieren oder relative pfade nutzen
+    import { api_url } from '$lib/constants';
 
     let { data } = $props();
 
@@ -26,7 +26,7 @@
     // --- TEIL 2: STUDIENGÄNGE ---
     let newProgramName = $state("");
     let newProgramSws = $state("");
-    let newProgramDegree = $state(""); // Speichert die Zahl (B=1, M=2 oder D=3)
+    let newProgramDegree = $state("");
 
     // Mapping auf API-Werte
     const degreeOptions = [
@@ -63,7 +63,7 @@
         return degreeShortMap[value] || value || '';
     }
 
-    // Baut den zu sendenden Titel nach Schema: "<Kürzel> in <Titel>"
+    // Baut den zu sendenden Titel nach Schema: "<Kürzel> in <Titel>", nach Telefonat mit Loick nicht mehr erwünscht
     function formatProgramTitle(title, degreeType) {
         const short = getDegreeShort(degreeType);
         return short ? `${short} in ${title}` : title;
@@ -77,7 +77,8 @@
         }
 
         let payload = { 
-            title: formatProgramTitle(newProgramName, newProgramDegree), // Titel mit Abschluss-Kürzel präfixen
+            // title: formatProgramTitle(newProgramName, newProgramDegree), // Titel mit Abschluss-Kürzel präfixen, nach Anruf mit Loick entfernt
+            title: newProgramName, //Stattdessen nur der Titel
             sws: Number(newProgramSws),
             degreeType: newProgramDegree // Sendet z.B. "B_SC"
         };
@@ -114,10 +115,103 @@
             alert("Verbindungsfehler beim Löschen.");
         }
     }
+
+// --- TEIL 3: EXCEL IMPORT/EXPORT ---
+let serverFilePath = $state("");
+
+//Funktion um Pfad zu formatieren und zu validieren
+function normalizePath(input) {
+    const raw = (input ?? "").trim();
+    if (!raw) return { ok: false, error: "Bitte geben Sie den Pfad zur Datei an." };
+
+    // 1) ohne Quotes
+    if (!raw.startsWith('"') && !raw.startsWith("'") && !raw.endsWith('"') && !raw.endsWith("'")) {
+        return { ok: true, path: raw };
+    }
+
+    // 2) mit "..."
+    if (raw.length >= 2 && raw.startsWith('"') && raw.endsWith('"')) {
+        const inner = raw.slice(1, -1).trim();
+        if (!inner) return { ok: false, error: "Bitte geben Sie den Pfad zur Datei an." };
+        return { ok: true, path: inner };
+    }
+
+    // 3) mit '...'
+    if (raw.length >= 2 && raw.startsWith("'") && raw.endsWith("'")) {
+        const inner = raw.slice(1, -1).trim();
+        if (!inner) return { ok: false, error: "Bitte geben Sie den Pfad zur Datei an." };
+        return { ok: true, path: inner };
+    }
+
+    // alles andere
+    return { ok: false, error: "Ungültiger Pfad: Bitte entweder ohne Anführungszeichen oder mit passenden \"...\" bzw. '...' einfügen." };
+}
+
+async function importExcel() {
+    const normalized = normalizePath(serverFilePath);
+
+    if (!normalized.ok) {
+        alert(normalized.error);
+        return;
+    }
+
+    try {
+        let res = await POST(`/api/data/import?file=${encodeURIComponent(normalized.path)}`, {});
+        if (res.ok) {
+            let msg = await res.text();
+            // Übersetze englische Erfolgsmeldung ins Deutsche
+            if (msg && msg.trim() === "Successfully imported Excel data to database") {
+                alert("Excel-Daten wurden erfolgreich importiert!");
+            } else {
+                alert(msg || "Import erfolgreich!");
+            }
+            invalidateAll();
+        } else {
+            alert("Fehler beim Importieren (Prüfen Sie den Pfad).");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Verbindungsfehler beim Import.");
+    }
+}
+
+function exportExcel() {
+    window.open(`${api_url}/api/data/export`, '_blank');
+}
+
+
+    // --- TEIL 4: DATENBANK ZURÜCKSETZEN ---
+    async function resetDatabase() {
+        if(!confirm('Sind Sie sicher, dass Sie alle Daten löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden!')) {
+            return;
+        }
+
+        try {
+            let res = await fetch(`${api_url}/api/data/reset`, {
+                method: 'DELETE'
+            });
+
+            if(res.ok) {
+                alert('Datenbank wurde erfolgreich zurückgesetzt.');
+                invalidateAll();
+                window.location.reload();
+            } else {
+                alert('Fehler beim Zurücksetzen der Datenbank.');
+                invalidateAll();
+                window.location.reload();
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Verbindungsfehler beim Zurücksetzen.');
+        }
+    }
 </script>
 
 <main class="settings-container">
-    <div class="page-title">EINSTELLUNGEN</div>
+    <div class="page-header">
+        <div class="page-title">EINSTELLUNGEN</div>
+        <a href="settings/user-documentation" class="help-btn">Hilfe</a>
+    </div>
 
     <!-- TEIL 1: BENUTZER -->
     <div class="card user-section">
@@ -176,7 +270,7 @@
             />
 
             <!-- Dropdown für Abschluss -->
-            <select class="input-degree" bind:value={newProgramDegree}>
+            <select class="input-degree" bind:value={newProgramDegree} required>
                 <option value="" disabled selected>Abschluss wählen</option>
                 {#each degreeOptions as opt}
                     <option value={opt.value}>{opt.label}</option>
@@ -185,6 +279,43 @@
 
             <button class="add-btn" onclick={addStudyProgram}>+</button>
         </div>
+    </div>
+
+    <div class="card excel-section">
+        <div class="headline-s">Daten Import/Export</div>
+        <p class="description">
+            Hier können Sie Daten über Excel-Listen importieren und exportieren. <br>
+            <span style="font-size: 0.9em; opacity: 0.8;">Hinweis: Um eine Datei zu importieren, geben Sie bitte den Pfad zu der Datei an.</span>
+        </p>
+
+        <div class="excel-row">
+            <input 
+                class="input-path" 
+                type="text" 
+                placeholder="Datei-Pfad (z.B. C:\Users\mena2\Documents\ProfisExcel.xlsx)" 
+                bind:value={serverFilePath} 
+            />
+            <button class="save-btn" onclick={importExcel}>Importieren</button>
+        </div>
+
+        <div class="excel-row" style="margin-top: 15px;">
+            <span class="export-label">
+                Datenbankstand sichern:
+            </span>
+            <button class="secondary-btn" onclick={exportExcel}>Exportieren</button>
+        </div>
+    </div>
+
+    <!-- TEIL 4: GEFAHRENZONE -->
+    <div class="card danger-section">
+        <div class="headline-s danger-title">ProfIS zurücksetzen</div>
+        <p class="description">
+            Hier können Sie alle Daten in ProfIS vollständig löschen.<br>
+            Dabei werden sämtliche gespeicherten Informationen unwiderruflich gelöscht.<br><br>
+            Wenn Sie die Daten später noch benötigen, exportieren Sie diese bitte vorher als Backup. Bitte beachten Sie, dass Events nicht mitgesichert werden.<br><br>
+            <strong class="danger-warning">Diese Aktion kann nicht rückgängig gemacht werden.</strong>
+        </p>
+        <button class="danger-btn" onclick={resetDatabase}>Alle Daten löschen</button>
     </div>
 </main>
 
@@ -202,12 +333,33 @@
         font-family: "Inter", sans-serif;
     }
 
-    /* Seitentitel */
-    .page-title {
+    /* Seitentitel-Bereich */
+    .page-header {
         grid-column: 1 / 13;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 0 30px;
-        font-size: 2em;
         margin-top: 20px;
+    }
+
+    .page-title {
+        font-size: 2em;
+    }
+
+    .help-btn {
+        background-color: #FDF8F8;
+        color: black;
+        border: 1px solid #E9E9E9;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-family: "Inter";
+        font-size: 14px;
+        font-weight: 600;
+        transition: background 0.2s;
+
+        &:hover { background-color: #FFF0F0; }
     }
 
     /* Genereller Karten-Style (wie bei den anderen Seiten) */
@@ -235,10 +387,10 @@
         line-height: 1.5;
     }
 
-    /* --- User Section Layout --- */
+    /* --- User Section --- */
     .user-section {
-        grid-column: 1 / 7; /* Linke Hälfte */
-        grid-row: 2 / 8;
+        grid-column: 1 / 7;
+        grid-row: 2 / 3;
     }
 
     .input-row {
@@ -249,12 +401,39 @@
 
     .search-wrapper {
         flex-grow: 1;
+        
+        :global(.search-wrapper) {
+            align-items: stretch;
+        }
+        
+        :global(.input-container) {
+            height: 38px;
+        }
+        
+        :global(.refresh-btn) {
+            height: 38px;
+            width: 38px;
+        }
+        
+        :global(.input-wrapper input) {
+            font-size: 14px;
+            color: black;
+            
+            &::placeholder {
+                color: #A0A0A0;
+            }
+        }
+        
+        :global(.display-value) {
+            font-size: 14px;
+            color: black;
+        }
     }
 
     /* --- Program Section Layout --- */
     .program-section {
-        grid-column: 7 / 13; /* Rechte Hälfte */
-        grid-row: 2 / 12;    /* Etwas länger, da Liste */
+        grid-column: 7 / 13;
+        grid-row: 2 / 4; 
     }
 
     .program-list {
@@ -262,14 +441,13 @@
         flex-direction: column;
         gap: 10px;
         margin-bottom: 20px;
-        max-height: 300px;
+        max-height: 300px; 
         overflow-y: auto;
     }
 
     .list-header {
         display: grid;
-        /* GEÄNDERT: Nur noch 2 Spalten (Titel nimmt Platz, Button nimmt Rest) */
-        grid-template-columns: 1fr auto; 
+        grid-template-columns: 1fr auto;
         padding: 0 12px;
         font-size: 12px;
         font-weight: 600;
@@ -279,7 +457,6 @@
 
     .program-row {
         display: grid;
-        /* GEÄNDERT: Gleiches Grid wie Header */
         grid-template-columns: 1fr auto;
         align-items: center;
         padding: 12px;
@@ -299,8 +476,7 @@
     .add-row {
         display: flex;
         gap: 10px;
-        margin-top: auto; /* Drückt es nach unten */
-
+        margin-top: auto; 
         input, select {
             padding: 10px;
             border: 1px solid #E9E9E9;
@@ -309,16 +485,59 @@
             font-family: "Inter";
             font-size: 14px;
             background-color: white;
-            
-            &:focus {
-                border-color: #ccc;
-            }
+            color: black;
+            &::placeholder { color: #A0A0A0; }
+            &:focus { border-color: #ccc; }
         }
 
         /* Breiten der Eingabefelder */
-        .input-title { flex-grow: 2; }
-        .input-sws { width: 60px; }
-        .input-degree { flex-grow: 1; cursor: pointer; }
+        .input-title { flex-grow: 3; }
+        .input-sws { width: 50px; }
+        .input-degree { 
+            flex-grow: 1; 
+            cursor: pointer;
+            
+            &:invalid {
+                color: #A0A0A0;
+            }
+            
+            option {
+                color: black;
+            }
+        }
+    }
+
+    /* --- Excel Section (angepasst) --- */
+    .excel-section {
+        grid-column: 1 / 7;
+        grid-row: 3 / 4; /* Auch länger gemacht, passend zur rechten Seite */
+        justify-content: center; /* Inhalt vertikal mittig, wenn Platz da ist */
+    }
+    
+    .excel-row {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+    }
+
+    .input-path {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #E9E9E9;
+        border-radius: 6px;
+        font-family: "Inter";
+        font-size: 14px;
+        color: black;
+        &::placeholder { color: #A0A0A0; }
+        &:focus { border-color: #ccc; outline: none; }
+    }
+    
+    .export-label {
+        flex-grow: 1;
+        font-size: 14px;
+        font-weight: 500;
+        color: $secondary; /* Dunkelgrau/Schwarz */
     }
 
     /* --- Buttons --- */
@@ -337,13 +556,12 @@
     .save-btn, .add-btn {
         background-color: $primary;
         color: white;
-
-        /* Match the search component height */
-        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0 16px;
+        padding: 10px 16px;
+        height: 38px;
+        box-sizing: border-box;
 
         &:hover { opacity: 0.9; }
     }
@@ -357,5 +575,33 @@
         font-size: 12px;
 
         &:hover { background-color: #FFF0F0; }
+    }
+
+    /* --- Danger Section --- */
+    .danger-section {
+        grid-column: 1 / 13;
+        grid-row: 4 / 5;
+        border: 1px solid #FFCDD2;
+        background-color: #FFFAFA;
+    }
+
+    .danger-title {
+        color: #D32F2F;
+    }
+
+    .danger-warning {
+        color: #D32F2F;
+    }
+
+    .danger-btn {
+        background-color: #D32F2F;
+        color: white;
+        padding: 10px 20px;
+        font-weight: 600;
+        align-self: flex-start;
+
+        &:hover { 
+            background-color: #B71C1C;
+        }
     }
 </style>
