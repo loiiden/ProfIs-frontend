@@ -2,6 +2,9 @@
     let props = $props()
 
     import { alevel_to_title } from "$lib/mappings";
+	import { onMount } from "svelte";
+    import { date_to_string } from "$lib/functions";
+    import { status_mapping } from "$lib/mappings";
 
     let swork = $derived(props.swork);
     let studmap = $derived(props.studmap);
@@ -9,8 +12,6 @@
     let refmap = $derived(props.refmap);
 
     function convert_mark(mark) {
-        console.log(mark);
-
         let gmark = 0;
 
         if (mark >= 95)
@@ -29,6 +30,59 @@
         let num = Math.round(gmark * multiple) / multiple;
         return num.toFixed(1);
     }
+
+    function position_events(){
+        let ev_container = document.querySelector(".events-container");
+
+        if(ev_container === null) return;
+
+        let step = 100;
+        let i = 0;
+        for (const child of ev_container.children) {
+            child.style.left = `${i * step}px`;
+            i++;
+        }
+
+        set_bar_width(step);
+    }
+
+    function set_bar_width(step){
+        let pbar = document.querySelector(".progress-bar");
+        let pbarb = document.querySelector(".progress-bar-back");
+        if(pbar === null) return;
+
+        let snapshot = $state.snapshot(swork);
+        let events = snapshot.events;
+        events.push({eventDate: snapshot.colloquium.splice(0, 3)});
+
+        const today = new Date();
+        let events_count = events.length + 2;
+        let progress_count = 0;
+        
+        for(const event of events){
+            const ev_date = new Date(String(event.eventDate).replaceAll(",", "-"))
+            const timediff = ev_date - today;
+            const day_diff = Math.ceil(timediff / (1000 * 3600 * 24));
+
+            if(day_diff <= 0) progress_count++;
+        }
+        
+        pbarb.style.width = `${(events_count - 2) * step + 3}px`;
+        events_count = Math.min(progress_count, events_count)
+        pbar.style.width = `${(events_count) * step + 3}px`;
+    }
+
+    onMount(() => {
+        let timeline = document.querySelector(".timeline");
+        position_events();
+
+        let observer = new MutationObserver((mutations) => {
+            position_events();
+        });
+
+        let config = { childList: true, subtree:true };
+        observer.observe(timeline, config);
+    })
 </script>
 
 <div class="overview-arbeit-container">
@@ -48,6 +102,29 @@
             </div>
         </div>
         <div class="timeline">
+            {#if swork}
+            <div class="progress-bar-back grey"></div>
+                <div class="progress-bar green"></div>
+                <div class="events-container">
+                    <div class="event">
+                        <div class="line"></div>
+                        <p class="ev-head">Startdatum:</p>
+                        <p>{swork.startDate ? date_to_string(swork.startDate) : "-"}</p>
+                    </div>
+                    {#each swork.events as event}
+                        <div class="event">
+                            <div class="line"></div>
+                            <p class="ev-head">{status_mapping[event.eventType]}:</p>
+                            <p>{date_to_string(event.eventDate)}</p>
+                        </div>
+                    {/each}
+                    <div class="event">
+                        <div class="line"></div>
+                        <p class="ev-head">Kolloquium:</p>
+                        <p>{swork.colloquium ? String(swork.colloquium.toReversed().splice(2)).replaceAll(",", ".") : "-"}, {swork.colloquiumLocation ?? "-"}, {swork.presentationStart ?? "-"}</p>
+                    </div>
+                </div>
+            {/if}
         </div>
         <div class="grades">
             <div class="mark">
@@ -160,6 +237,72 @@
     }
 }
 
+.timeline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+    width: 100%;
+    position: relative;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    box-sizing: border-box;
+
+    .progress-bar, .progress-bar-back {
+        position: absolute;
+        height: 10px;
+        left: 27px;
+        border-radius: 4px;
+    }
+
+    .events-container {
+        position: absolute;
+        width: 90%;
+        height: 10px;
+
+        .event:nth-child(even) {
+            top: 30px;
+
+            .line {
+                position: absolute;
+                top: -19px;
+                left: -10px;
+                width: 1px;
+                height: 55px;
+                background-color: #41525A;
+            }
+        }
+        
+        .event:nth-child(odd) {
+            top: -60px;
+            
+            .line {
+                position: absolute;
+                top: 5px;
+                left: -10px;
+                width: 1px;
+                height: 54px;
+                background-color: #41525A;
+            }
+        }
+
+        .event {
+            position: absolute;
+            width: 150px;
+
+            .ev-head {
+                font-family: 'Inter SB';
+                font-size: 16px;
+            }
+
+            p {
+                margin: 0px;
+                font-size: 14px;
+            }
+        }
+    }
+}
+
 .grades {
     display: flex;
     margin-bottom: 10px;
@@ -209,5 +352,9 @@
 
 .blue {
     background-color: #24B6D8;
+}
+
+.grey {
+    background-color: #F6F6F6;
 }
 </style>

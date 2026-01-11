@@ -19,7 +19,6 @@
         } else if(daysDifference > 1) {
             return `In ${daysDifference} Tagen`;
         }
-
     }
 </script>
 

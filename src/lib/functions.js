@@ -42,3 +42,6 @@ export async function GET(path){
     })).json();
 }
 
+export function date_to_string(date){
+    return String(date.toReversed()).replaceAll(",", ".");
+}
