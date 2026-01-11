@@ -455,6 +455,9 @@
 
                 .work-title {
                     width: 100%;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
                     max-width: 100%;
                     font-size: 14px;
                     font-family: 'Inter SB';
