@@ -3,6 +3,7 @@
     import StudentSearch from '$lib/components/arbeit/student-search.svelte';
     import {GET} from '$lib/functions.js';
     import StudyProgramSearch from '$lib/components/arbeit/study-program-search.svelte';
+    import {status_mapping} from '$lib/mappings.js';
 
     let {
         data = $bindable({
@@ -103,18 +104,15 @@
 
     let eventsLen = $derived((data.events ?? []).length);
 
+    let hasEvents = $derived((data.events?.length ?? 0) > 0);
+
     let activeVeranstaltung = $derived(
-        (data.events ?? [])[activeVeranstaltungIndex] ?? { eventType: "", eventDate: "" }
+        hasEvents
+            ? (data.events ?? [])[activeVeranstaltungIndex]
+            : {eventType: "", eventDate: ""}
     );
 
-    const EVENT_OPTIONS = [
-        {value: "PROPOSAL", label: "PROPOSAL"},
-        {value: "DISCUSSION", label: "DISCUSSION"},
-        {value: "FINAL_SUBMISSION", label: "FINAL_SUBMISSION"},
-        {value: "REVIEW", label: "REVIEW"},
-        {value: "ARCHIVE", label: "ARCHIVE"},
-        {value: "ABORT", label: "ABORT"}
-    ];
+    const EVENT_OPTIONS = Object.entries(status_mapping).map(([value, label]) => ({value, label}));
 
     $effect(() => {
         if (data.studentId && !selectedStudent && students.length > 0) {
@@ -155,9 +153,21 @@
                 }
             }
         }
-        if (data.colloquiumDuration) {
-             const match = data.colloquiumDuration.match(/\d+/);
-             if (match) durationMinutes = match[0];
+        const d = data.colloquiumDuration;
+
+        if (d == null || d === 0) {
+            durationMinutes = "";
+            return;
+        }
+
+        if (typeof d === "number") {
+            durationMinutes = String(Math.round(d / 60));
+            return;
+        }
+
+        if (typeof d === "string") {
+            const match = d.match(/\d+/);
+            durationMinutes = match ? match[0] : "";
         }
     });
 
@@ -231,26 +241,14 @@
         if (!kolloquiumUI.tag || !kolloquiumUI.zeit) {
             if (!data.colloquium) return;
         } else {
-             data.colloquium = `${kolloquiumUI.tag}T${kolloquiumUI.zeit}`;
+            data.colloquium = `${kolloquiumUI.tag}T${kolloquiumUI.zeit}`;
         }
     });
 
     function setDurationMinutes(minutesStr) {
         durationMinutes = minutesStr;
         const minutes = Number(minutesStr);
-        data.colloquiumDuration = Number.isFinite(minutes) && minutes > 0 ? `PT${minutes}M` : null;
-    }
-
-    function setStudyProgram(sp) {
-        selectedStudyProgramId = sp.id;
-        data.studyProgramId = sp.id;
-        studyProgramText = sp.title;
-    }
-
-    function onStudyProgramTextInput(value) {
-        studyProgramText = value;
-        selectedStudyProgramId = null;
-        data.studyProgramId = null;
+        data.colloquiumDuration = Number.isFinite(minutes) && minutes > 0 ? minutes * 60 : null;
     }
 
     function handleStudentClear() {
@@ -286,17 +284,45 @@
         activeVeranstaltungIndex = index;
     }
 
+    function ensureEventAtIndex() {
+        const events = Array.isArray(data.events) ? data.events : [];
+        if (events.length === 0) {
+            data.events = [{eventType: "", eventDate: ""}];
+            activeVeranstaltungIndex = 0;
+        }
+    }
+
     function updateVeranstaltungType(value) {
-        const copy = [...(data.events ?? [])];
+        ensureEventAtIndex();
+        const copy = [...data.events];
         copy[activeVeranstaltungIndex] = {...(copy[activeVeranstaltungIndex] ?? {}), eventType: value};
         data.events = copy;
     }
 
     function updateVeranstaltungDate(value) {
-        const copy = [...(data.events ?? [])];
+        ensureEventAtIndex();
+        const copy = [...data.events];
         copy[activeVeranstaltungIndex] = {...(copy[activeVeranstaltungIndex] ?? {}), eventDate: value};
         data.events = copy;
     }
+
+    const isEventFilled = (e) => !!(e?.eventType || e?.eventDate);
+
+    //Chat GPT 5: Frage: Wie kann ich die Events auf [] setzen, wenn sie leer sind; angelehnt an
+    $effect(() => {
+        if (!Array.isArray(data.events)) return;
+
+        if (data.events.length > 0 && data.events.every(e => !isEventFilled(e))) {
+            data.events = [];
+            activeVeranstaltungIndex = 0;
+        }
+
+        if ((data.events?.length ?? 0) === 0) {
+            activeVeranstaltungIndex = 0;
+        } else if (activeVeranstaltungIndex > data.events.length - 1) {
+            activeVeranstaltungIndex = data.events.length - 1;
+        }
+    });
 
     async function loadStudents() {
         console.log("loading students...");
@@ -319,7 +345,7 @@
 
 <div class="erfassen-daten-arbeit-container">
     <div class="card">
-    <div class="section">
+        <div class="section">
             <div class="section-title">Student</div>
 
             <div class="row-inline student-row">
@@ -348,7 +374,9 @@
                 {#if selectedStudent && selectedStudent.studyProgramId}
                     <div class="student-studyprogram-hint">
                         <strong>
-                            {selectedStudent.firstName} {selectedStudent.lastName} studiert {studentStudyProgramTitle || "-"}{studentStudyProgramDegree ? ` (${studentStudyProgramDegree})` : ""}.
+                            {selectedStudent.firstName} {selectedStudent.lastName}
+                            studiert {studentStudyProgramTitle || "-"}{studentStudyProgramDegree ? ` (${studentStudyProgramDegree})` : ""}
+                            .
                         </strong>
                     </div>
                 {/if}
@@ -469,26 +497,28 @@
             <div class="veranstaltung-header">
                 <div class="section-title">Veranstaltung*</div>
 
-                <div class="pager">
-                    <button
-                            type="button"
-                            class="pager-arrow"
-                            on:click={() => goToVeranstaltung(activeVeranstaltungIndex - 1)}
-                            disabled={activeVeranstaltungIndex === 0}
-                    >
-                        ←
-                    </button>
-
-                    {#each Array.from({ length: eventsLen }, (_, i) => i) as i}
+                {#if hasEvents}
+                    <div class="pager">
                         <button
                                 type="button"
-                                class="pager-num {i === activeVeranstaltungIndex ? 'active' : ''}"
-                                on:click={() => goToVeranstaltung(i)}
+                                class="pager-arrow"
+                                on:click={() => goToVeranstaltung(activeVeranstaltungIndex - 1)}
+                                disabled={activeVeranstaltungIndex === 0}
                         >
-                            [{i + 1}]
+                            ←
                         </button>
-                    {/each}
-                </div>
+
+                        {#each Array.from({length: eventsLen}, (_, i) => i) as i}
+                            <button
+                                    type="button"
+                                    class="pager-num {i === activeVeranstaltungIndex ? 'active' : ''}"
+                                    on:click={() => goToVeranstaltung(i)}
+                            >
+                                [{i + 1}]
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
             </div>
 
             <div class="grid-3-event">
@@ -526,9 +556,9 @@
                         <button type="button" class="input-shell action-shell plus-shell" on:click={addVeranstaltung}>
                             +
                         </button>
-
-                        {#if (data.events?.length ?? 0) > 0}
-                            <button type="button" class="input-shell action-shell remove-shell" on:click={removeVeranstaltung}>
+                        {#if hasEvents}
+                            <button type="button" class="input-shell action-shell remove-shell"
+                                    on:click={removeVeranstaltung}>
                                 entfernen
                             </button>
                         {/if}
