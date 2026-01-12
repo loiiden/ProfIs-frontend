@@ -16,7 +16,7 @@
     let study_programs = data.study_programs;
     let study_programs_mapping = {};
     data.study_programs.forEach(program => {
-        study_programs_mapping[program.id] = program.title;
+        study_programs_mapping[program.id] = program.degreeType + " in " + program.title;
     });
 
     let search_value = $state("");
@@ -96,7 +96,7 @@
                         <span class="filter-heading">Studiengang</span>
                         <div class="filter-study-program">
                             {#each study_programs as study_program}
-                                <div class="study-program" data-st-id="{study_program.id}" onclick={() => { toggle_study_program(study_program.id); }}>{study_program.title}</div>
+                                <div class="study-program" data-st-id="{study_program.id}" onclick={() => { toggle_study_program(study_program.id); }}>{study_program.degreeType + " in " +study_program.title}</div>
                             {/each}
                         </div>
                     </div>
@@ -112,7 +112,7 @@
         <div class="student-table">
             {#each students_filtered as student}
                 <div class="student-row">
-                    <span onclick={() => { show_connected(student.id); }} class="stu-name">{student.firstName + " " + student.lastName}<a href="/erstellen/student/?id={student.id}"><img class="open-new" src={openblank} alt=""></a></span>
+                    <span onclick={() => { show_connected(student.id); }} class="stu-name"><a href="/erstellen/student/?id={student.id}"><img class="open-new" src={openblank} alt=""></a>{student.firstName + " " + student.lastName}</span>
                     <span class="stu-num">{student.studentNumber}</span>
                     <span class="stu-program" title="{study_programs_mapping[student.studyProgramId]}">{study_programs_mapping[student.studyProgramId]}</span>
                     <span class="stu-email"><a href="mailto:{student.email}">{student.email}</a></span>
@@ -331,8 +331,10 @@
 
                     .open-new {
                         width: 14px;
-                        margin-left: 10px;
                         user-select: none;
+                        margin-right: 10px;
+                        position: relative;
+                        top: 2px;
                     }
                 }
 
@@ -405,6 +407,7 @@
             padding: 8px;
             margin: 8px 0px;
             border-radius: 6px;
+            font-size: 12px;
         }
 
         .connected-works-list {

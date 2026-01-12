@@ -199,7 +199,7 @@
                         </div>
                         <span class="work-student">{work.studentFirstName + " " + work.studentLastName}</span>
                         <span class="work-program">{work.studyProgramTitle}</span>
-                        <span class="work-title">{work.title}</span>
+                        <span class="work-title" title="{work.title}">{work.title}</span>
                     </div>
                 {/each}
             </div>
@@ -214,8 +214,9 @@
                                 <p>{work.status?.eventDate ? String(work.status.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
                             </span>
                         </div>
+                        <span class="work-student">{work.studentFirstName + " " + work.studentLastName}</span>
                         <span class="work-program">{work.studyProgramTitle}</span>
-                        <span class="work-title">{work.title}</span>
+                        <span class="work-title" title="{work.title}">{work.title}</span>
                     </div>
                 {/each}
             </div>

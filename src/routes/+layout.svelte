@@ -118,8 +118,10 @@ header {
             .anlegen {
                 color: $primary;
                 background-color: #FFFFFF;
-                font-family: "Inter SB";
                 font-size: 14px;
+                font-weight: 600;
+                font-size: 18px;
+                font-family: "Inter";
             }
 
             .anlegen-options {
@@ -129,7 +131,7 @@ header {
                 align-items: flex-start;
                 flex-direction: column;
                 width: 100%;
-                margin-top: 10px;
+                margin-top: 0px;
 
                 a {
                     position: relative;
@@ -137,6 +139,9 @@ header {
                     padding: 8px 6px;
                     text-decoration: none;
                     color: black;
+                    font-weight: 600;
+                    font-size: 18px;
+                    font-family: "Inter";
                 }
             }
         }
@@ -144,8 +149,9 @@ header {
         .export {
             margin-left: 20px;
             background-color: #FFFFFF;
-            font-family: "Inter SB";
-            font-size: 14px;
+            font-weight: 600;
+            font-size: 18px;
+            font-family: "Inter";
             color: black;
             text-decoration: none;
             display: inline-block;

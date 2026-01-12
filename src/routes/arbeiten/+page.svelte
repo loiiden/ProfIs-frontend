@@ -158,7 +158,7 @@
                         <span class="filter-heading">Studiengang</span>
                         <div class="filter-study-program">
                             {#each study_programs as study_program}
-                                <div class="study-program" data-st-id="{study_program.id}" onclick={() => { toggle_study_program(study_program.id); }}>{study_program.title}</div>
+                                <div class="study-program" data-st-id="{study_program.id}" onclick={() => { toggle_study_program(study_program.id); }}>{study_program.degreeType + " in " + study_program.title}</div>
                             {/each}
                         </div>
                     </div>
