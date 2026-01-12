@@ -203,11 +203,11 @@
                 <a class="edit-btn" href="/erstellen/arbeit?id={current_swork.id}"><img src={pen} alt="Bearbeiten"></a>
                 <button class="delete-btn" onclick={() => delete_swork(current_swork.id)}><img src={trash} alt="Löschen"></button>
             </div>
-            <span class="style-med">{current_swork.title ?? "-"}</span>
+            <span class="style-large">{current_swork.title ?? "-"}</span>
             <span class="style-small ellipsis">{study_programs_mapping[current_swork.studyProgramId]}</span>
             <span class="style-small">{(student_mapping[current_swork.studentId]?.firstName ?? "") + " " + (student_mapping[current_swork.studentId]?.lastName ?? "-")}</span>
             
-            <span class="style-med top-gap">Verlauf:</span>
+            <span class="style-large top-gap">Verlauf:</span>
             <div class="events-verlauf">
                 {#each events as event}
                     <div class="work-status">
@@ -220,10 +220,10 @@
                 {/each}
             </div>
 
-            <span class="style-med top-gap">Kommentar: </span>
+            <span class="style-large top-gap">Kommentar: </span>
             <span class="style-small">{current_swork.comment ?? "-"}</span>
 
-            <span class="style-med top-gap">Termine: </span>
+            <span class="style-large top-gap">Termine: </span>
             <span class="style-small">Startdatum: {current_swork.startDate ? String(current_swork.startDate.toReversed()).replaceAll(",", ".") : "-"}</span>
             <span class="style-small">Abgabedatum: {current_swork.endDate ? String(current_swork.endDate.toReversed()).replaceAll(",", ".") : "-"}</span>
             
@@ -232,14 +232,18 @@
             <span class="style-small">Präsentation: {current_swork.presentationStart ?? "-"} - {current_swork.presentationEnd ?? "-"}</span>
             <span class="style-small">Diskussions: {current_swork.discussionStart ?? "-"} - {current_swork.discussionEnd ?? "-"}</span>
             
-            <span class="style-med top-gap">Referent: {current_swork.mainEvaluatorId ? alevel_to_title[referent_mapping[current_swork.mainEvaluatorId].academicLevel] + referent_mapping[current_swork.mainEvaluatorId].firstName + " " + referent_mapping[current_swork.mainEvaluatorId].lastName : "-"}</span>
+            <span class="style-large top-gap">Referent: {current_swork.mainEvaluatorId ? alevel_to_title[referent_mapping[current_swork.mainEvaluatorId].academicLevel] + referent_mapping[current_swork.mainEvaluatorId].firstName + " " + referent_mapping[current_swork.mainEvaluatorId].lastName : "-"}</span>
             <span class="style-small">Punkte Arbeit: {current_swork.mainEvaluatorWorkMark ?? "-"}</span>
             <span class="style-small">Punkte Kolloquium: {current_swork.mainEvaluatorColloquiumMark ?? "-"}</span>
             
-            <span class="style-med top-gap">Korreferent: {current_swork.secondEvaluatorId ? alevel_to_title[referent_mapping[current_swork.secondEvaluatorId].academicLevel] + referent_mapping[current_swork.secondEvaluatorId].firstName + " " + referent_mapping[current_swork.secondEvaluatorId].lastName : "-"}</span>
+            <span class="style-large top-gap">Korreferent: {current_swork.secondEvaluatorId ? alevel_to_title[referent_mapping[current_swork.secondEvaluatorId].academicLevel] + referent_mapping[current_swork.secondEvaluatorId].firstName + " " + referent_mapping[current_swork.secondEvaluatorId].lastName : "-"}</span>
             <span class="style-small">Punkte Arbeit: {current_swork.secondEvaluatorWorkMark ?? "-"}</span>
             <span class="style-small">Punkte Kolloquium: {current_swork.secondEvaluatorColloquiumMark ?? "-"}</span>
         </div>
+        {:else}
+            <div class="not-selected">
+                Noch keine Arbeit ausgewählt!
+            </div>
         {/if}
     </div>
 </div>
@@ -501,6 +505,11 @@
         padding: 12px;
         border-radius: 10px;
 
+        .not-selected {
+            font-size: 14px;
+            font-family: 'Inter SB';
+        }
+
         .current-swork {
             display: flex;
             justify-content: center;
@@ -595,10 +604,9 @@
             }
 
             .style-large {
-                font-size: 22px;
-                font-weight: bold;
+                font-size: 18px;
                 font-family: 'Inter SB';
-                padding: 6px 0px;
+                padding: 2px 0px;
             }
         }
     }

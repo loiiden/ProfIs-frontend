@@ -145,6 +145,10 @@
                     </div>
                 {/each}
             </div>
+        {:else}
+            <div class="not-selected">
+                Noch keinen Studenten ausgewählt!
+            </div>
         {/if}
     </div>
 </div>
@@ -375,6 +379,11 @@
         padding: 12px;
         border-radius: 10px;
         overflow-y: auto;
+
+        .not-selected {
+            font-size: 14px;
+            font-family: 'Inter SB';
+        }
 
         .current-student {
             display: flex;
