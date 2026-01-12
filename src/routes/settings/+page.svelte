@@ -3,6 +3,7 @@
     import { POST } from '$lib/functions';
     import { invalidateAll } from '$app/navigation';
     import { api_url } from '$lib/constants';
+    import DownloadSwsReport from '$lib/components/download-sws-report.svelte';
 
     let { data } = $props();
 
@@ -393,6 +394,7 @@
             <button class="secondary-btn" onclick={exportExcel}>Exportieren</button>
         </div>
     </div>
+    <DownloadSwsReport active = {selectedUser !== null}></DownloadSwsReport>
 
     <!-- TEIL 4: GEFAHRENZONE -->
     <div class="card danger-section">
@@ -526,7 +528,7 @@
     /* --- Program Section Layout --- */
     .program-section {
         grid-column: 7 / 13; /* rechte Hälfte */
-        grid-row: 2 / 4; 
+        grid-row: 2 / 5; 
     }
 
     /* Liste der Studiengänge (fixe Höhe + Scroll, um Layout-Sprünge zu vermeiden) */
@@ -535,7 +537,7 @@
         flex-direction: column;
         gap: 10px;
         margin-bottom: 20px;
-        height: 250px;
+        height: 450px;
         //max-height: 300px; //mal schauen ob nötig
         overflow-y: auto;
     }
@@ -716,7 +718,7 @@
     /* --- Danger Section --- */
     .danger-section {
         grid-column: 1 / 13; /* volle Breite */
-        grid-row: 4 / 5;
+        grid-row: 5 / 6;
         border: 1px solid #FFCDD2;
         background-color: #FFFAFA;
     }
