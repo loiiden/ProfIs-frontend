@@ -528,7 +528,7 @@
     /* --- Program Section Layout --- */
     .program-section {
         grid-column: 7 / 13; /* rechte Hälfte */
-        grid-row: 2 / 4; 
+        grid-row: 2 / 5; 
     }
 
     /* Liste der Studiengänge (fixe Höhe + Scroll, um Layout-Sprünge zu vermeiden) */
@@ -537,7 +537,7 @@
         flex-direction: column;
         gap: 10px;
         margin-bottom: 20px;
-        height: 250px;
+        height: 450px;
         //max-height: 300px; //mal schauen ob nötig
         overflow-y: auto;
     }
@@ -718,7 +718,7 @@
     /* --- Danger Section --- */
     .danger-section {
         grid-column: 1 / 13; /* volle Breite */
-        grid-row: 4 / 5;
+        grid-row: 5 / 6;
         border: 1px solid #FFCDD2;
         background-color: #FFFAFA;
     }
