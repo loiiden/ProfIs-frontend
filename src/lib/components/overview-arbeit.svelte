@@ -1,6 +1,8 @@
 <script>
     let props = $props()
 
+    import pen from '$lib/assets/pen.svg';
+
     import { alevel_to_title } from "$lib/mappings";
 	import { onMount } from "svelte";
     import { date_to_string } from "$lib/functions";
@@ -58,7 +60,6 @@
             if(typeof snapshot.colloquium === "string"){
                 let splitted = snapshot.colloquium.split("T");
                 let colq = splitted[0].split("-").map(x => parseInt(x, 10));
-                console.log(colq);
                 
                 events.push({eventDate: colq});
             } else {
@@ -107,8 +108,6 @@
             splitted[1]
         ]
     }
-
-    import pen from '$lib/assets/pen.svg';
 </script>
 
 <div class="overview-arbeit-container {page.url.pathname == "/" ? "grid-layout-home": "grid-layout-preview"}">
@@ -120,7 +119,12 @@
         <div class="header">
             {#if swork}
                 <div class="left">
-                    <p class="student">{swork.studentId ? studmap[swork.studentId].firstName + " " + studmap[swork.studentId].lastName : "-"}<a href="{`/erstellen/arbeit?id=${swork.id}`}"><img src={pen} alt="Löschen"></a></p>
+                    <p class="student">
+                        {swork.studentId ? studmap[swork.studentId].firstName + " " + studmap[swork.studentId].lastName : "-"}
+                        {#if page.url.pathname == "/"}
+                            <a href="{`/erstellen/arbeit?id=${swork.id}`}"><img src={pen} alt="Löschen"></a>
+                        {/if}
+                    </p>
                     <p class="title">{swork ? swork.title : "-"}</p>
                 </div>
                 <div class="right">

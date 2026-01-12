@@ -303,7 +303,11 @@
         ensureEventAtIndex();
         const copy = [...data.events];
         copy[activeVeranstaltungIndex] = {...(copy[activeVeranstaltungIndex] ?? {}), eventDate: value};
-        data.events = copy;
+        
+        let snap = $state.snapshot(copy);
+        snap.sort((e1, e2) => e1.eventDate > e2.eventDate);
+        
+        data.events = snap;
     }
 
     const isEventFilled = (e) => !!(e?.eventType || e?.eventDate);
