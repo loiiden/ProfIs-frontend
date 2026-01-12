@@ -38,8 +38,6 @@
         }
 
         let res = await PATCH(`/api/student/${id}`, payload);
-        
-        console.log(res);
 
         if(res.status == 200){
             console.log("Successfully Patched Student");

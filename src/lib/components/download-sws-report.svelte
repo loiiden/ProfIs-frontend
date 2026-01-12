@@ -13,7 +13,6 @@
             });
             if (!res.ok) throw new Error('Fetch failed');
             const data = await res.json();
-            console.log(data);
             if (data.length > 0){
                 chosenSemester = data[0];
             }
