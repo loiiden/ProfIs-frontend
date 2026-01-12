@@ -3,6 +3,7 @@
     import { POST } from '$lib/functions';
     import { invalidateAll } from '$app/navigation';
     import { api_url } from '$lib/constants';
+    import DownloadSwsReport from '$lib/components/download-sws-report.svelte';
 
     let { data } = $props();
 
@@ -393,6 +394,7 @@
             <button class="secondary-btn" onclick={exportExcel}>Exportieren</button>
         </div>
     </div>
+    <DownloadSwsReport active = {selectedUser !== null}></DownloadSwsReport>
 
     <!-- TEIL 4: GEFAHRENZONE -->
     <div class="card danger-section">
