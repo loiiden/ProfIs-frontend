@@ -11,7 +11,7 @@
 
     let study_programs_mapping = {};
     data.study_programs.forEach(program => {
-        study_programs_mapping[program.id] = program.title;
+        study_programs_mapping[program.id] = program.degreeType + " in " + program.title;
     });
 
     let student_mapping = {};
