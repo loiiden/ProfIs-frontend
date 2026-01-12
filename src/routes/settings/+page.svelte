@@ -435,7 +435,8 @@
     }
 
     .page-title {
-        font-size: 2em;
+        font-size: 18px;
+        font-weight: 600;
     }
 
     /* Help-Link als Button */
