@@ -41,7 +41,7 @@
 
         if(res.status == 200){
             console.log("Successfully Patched Student");
-            window.location = `/erstellen/student?id=${id}`;
+            window.location = `/studenten`;
         }
     }
 

@@ -37,7 +37,7 @@
 
         if(res.status == 200){
             console.log("Successfully Patched Referent");
-            window.location = `/erstellen/referent?id=${id}`;
+            window.location = `/referenten`;
         }
     }
 
