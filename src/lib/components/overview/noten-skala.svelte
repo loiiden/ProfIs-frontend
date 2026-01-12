@@ -19,11 +19,11 @@
     let average = $derived(roundNumber(props.average, 2));
 
     let position = -37 + ((5.0 - average) / 4) * 532.0;
-    let vheight = $state(67);
+    let vheight = $state(57);
     let vmargin = $state(0);
     if((average % 1) < 0.14 || (average % 1) > 0.86){
         vheight = 23;
-        vmargin = 44;
+        vmargin = 35;
     };
 
 </script>

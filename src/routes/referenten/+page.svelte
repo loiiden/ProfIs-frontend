@@ -169,7 +169,7 @@
         <div class="referent-table">
             {#each referent_filtered as referent}
                 <div class="referent-row">
-                    <span onclick={() => { show_connected(referent.id); }} class="ref-name">{alevel_to_title[referent.academicLevel] + referent.firstName + " " + referent.lastName}<a href="/erstellen/referent/?id={referent.id}"><img class="open-new" src={openblank} alt=""></a></span>
+                    <span onclick={() => { show_connected(referent.id); }} class="ref-name"><a href="/erstellen/referent/?id={referent.id}"><img class="open-new" src={openblank} alt=""></a>{alevel_to_title[referent.academicLevel] + referent.firstName + " " + referent.lastName}</span>
                     <span class="current-works">{referent.numberOfOpenWorks}</span>
                     <span class="ref-email"><a href="mailto:{referent.email}">{referent.email}</a></span>
                     <span class="ref-phone">{referent.phoneNumber}</span>
@@ -199,7 +199,7 @@
                         </div>
                         <span class="work-student">{work.studentFirstName + " " + work.studentLastName}</span>
                         <span class="work-program">{work.studyProgramTitle}</span>
-                        <span class="work-title">{work.title}</span>
+                        <span class="work-title" title="{work.title}">{work.title}</span>
                     </div>
                 {/each}
             </div>
@@ -214,10 +214,15 @@
                                 <p>{work.status?.eventDate ? String(work.status.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
                             </span>
                         </div>
+                        <span class="work-student">{work.studentFirstName + " " + work.studentLastName}</span>
                         <span class="work-program">{work.studyProgramTitle}</span>
-                        <span class="work-title">{work.title}</span>
+                        <span class="work-title" title="{work.title}">{work.title}</span>
                     </div>
                 {/each}
+            </div>
+        {:else}
+            <div class="not-selected">
+                Noch keinen Referenten ausgewählt!
             </div>
         {/if}
     </div>
@@ -405,8 +410,10 @@
 
                     .open-new {
                         width: 14px;
-                        margin-left: 10px;
                         user-select: none;
+                        margin-right: 10px;
+                        position: relative;
+                        top: 2px;
                     }
                 }
 
@@ -448,6 +455,11 @@
         border-radius: 10px;
         overflow-y: auto;
 
+        .not-selected {
+            font-size: 14px;
+            font-family: 'Inter SB';
+        }
+
         .current-referent {
             display: flex;
             justify-content: center;
@@ -484,6 +496,7 @@
             padding: 8px;
             margin: 8px 0px;
             border-radius: 6px;
+            font-size: 12px;
         }
 
         .connected-works-list {

@@ -9,8 +9,8 @@ export const color_mapping = {
     }
 
 export const status_mapping = {
-    "PLANNED": "Vorgeschlagen",
-    "PROPOSAL": "In Planung",
+    "PLANNED": "In Planung",
+    "PROPOSAL": "Thema",
     "DISCUSSION": "Besprochen",
     "FINAL_SUBMISSION": "Abgegeben",
     "REVIEW": "Korrektur",

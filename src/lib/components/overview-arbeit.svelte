@@ -108,6 +108,7 @@
         ]
     }
 
+    import pen from '$lib/assets/pen.svg';
 </script>
 
 <div class="overview-arbeit-container {page.url.pathname == "/" ? "grid-layout-home": "grid-layout-preview"}">
@@ -116,11 +117,10 @@
     <div class="effect-el-2" style:display={page.url.pathname == "/" ? "" : "none"}></div>
 
     <div class="overview-arbeit stroke-style" style:width={page.url.pathname == "/"  ? "94%" : "100%"}>
-
         <div class="header">
             {#if swork}
                 <div class="left">
-                    <p class="student">{swork.studentId ? studmap[swork.studentId].firstName + " " + studmap[swork.studentId].lastName : "-"}</p>
+                    <p class="student">{swork.studentId ? studmap[swork.studentId].firstName + " " + studmap[swork.studentId].lastName : "-"}<a href="{`/erstellen/arbeit?id=${swork.id}`}"><img src={pen} alt="Löschen"></a></p>
                     <p class="title">{swork ? swork.title : "-"}</p>
                 </div>
                 <div class="right">
@@ -251,6 +251,24 @@
         .student {
             font-family: 'Inter EB';
             font-size: 30px;
+            display: flex;
+            align-items: center;
+            
+            a {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+            
+            img {
+                width: 18px;
+                height: 18px;
+                background: #F9F9F9;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                padding: 5px 8px;
+                margin-left: 10px;
+            }
         }
 
         .title {
