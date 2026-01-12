@@ -44,6 +44,10 @@
     });
 </script>
 
+<svelte:head>
+    <title>{create ? "Referent anlegen" : "Referent bearbeiten"} - ProfIS</title>
+</svelte:head>
+
 <main class="erstellen-referent-container">
     <ReferentAnlegen create={create} referent_id={referent_id} referent_data={referent_data}/>
 </main>

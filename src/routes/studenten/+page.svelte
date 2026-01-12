@@ -79,6 +79,11 @@
     }
 </script>
 
+<svelte:head>
+    <title>Studenten - ProfIS</title>
+</svelte:head>
+
+
 <div class="student-filter-table-container">
     <div class="headline-s">STUDENTEN</div>
     <div class="student-table-container stroke-style">

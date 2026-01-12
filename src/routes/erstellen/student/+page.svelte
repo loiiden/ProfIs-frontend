@@ -55,6 +55,10 @@
     });
 </script>
 
+<svelte:head>
+    <title>{create ? "Student anlegen" : "Student bearbeiten"} - ProfIS</title>
+</svelte:head>
+
 <main class="erstellen-student-container">
     <StudentAnlegen create={create} student_id={student_id} student_data={student_data} study_programs={study_programs}/>
 </main>
