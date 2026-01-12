@@ -7,6 +7,10 @@
     let { data } = $props();
 </script>
 
+<svelte:head>
+    <title>ProfIS</title>
+</svelte:head>
+
 <main class="overview-container">
     <div class="headline-s">ÜBERSICHT</div>
     <FilterArbeiten sworks={data.sworks} study_programs={data.study_programs} students={data.students} referents={data.referents}/>

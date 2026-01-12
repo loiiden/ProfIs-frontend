@@ -270,6 +270,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>Einstellungen - ProfIS</title>
+</svelte:head>
+
 <main class="settings-container">
     <div class="page-header">
         <div class="page-title">EINSTELLUNGEN</div>

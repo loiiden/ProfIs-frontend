@@ -327,6 +327,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>{create ? "Arbeit anlegen" : "Arbeit bearbeiten"} - ProfIS</title>
+</svelte:head>
+
 <main class="erstellen-arbeit-container">
     <div class="header-row">
         <div class="page-title">{create ? "ARBEIT ANLEGEN" : "ARBEIT BEARBEITEN"}</div>

@@ -135,6 +135,11 @@
     ]
 </script>
 
+<svelte:head>
+    <title>Arbeiten - ProfIS</title>
+</svelte:head>
+
+
 <div class="sworks-filter-table-container">
     <div class="headline-s">ARBEITEN</div>
     <div class="sworks-table-container stroke-style">

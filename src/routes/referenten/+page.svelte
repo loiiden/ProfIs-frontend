@@ -130,6 +130,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>Referenten - ProfIS</title>
+</svelte:head>
+
 <div class="referent-filter-table-container">
     <div class="headline-s">REFERENTEN</div>
     <div class="referent-table-container stroke-style">
