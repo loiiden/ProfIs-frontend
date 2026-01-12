@@ -6,6 +6,9 @@
     
     import { GET, POST } from '$lib/functions';
     
+    let { data } = $props();
+    let study_programs = data.study_programs;
+
     function get_student(id){
         return GET(`/api/student/${id}`);
     }
@@ -22,7 +25,8 @@
         studentNumber: null,
         salutation: null,
         academicLevel: null,
-        scientificWorksIds: []
+        scientificWorksIds: [],
+        studyProgramId: null
     });
 
     afterNavigate(async () => {
@@ -44,14 +48,15 @@
                 studentNumber: null,
                 salutation: null,
                 academicLevel: null,
-                scientificWorksIds: []
+                scientificWorksIds: [],
+                studyProgramId: null
             };
         }
     });
 </script>
 
 <main class="erstellen-student-container">
-    <StudentAnlegen create={create} student_id={student_id} student_data={student_data}/>
+    <StudentAnlegen create={create} student_id={student_id} student_data={student_data} study_programs={study_programs}/>
 </main>
 
 <style lang="scss"></style>

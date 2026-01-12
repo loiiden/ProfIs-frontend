@@ -11,7 +11,8 @@
             "studentNumber": Number(matrikel),
             "salutation": anrede,
             "academicLevel": abschluss,
-            "scientificWorksIds": []
+            "scientificWorksIds": [],
+            "studyProgramId": studyprogramid
         }
 
         let res = await POST("/api/student", payload);
@@ -32,7 +33,8 @@
             "studentNumber": Number(matrikel),
             "salutation": anrede,
             "academicLevel": abschluss,
-            "scientificWorksIds": []
+            "scientificWorksIds": [],
+            "studyProgramId": studyprogramid
         }
 
         let res = await PATCH(`/api/student/${id}`, payload);
@@ -56,6 +58,8 @@
 
     let props = $props();
 
+    let study_programs = props.study_programs;
+
     let create = $derived(props.create);
     let student_id = $derived(props.student_id);;
     let student_data = $derived(props.student_data);
@@ -68,6 +72,7 @@
     let matrikel = $derived(student_data.studentNumber);
     let abschluss = $derived(student_data.academicLevel);
     let anrede = $derived(student_data.salutation);
+    let studyprogramid = $derived(student_data.studyProgramId);
 
     let external_toggle = $state(false);
 </script>
@@ -104,6 +109,14 @@
         <div class="annotated-text-input">
             <div class="annotation">Matrikelnummer</div>
             <input class="stroke-style" type="text" placeholder="Matrikelnummer" bind:value={matrikel}>
+        </div>
+        <div class="annotated-text-input study-program">
+            <div class="annotation">Studiengang</div>
+            <select class="stroke-style" bind:value={studyprogramid} name="" id="">
+                {#each study_programs as sprogram}
+                    <option value="{sprogram.id}">{sprogram.degreeType + " in " + sprogram.title}</option>
+                {/each}
+            </select>
         </div>
     </div>
     <div class="student-contact-information-container stroke-style">
@@ -158,7 +171,7 @@
     grid-column-start: 1;
     grid-column-end: 7;
     grid-row-start: 3;
-    grid-row-end: 19;
+    grid-row-end: 22;
 
     background-color: #FFFFFF;
     padding: 12px;
@@ -187,6 +200,20 @@
 
         select {
             padding: 10px;
+            margin-right: 20px;
+            border-radius: 5px;
+            background-color: #FFFFFF;
+        }
+    }
+
+    .study-program {
+        .annotation {
+            margin-bottom: 16px;
+        }
+
+        select {
+            padding: 10px;
+            width: 80%;
             margin-right: 20px;
             border-radius: 5px;
             background-color: #FFFFFF;
