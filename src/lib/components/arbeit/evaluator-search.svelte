@@ -1,4 +1,8 @@
 <script>
+    //KI: ChatGPT5.2 Thinking & Github Copilot Claude Opus 4: Verbessere und Kontrolliere meinen Code. Wenn du Sachen siehst die, nicht Funktionieren, sage mir bescheid und gebe verbesserungsvorschläge; übernommen und angepasst
+
+
+
     // Such-Icon (derzeit nicht verwendet)
     import searchIcon from '$lib/assets/search.svg';
 
@@ -40,6 +44,7 @@
     <div class="search-wrapper">
 
         <div class="input-container">
+            <!-- KI: Gemini 3 Pro: Ich möchte, dass wenn ich suche, und noch kein Treffer gefunden wurde, ein Button zum Erstellen eines neuen Referenten erscheint, übernommen -->
             <!-- Fall 1: Schon eine Person gewählt → als Button anzeigen (Klick = `clear()`) -->
             {#if selectedEvaluator}
                  <button class="display-value" onclick={clear} aria-label="Auswahl ändern">
@@ -95,7 +100,9 @@
 
 
 <style lang="scss">
-    /* Keine Imports nötig hier, wir nutzen feste Farben für dieses Element */
+    //KI: ChatGPT 5.2 Thinking: Fragen zu einzelnen CSS befehlen und Funktionen, angelehnt an/übernommen
+
+    /* Keine Imports -> feste Farben */
 
     /* Äußerer Wrapper */
     .search-component {

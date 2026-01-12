@@ -1,6 +1,8 @@
 <script>
+    //KI: ChatGPT5.2 Thinking & Github Copilot Claude Opus 4: Verbessere und Kontrolliere meinen Code. Wenn du Sachen siehst die, nicht Funktionieren, sage mir bescheid und gebe verbesserungsvorschläge; übernommen und angepasst @Mena
+    
     import EvaluatorSearch from '$lib/components/arbeit/evaluator-search.svelte';  //wiederverwenden von Referentensuche
-    import { POST } from '$lib/functions';
+    import { POST } from '$lib/functions'; 
     import { invalidateAll } from '$app/navigation';
     import { api_url } from '$lib/constants';
     import DownloadSwsReport from '$lib/components/download-sws-report.svelte';
@@ -46,7 +48,7 @@
         { value: 'MBA', label: 'Master of Business Admin. (MBA)' }
     ];
 
-    // Kürzel-Mapping für die Titelpräfixe (wird aktuell nicht zum Speichern verwendet, bleibt aber erhalten)
+    // Kürzel-Mapping für die Titelpräfixe 
     const degreeShortMap = {
         B_A: 'B.A.',
         B_ENG: 'B.Eng.',
@@ -71,6 +73,7 @@
         return short ? `${short} in ${title}` : title;
     }
 
+    // KI: GPT5.2: Wie kann ich eine Funktion bauen, die mir, bevor der Titel angezeigt wird, das Kürzel des Abschlusses davortut?; angelehnt an
     // Baut den Titel für die Anzeige (Studiengang-Liste): "<Kürzel> in <Titel>"
     function formatProgramDisplay(program) {
         const title = (program?.title || "").trim();
@@ -97,7 +100,7 @@
         // Payload so wie Backend es erwartet
         let payload = { 
             // title: formatProgramTitle(newProgramName, newProgramDegree), // Titel mit Abschluss-Kürzel präfixen, nach Anruf mit Loick entfernt
-            title: newProgramName, //Stattdessen nur der Titel
+            title: newProgramName, //Nur der Titel
             sws: Number(newProgramSws), // String -> Number (Backend erwartet Zahl)
             degreeType: newProgramDegree // Sendet z.B. "B_SC"
         };
@@ -116,6 +119,8 @@
         }
     }
 
+
+    // KI: GPT5.2 Thinking: Baue eine Funktion, die mir einen Studiengang anhand seiner ID löscht; angelehnt an
     async function deleteStudyProgram(id) {
         //if(!confirm("Diesen Studiengang wirklich löschen?")) return; // Optional: Bestätigungspopup
 
@@ -193,9 +198,10 @@
         setExcelFile(file);
     }
 
+    // KI: Wie lädt man eine Excel-Datei hoch und sendet sie als multipart/form-data an einen API-Endpunt; übernommen
     // Upload der Excel-Datei als multipart/form-data an /api/data/import
     async function importExcel() {
-        if (!excelFile) {
+        if (!excelFile) {  //Wenn keine Datei ausgewählt ist
             alert("Bitte wählen Sie eine Excel-Datei aus.");
             return;
         }
@@ -236,6 +242,7 @@
         }
     }
 
+    //KI: nur Frage gestellt: Wie mache ich, dass ein Tab in neuem Fenster geöffnet wird?; --> Antwort: window.open(url, '_blank');
     // Export startet einen Datei-Download in neuem Tab
     function exportExcel() {
         window.open(`${api_url}/api/data/export`, '_blank');
@@ -280,6 +287,7 @@
         <a href="settings/user-documentation" class="help-btn">Hilfe</a>
     </div>
 
+    
     <!-- TEIL 1: BENUTZER -->
     <div class="card user-section">
         <div class="headline-s">Benutzer auswählen</div>
@@ -293,12 +301,12 @@
         
         <!-- Eingabe: Suchkomponente (evaluator-search) + Speichern-Button -->
         <div class="input-row">
-            <div class="search-wrapper">
+            <div class="search-wrapper"> <!-- Wiederverwendete Suchkomponente -->
                 <EvaluatorSearch 
                     data={data.referenten} 
                     bind:selectedEvaluator={selectedUser} 
                     placeholder="Benutzer/Referent suchen..."
-                />
+                /> 
             </div>
             <button class="save-btn" onclick={saveUser}>Speichern</button>
         </div>
@@ -324,6 +332,7 @@
                     </div>
                 {/each}
             {:else}
+                <!-- KI: GPT5.2 Thinking: Wie kann ich, wenn keine Studiengänge vorhanden sind, eine entsprechende Meldung anzeigen?, übernommen-->
                 <!-- Effekt: Wird angezeigt, wenn keine Studiengänge vorhanden sind -->
                 <div class="empty-programs">Keine Studiengänge vorhanden.</div>
             {/if}
@@ -342,11 +351,13 @@
                 inputmode="decimal"
             />
 
+            <!-- KI: GPT5.2 Thinking: Schreibe eine Funktion, die mir die studiengänge anzeigt, nur Frage-->
             <!-- Dropdown für Abschluss -->
             <select class="input-degree" bind:value={newProgramDegree} required>
                 <option value="" disabled selected>Abschluss wählen</option>
                 {#each degreeOptions as opt}
-                    <option value={opt.value}>{opt.label}</option>
+                    <option value={opt.value}>
+                        {opt.label}</option>
                 {/each}
             </select>
 
@@ -355,6 +366,8 @@
         </div>
     </div>
 
+    <!-- TEIL 3: EXCEL IMPORT/EXPORT -->
+    <!-- KI: GPT5.2 Thinking: Wie lade ich eine Excel-Datei hoch und sende sie als multipart/form-data an einen API-Endpunkt?, übernommen, eigenes hinzugefügt-->
     <div class="card excel-section">
         <div class="headline-s">Daten Import/Export</div>
 
@@ -394,11 +407,11 @@
             <span class="export-label">
                 Datenbankstand sichern:
             </span>
-            <!-- Export öffnet Download-Endpoint -->
+            <!-- Export button öffnet Download -->
             <button class="secondary-btn" onclick={exportExcel}>Exportieren</button>
         </div>
     </div>
-    <DownloadSwsReport active = {selectedUser !== null}></DownloadSwsReport>
+    <DownloadSwsReport active = {selectedUser !== null}></DownloadSwsReport> <!-- Maksim -->
 
     <!-- TEIL 4: GEFAHRENZONE -->
     <div class="card danger-section">
@@ -416,6 +429,9 @@
 
 <style lang="scss">
     @import 'src/styles/colors.scss'; // Für $primary, $error etc.
+
+
+    /* KI: GPT5: Ab und zu nach bestimmten befehlen gefragt, wenig übernommen */
 
     /* --- Gesamt-Layout (12-Spalten Grid) --- */
     .settings-container {

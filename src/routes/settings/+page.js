@@ -1,3 +1,6 @@
+//Abgeschrieben Anton R.
+//KI: ChatGPT5.2 Thinking & Github Copilot Claude Opus 4: Verbessere und Kontrolliere meinen Code. Wenn du Sachen siehst die, nicht Funktionieren, sage mir bescheid und gebe verbesserungsvorschläge; übernommen und angepasst
+
 import { api_url } from '$lib/constants.js';
 
 export const ssr = false;

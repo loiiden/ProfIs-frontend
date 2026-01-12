@@ -1,4 +1,6 @@
 <script>
+    //KI: ChatGPT5.2 Thinking & Github Copilot Claude Opus 4: Verbessere und Kontrolliere meinen Code. Wenn du Sachen siehst die, nicht Funktionieren, sage mir bescheid und gebe verbesserungsvorschläge; übernommen und angepasst
+    
     let props = $props();
 
     // Ziel (feste Zahl)
@@ -7,6 +9,7 @@
     // Jetzt Wert aus API
     let jetzt = $derived(Number(props.current ?? 0));
 
+    //KI: GPT5.2 Thinking: Wie berechne ich den Prozentwert für einen Fortschrittsbalken basierend auf dem aktuellen Wert und dem Zielwert?, übernommen
     // Prozentberechnung für den Balken [geteilt durch 0 geht nicht]
     let prozent = $derived(ziel > 0 ? Math.min((jetzt / ziel) * 100, 100) : 0);
     
@@ -45,6 +48,10 @@
 </div>
 
 <style lang="scss">
+//KI: ChatGPT 5.2 Thinking: Fragen zu einzelnen CSS befehlen und Funktionen, angelehnt an
+//BSP: Wie mache ich mehr Platz nach unten hin --> Footer mit flex-grow: 1; 
+
+
 //Eigene Farben
 $text-light: #41525A66; //Grau Verbesserung Anton Baranov
 $bar-green: #317B3B; //Barfarbe, vorgegeben von Anton Baranov

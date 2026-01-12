@@ -24,10 +24,10 @@
         referent_mapping[referent.id] = referent;
     });
 
-    let create = $state(true);
-    let workId = $state(0);
+    let create = $state(true); // true = Erstellen, false = Bearbeiten
+    let workId = $state(0); // ID der zu bearbeitenden Arbeit
 
-    let arbeitData = $state({
+    let arbeitData = $state({ // Daten der Arbeit
         mainEvaluator: null,
         secondEvaluator: null,
         mainEvaluatorWorkMark: null,
@@ -50,17 +50,18 @@
         events: [{eventType: "", eventDate: ""}]
     });
     
-    // Track event IDs loaded from backend to detect deletions
+    // Track event IDs loaded from backend to detect deletions 
     let loadedEventIds = $state([]);
     
     let isSaving = $state(false);
 
-    function findEvaluator(id) {
+    function findEvaluator(id) { // Hilfsfunktion: Referent anhand der ID finden
         if (!id || !data.referenten) return null;
         return data.referenten.find(r => r.id === id) || { id: id };
     }
 
     // --- NEUE HELFER-FUNKTIONEN ---
+    //KI: ChatGPT 5.2 Thinking: Bei der Fehlersuche: Warum funktioniert das Datum nicht richtig?; --> Antwort: Helferfunktionen zum formatieren; übernommen
     // Wandelt [2025, 7, 9] in "2025-07-09" um
     function formatBackendDate(d) {
         if (!d) return null;
@@ -82,7 +83,8 @@
     }
     // -----------------------------
 
-    async function loadWork(id) {
+    //KI: ChatGPT 5.2 Thinking: Wie lade ich eine Arbeit anhand der ID, angelehnt und angepasst
+    async function loadWork(id) { // Arbeit laden anhand der ID
         try {
             const work = await GET(`/api/scientific-work/${id}`);
             const workEvents = await GET(`/api/scientific-work/${id}/events`);
@@ -134,6 +136,7 @@
 
     let previousWorkId = 0;
 
+    // KI: ChatGPT 5.2 Thinking: Mache eine funktion, die prüft, ob ich im link eine id habe und dann die daten lädt, übernommen und angepasst
     afterNavigate(async () => {
         const url_params = new URLSearchParams(window.location.search);
         if(url_params.has('id')){
@@ -171,7 +174,7 @@
             loadedEventIds = [];
             previousWorkId = 0;
             
-            // Auto-refresh nach Wechsel von Edit zu Create
+            // Auto-refresh nach Wechsel von Edit zu Create, damit alles verschwindet, nach 0,2s
             if (wasEditMode) {
                 setTimeout(() => {
                     window.location.reload();
@@ -232,7 +235,10 @@
         return null;
     }
 
-    async function arbeitSpeichern() {
+
+    // Arbeit speichern (Erstellen oder Aktualisieren)
+    //KI: ChatGPT 5.2 Thinking: Erstelle eine Funktion um die Arbeit zu speichern, übernommen und angepasst
+    async function arbeitSpeichern() { 
         const err = validateBeforeSubmit();
         if (err) {
             alert(err);
@@ -268,6 +274,7 @@
 
             const events = buildEventDTOs(finalWorkId);
 
+            // KI: ChatGPT 5.2 Thinking: Prüfe, ob Events gelöscht wurden und lösche diese, übernommen und angepasst
             // Detect deleted events: present before, missing now (after filtering invalid ones)
             const currentValidIds = new Set(events.map(e => e.id).filter(Boolean));
             const toDeleteIds = (loadedEventIds ?? []).filter(id => !currentValidIds.has(id));
@@ -333,7 +340,7 @@
 
 <main class="erstellen-arbeit-container">
     <div class="header-row">
-        <div class="page-title">{create ? "ARBEIT ANLEGEN" : "ARBEIT BEARBEITEN"}</div>
+        <div class="page-title">{create ? "ARBEIT ANLEGEN" : "ARBEIT BEARBEITEN"}</div> <!-- Wenn create true ist → „Arbeit anlegen“, sonst → „Arbeit bearbeiten“.-->
     </div>
 
     <PreviewOverviewArbeit swork={arbeitData} studmap={student_mapping}
