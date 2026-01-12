@@ -104,7 +104,7 @@
     }
 
     let current_swork = $state(0);
-    let events = $state(0);
+    let events = $state([]);
 
     async function get_events(id){
         return GET(`/api/scientific-work/${id}/events`);
@@ -209,15 +209,19 @@
             
             <span class="style-large top-gap">Verlauf:</span>
             <div class="events-verlauf">
-                {#each events as event}
-                    <div class="work-status">
-                        <span class="color" style:background-color="{event.eventType ? color_mapping[event.eventType]: "#3B4B55"}"></span>
-                        <span class="work-event">
-                            <p>{event.eventType ? status_mapping[event.eventType] : "-"}</p>
-                            <p>{event.eventDate ? String(event.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
-                        </span>
-                    </div>
-                {/each}
+                {#if events.length > 0}
+                    {#each events as event}
+                        <div class="work-status">
+                            <span class="color" style:background-color="{event.eventType ? color_mapping[event.eventType]: "#3B4B55"}"></span>
+                            <span class="work-event">
+                                <p>{event.eventType ? status_mapping[event.eventType] : "-"}</p>
+                                <p>{event.eventDate ? String(event.eventDate.toReversed()).replaceAll(",", "."): "-"}</p>
+                            </span>
+                        </div>
+                    {/each}
+                {:else}
+                    -
+                {/if}
             </div>
 
             <span class="style-large top-gap">Kommentar: </span>

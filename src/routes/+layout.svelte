@@ -133,14 +133,18 @@ header {
                 width: 100%;
                 margin-top: 0px;
 
+                a:nth-child(1){
+                    padding-top: 0px;
+                }
+
                 a {
                     position: relative;
                     left: 8px;
-                    padding: 8px 6px;
+                    padding: 5px 6px;
                     text-decoration: none;
                     color: black;
                     font-weight: 600;
-                    font-size: 18px;
+                    font-size: 14px;
                     font-family: "Inter";
                 }
             }
