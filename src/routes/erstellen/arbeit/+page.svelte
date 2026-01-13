@@ -254,7 +254,11 @@
             if (create) {
                 const workRes = await POST("/api/scientific-work", workPayload);
                 if (!workRes?.ok) {
-                    alert("Fehler beim Erstellen der Arbeit.");
+                    if (workRes.status === 400) {
+                        alert("Ungültige Eingabedaten. Bitte prüfen Sie Ihre Angaben. Ein Referent muss mindestens denselben akademischen Grad vorweisen wie der zugehörige Student.");
+                    } else{
+                        alert("Fehler beim Erstellen der Arbeit.");
+                    }
                     return;
                 }
                 const created = await workRes.json();
@@ -262,7 +266,11 @@
             } else {
                 const workRes = await PATCH(`/api/scientific-work/${workId}`, workPayload);
                 if (!workRes?.ok) {
-                    alert("Fehler beim Aktualisieren der Arbeit.");
+                    if (workRes.status === 400) {
+                        alert("Ungültige Eingabedaten. Bitte prüfen Sie Ihre Angaben. Ein Referent muss mindestens denselben akademischen Grad vorweisen wie der zugehörige Student.");
+                    } else{
+                        alert("Fehler beim Erstellen der Arbeit.");
+                    }
                     return;
                 }
             }
